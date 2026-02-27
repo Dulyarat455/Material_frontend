@@ -1,0 +1,93 @@
+<div class="page">
+    <div class="page-header">
+      <div class="title">
+        <div class="h1">Issue Part</div>
+        <div class="sub">Production requests material from Store</div>
+      </div>
+    </div>
+  
+    <div class="grid">
+      <!-- left: form -->
+      <div class="card">
+        <div class="card-title">New Issue Request</div>
+  
+        <div class="form">
+          <div class="row">
+            <label>Material No</label>
+            <input [(ngModel)]="materialNo" placeholder="MATS1" />
+          </div>
+  
+          <div class="row">
+            <label>Quantity</label>
+            <input type="number" [(ngModel)]="qty" placeholder="200" />
+          </div>
+  
+          <div class="row">
+            <label>Destination (Machine/Area)</label>
+            <input [(ngModel)]="destination" placeholder="MC-01" />
+          </div>
+  
+          <div class="row">
+            <label>Priority</label>
+            <select [(ngModel)]="priority">
+              <option value="Normal">Normal</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+  
+          <div class="row">
+            <label>Remark</label>
+            <input [(ngModel)]="remark" placeholder="Optional..." />
+          </div>
+  
+          <button class="btn-primary" (click)="submitIssueRequest()">
+            Submit Issue Request →
+          </button>
+        </div>
+      </div>
+  
+      <!-- right: list -->
+      <div class="card">
+        <div class="card-title">Request Queue</div>
+  
+        <div class="toolbar">
+          <input [(ngModel)]="q" (ngModelChange)="applyFilters()" placeholder="Search material / destination / user..." />
+          <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+            <option value="all">All</option>
+            <option value="Waiting">Waiting</option>
+            <option value="Processing">Processing</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <button class="btn-ghost" (click)="resetFilters()">Reset</button>
+        </div>
+  
+        <div class="list">
+          <div class="req" *ngFor="let r of requestsView">
+            <div class="req-head">
+              <div class="mat">{{ r.materialNo }}</div>
+              <div class="badge" [class.urgent]="r.priority==='Urgent'">{{ r.priority }}</div>
+            </div>
+  
+            <div class="req-meta">
+              <span>Qty: <b>{{ r.qty }}</b></span>
+              <span>→ {{ r.destination }}</span>
+              <span>{{ r.requestBy }}</span>
+              <span>{{ r.requestAt }}</span>
+            </div>
+  
+            <div class="req-foot">
+              <span class="status" [class.wait]="r.status==='Waiting'" [class.proc]="r.status==='Processing'">
+                {{ r.status }}
+              </span>
+  
+              <button class="btn-small" (click)="confirmProcess(r)" [disabled]="r.status!=='Waiting'">
+                Process
+              </button>
+            </div>
+          </div>
+  
+          <div class="empty" *ngIf="!requestsView.length">No requests</div>
+        </div>
+      </div>
+    </div>
+  </div>

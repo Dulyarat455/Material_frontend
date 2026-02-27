@@ -1,0 +1,255 @@
+/* ===== NAVBAR (enterprise) ===== */
+.topbar.navbar{
+    height: 56px;
+    background: #fff !important;
+    border-bottom: 1px solid rgba(2,6,23,.10);
+    box-shadow: 0 4px 14px rgba(15,23,42,.06);
+  }
+  
+  /* spacing groups */
+  .nav-left, .nav-right{
+    align-items: center;
+  }
+  .nav-left{ gap: 10px; }
+  .nav-right{ gap: 10px; }
+  
+  /* ===== icon buttons (hamburger / fullscreen) ===== */
+  .nav-btn{
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;                 /* ลดความโค้ง */
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    background: #f8fafc;
+    border: 1px solid rgba(2,6,23,.10);
+    color: #0f172a !important;
+    transition: .15s ease;
+  }
+  .nav-btn:hover{
+    background: #f1f5f9;
+  }
+  
+  /* ===== Storage tab (left) ===== */
+  .nav-tab{
+    height: 40px;
+    display:flex !important;
+    align-items:center;
+    gap: 10px;
+    padding: 0 14px !important;
+    border-radius: 10px;                 /* ลดความโค้ง */
+    color: #0f172a !important;
+    font-weight: 800;
+    border: 1px solid rgba(2,6,23,.10);
+    background: #fff;
+    transition: .15s ease;
+  }
+  .nav-tab i{
+    color:#1d4ed8;                       /* น้ำเงินทางการ */
+    font-size: 16px;
+  }
+  .nav-tab:hover{
+    background:#f8fafc;
+  }
+  
+  /* active (ทางการ: เส้น + พื้นอ่อนๆ ไม่ฟู) */
+  .nav-tab.active{
+    background: rgba(29,78,216,.06);
+    border-color: rgba(29,78,216,.25);
+    box-shadow: none;
+  }
+
+
+
+  
+  
+  /* ===== center items (Issue / Receive) ===== */
+  /* ===== Enterprise Menu Tabs (Industrial Look) ===== */
+
+.nav-tab,
+.nav-center-item{
+  height: 38px;
+  display:flex !important;
+  align-items:center;
+  gap: 8px;
+  padding: 0 16px !important;
+
+  border-radius: 4px;                 /* ลดความกลม */
+  background: #f8fafc;                /* เทาอ่อน ไม่ขาว */
+  border: 1px solid rgba(0,0,0,.08);
+
+  color: #1e293b !important;          /* เทาเข้ม */
+  font-weight: 600;                   /* ลดความหนา */
+  font-size: 14px;
+  letter-spacing: .3px;
+
+  transition: background .15s ease;
+}
+
+/* icon สีเดียวกับ text */
+.nav-tab i,
+.nav-center-item i{
+  font-size: 15px;
+  color: #334155;
+  opacity: .9;
+}
+
+/* hover แบบสุภาพ */
+.nav-tab:hover,
+.nav-center-item:hover{
+  background: #eef2f6;
+}
+
+/* ===== Active (ทางการ ไม่ฟ้าเรือง) ===== */
+
+.nav-tab.active,
+.nav-center-item.active{
+  background: #e2e8f0;               /* เทาเข้มขึ้น */
+  border-color: rgba(0,0,0,.15);
+  color: #0f172a !important;
+}
+
+.nav-tab.active i,
+.nav-center-item.active i{
+  color: #0f172a;                     /* ไม่ใช้ฟ้า */
+}
+
+
+
+  
+  /* ===== Enterprise Date / Time ===== */
+.nav-pill{
+    height: 36px;
+    display:flex !important;
+    align-items:center;
+    gap: 8px;
+    padding: 0 14px !important;
+  
+    border-radius: 6px;                     /* ลดความกลม */
+    background: transparent;                /* เอาพื้นออก */
+    border: 1px solid rgba(0,0,0,.08);      /* เส้นบางเทา */
+    
+    color: #1e293b !important;              /* เทาเข้ม */
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .5px;
+  }
+  
+  /* ไอคอนให้เล็กลงและเป็นสีเทา */
+  .nav-pill i{
+    color: #64748b;
+    font-size: 14px;
+  }
+  
+  /* ไม่ให้เด่นเกิน */
+  .nav-pill:hover{
+    background: rgba(0,0,0,.02);
+  }
+
+
+
+
+  
+  /* ===== Responsive ===== */
+  
+  /* tablet: ลดข้อความบางอย่าง, ลด padding */
+  @media (max-width: 992px){
+    .nav-tab, .nav-center-item, .nav-pill{
+      padding: 0 10px !important;
+    }
+  }
+  
+
+
+
+
+
+  
+ /* mobile: 2 rows (top controls + bottom menu strip) */
+@media (max-width: 768px){
+    .topbar.navbar{
+      height: auto;
+      padding: 8px 10px 10px;
+    }
+  
+    /* ให้ UL ซ้ายเป็น wrapper 2 แถว */
+    .nav-left{
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;          /* ✅ สำคัญ */
+      gap: 8px;
+      justify-content: flex-start;  /* ✅ อย่าใช้ space-between */
+      align-items: center;
+    }
+  
+    /* ขวาให้ไปแถวบน */
+    .nav-right{
+      width: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-left: auto;        /* ดันไปขวา */
+    }
+  
+    /* ซ่อน date/time ตามที่คุณต้องการ */
+    .nav-pill{
+      display: none !important;
+    }
+  
+    /* ---------- Row 1 (top): hamburger + right controls ---------- */
+    /* hamburger ให้อยู่แถวบน */
+    .nav-left .nav-item:first-child{
+      order: 0;
+    }
+  
+    /* nav-right อยู่แถวบน */
+    .nav-right{
+      order: 0;
+    }
+  
+    /* ---------- Row 2 (bottom): menu strip ---------- */
+    /* ให้เมนูทั้ง 3 ตัวลงแถวล่าง */
+    .nav-left .nav-item:nth-child(2),
+    .nav-left .nav-item:nth-child(3),
+    .nav-left .nav-item:nth-child(4){
+      order: 1;
+    }
+  
+    /* ทำ “แถบเมนู” โดยบังคับให้ item เมนูอยู่ในบรรทัดใหม่เดียวกัน */
+    .nav-left .nav-item:nth-child(2){
+      margin-left: 0;
+    }
+  
+    /* ปุ่มเมนู: ให้เป็นขนาดเท่ากัน และไม่กองลง */
+    .nav-tab,
+    .nav-center-item{
+      height: 44px;
+      padding: 0 12px !important;
+      border: 1px solid rgba(2,6,23,.10);
+      background: #fff;
+      white-space: nowrap;
+      flex: 0 0 auto;           /* ✅ กันยุบ/กันตกบรรทัด */
+    }
+  
+    /* ทำแถวล่างให้เลื่อนแนวนอนได้ */
+    .nav-left{
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+    .nav-left::-webkit-scrollbar{ height: 6px; }
+    .nav-left::-webkit-scrollbar-thumb{
+      background: rgba(2,6,23,.18);
+      border-radius: 10px;
+    }
+  
+    /* ปรับสัดส่วนตัวอักษรให้ formal */
+    .nav-tab{ font-weight: 900; }
+    .nav-center-item span{ font-size: 12px; font-weight: 900; }
+  
+    /* ลดขนาด hamburger ให้บาลานซ์ */
+    .nav-btn{
+      width: 40px;
+      height: 40px;
+    }
+  }

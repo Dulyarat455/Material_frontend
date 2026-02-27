@@ -1,0 +1,92 @@
+<div class="page">
+    <div class="page-header">
+      <div class="title">
+        <div class="h1">Return Part</div>
+        <div class="sub">Production returns remaining material back to Store</div>
+      </div>
+    </div>
+  
+    <div class="grid">
+      <!-- left: form -->
+      <div class="card">
+        <div class="card-title">New Return Request</div>
+  
+        <div class="form">
+          <div class="row">
+            <label>Material No</label>
+            <input [(ngModel)]="materialNo" placeholder="MATS1" />
+          </div>
+  
+          <div class="row">
+            <label>Quantity</label>
+            <input type="number" [(ngModel)]="qty" placeholder="80" />
+          </div>
+  
+          <div class="row">
+            <label>From Area (Machine/PD)</label>
+            <input [(ngModel)]="fromArea" placeholder="MC-02" />
+          </div>
+  
+          <div class="row">
+            <label>Back to Storage Area (optional)</label>
+            <input [(ngModel)]="backToArea" placeholder="e.g. 3201" />
+          </div>
+  
+          <div class="row">
+            <label>Note</label>
+            <input [(ngModel)]="note" placeholder="Returning FIFO batch B001" />
+          </div>
+  
+          <button class="btn-primary" (click)="submitReturnRequest()">
+            Submit Return Request →
+          </button>
+        </div>
+      </div>
+  
+      <!-- right: list -->
+      <div class="card">
+        <div class="card-title">Return Queue</div>
+  
+        <div class="toolbar">
+          <input [(ngModel)]="q" (ngModelChange)="applyFilters()" placeholder="Search material / from area / user..." />
+          <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+            <option value="all">All</option>
+            <option value="Waiting">Waiting</option>
+            <option value="Processing">Processing</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <button class="btn-ghost" (click)="resetFilters()">Reset</button>
+        </div>
+  
+        <div class="list">
+          <div class="req" *ngFor="let r of requestsView">
+            <div class="req-head">
+              <div class="mat">{{ r.materialNo }}</div>
+              <div class="badge">{{ r.qty }} pcs</div>
+            </div>
+  
+            <div class="req-meta">
+              <span>From: <b>{{ r.fromArea }}</b></span>
+              <span *ngIf="r.backToArea">To: {{ r.backToArea }}</span>
+              <span>{{ r.requestBy }}</span>
+              <span>{{ r.requestAt }}</span>
+            </div>
+  
+            <div class="req-note" *ngIf="r.note">⚡ {{ r.note }}</div>
+  
+            <div class="req-foot">
+              <span class="status" [class.wait]="r.status==='Waiting'" [class.proc]="r.status==='Processing'">
+                {{ r.status }}
+              </span>
+  
+              <button class="btn-small" (click)="confirmReceive(r)" [disabled]="r.status!=='Waiting'">
+                Receive
+              </button>
+            </div>
+          </div>
+  
+          <div class="empty" *ngIf="!requestsView.length">No requests</div>
+        </div>
+      </div>
+    </div>
+  </div>

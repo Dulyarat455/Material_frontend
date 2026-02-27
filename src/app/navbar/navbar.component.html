@@ -1,0 +1,60 @@
+<nav class="main-header navbar navbar-expand navbar-white navbar-light topbar">
+  <!-- Left navbar links -->
+  <ul class="navbar-nav nav-left">
+    <li class="nav-item ml-2">
+      <a class="nav-link nav-btn" data-widget="pushmenu" href="#" role="button">
+        <i class="fas fa-bars"></i>
+      </a>
+    </li>
+
+    <!-- Storage (มี icon + active highlight) -->
+    <li class="nav-item">
+      <a
+        [routerLink]="['/storage']"
+        class="nav-link nav-tab"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <i class="fas fa-warehouse me-2"></i>
+        Storage
+      </a>
+    </li>
+
+    <!-- Issue -->
+    <li class="nav-item">
+      <a class="nav-link nav-center-item" [routerLink]="['/issue']" routerLinkActive="active">
+        <i class="fas fa-truck-loading"></i>
+        <span>Issue Part</span>
+      </a>
+    </li>
+
+    <!-- Receive -->
+    <li class="nav-item">
+      <a class="nav-link nav-center-item" [routerLink]="['/return']" routerLinkActive="active">
+        <i class="fas fa-dolly"></i>
+        <span>Return Part</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Right navbar links -->
+  <ul class="navbar-nav ml-auto nav-right">
+    <li class="nav-item">
+      <span class="nav-link nav-pill">
+        <i class="far fa-calendar-alt"></i>
+        <span id="currentDate">{{ formattedDate }}</span>
+      </span>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link nav-pill">
+        <i class="far fa-clock"></i>
+        <span id="currentTime">{{ formattedTime }}</span>
+      </span>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link nav-pill nav-btn" data-widget="fullscreen" href="#" role="button">
+        <i class="fas fa-expand-arrows-alt"></i>
+      </a>
+    </li>
+  </ul>
+</nav>
