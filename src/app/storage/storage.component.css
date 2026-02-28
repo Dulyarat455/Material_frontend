@@ -506,3 +506,111 @@
    .fp-pending{
     margin-bottom: 60px !important;   /* ปรับ 12–20px ตามชอบ */
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* ===== floorplan: 3 columns (left / zoneD / table) ===== */
+.floorplan{
+  grid-template-columns: max-content 230px minmax(420px, 1fr) !important;
+  grid-template-areas:
+    "pending right table"
+    "left    right table" !important;
+  column-gap: 12px !important;
+}
+
+/* โซนตาราง */
+.fp-table{
+  grid-area: table;
+  border:1px solid rgba(2,6,23,.08);
+  border-radius:14px;
+  background:#fff;
+  padding:10px;
+  min-width: 420px;
+}
+
+/* ตารางใน panel ให้สูงพอดีและ scroll ภายใน (ไม่ทำให้หน้าเลื่อน) */
+.fp-table .table-wrap{
+  max-height: 520px;      /* ปรับตามจอ */
+  overflow: auto;
+}
+
+/* แคบ gap เฉพาะ zone D */
+.fp-right .fp-two-col{
+  column-gap: 6px !important;
+}
+.fp-right .fp-col{
+  gap: 6px !important;
+}
+
+
+
+
+
+
+/* ================================
+   FIX: ให้ BTM/TOP ชิดกันจริงๆ (Zone D)
+   ================================ */
+
+/* แทนที่ 1fr 1fr ด้วย max-content */
+.fp-right .fp-right-two-col{
+  display: grid !important;
+  grid-template-columns: max-content max-content !important; /* ✅ ชิดตามขนาด card */
+  column-gap: 4px !important;   /* ✅ ระยะห่างระหว่าง BTM/TOP */
+  row-gap: 6px !important;
+  justify-content: start !important; /* ✅ ไม่ดันไปกินเต็มกล่อง */
+  align-content: start !important;
+}
+
+/* กัน fp-col ไป stretch แล้วทำให้ดูห่าง */
+.fp-right .fp-col{
+  align-items: flex-start !important;
+  gap: 6px !important;
+}
+
+/* (ถ้ายังรู้สึกว่ากล่อง fp-right กว้างเกิน) ให้ตัว fp-right หดตามเนื้อหา */
+.fp-right{
+  width: fit-content !important;
+}
+
+
+
+
+
+
+
+/* =========================================
+   FINAL FIX: ชิดจริง (Area ↔ Table)
+   วางท้ายสุดของ storage.css
+   ========================================= */
+
+/* 3 columns: left / zoneD / table */
+.floorplan{
+  grid-template-columns: max-content max-content minmax(0, 1fr) !important; /* ✅ 230px -> max-content */
+  column-gap: 6px !important; /* ระยะห่างจริงระหว่างคอลัมน์ */
+}
+
+/* กัน item ใน grid ถูก stretch จนกินที่ */
+.fp-right{
+  width: max-content !important;
+  justify-self: start !important;
+}
+
+.fp-table{
+  min-width: 0 !important;
+  width: 100% !important;
+  justify-self: stretch !important;
+  margin-left: 0 !important;
+}

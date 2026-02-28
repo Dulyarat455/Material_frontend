@@ -201,7 +201,7 @@
                   <span class="mini-pill">TOP</span>
                 </div>
 
-                <div class="fp-two-col">
+                <div class="fp-two-col fp-right-two-col">
                   <!-- 12xx (BTM) -->
                   <div class="fp-col">
                     <button *ngFor="let s of slotsBy('D','BTM')"
@@ -226,105 +226,96 @@
 
 
 
+
+
+                  <!-- TABLE PANEL (ขวาสุด) -->
+                <div class="fp-table">
+                  <!-- โชว์หัวตารางตลอด -->
+                  <div class="selected-title">
+                    <ng-container *ngIf="viewMode === 'PENDING'; else slotTitle">
+                      Pending Area
+                      <span class="badge badge-secondary ms-2">PENDING • {{ pendingItems.length }} items</span>
+                    </ng-container>
+
+                    <ng-template #slotTitle>
+                      <ng-container *ngIf="selectedSlot; else noneTitle">
+                        Slot <b>{{ selectedSlot.id }}</b> materials
+                        <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
+                      </ng-container>
+
+                      <ng-template #noneTitle>
+                        Materials
+                        <span class="badge badge-secondary ms-2">Select Pending/Slot</span>
+                      </ng-template>
+                    </ng-template>
+                  </div>
+
+                  <div class="table-wrap">
+                    <table class="table table-sm table-hover mb-0 wms-table">
+                      <thead>
+                        <tr>
+                          <th>Material</th>
+                          <th>Description</th>
+                          <th>INV</th>
+                          <th>Received</th>
+                          <th class="text-end">Qty</th>
+                          <th class="text-center">FIFO</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <!-- PENDING MODE -->
+                        <ng-container *ngIf="viewMode === 'PENDING'">
+                          <tr *ngFor="let p of pendingItems">
+                            <td><b>{{ p.matCode }}</b></td>
+                            <td class="muted">{{ p.description }}</td>
+                            <td class="muted">{{ p.invNo }}</td>
+                            <td class="muted">{{ p.receivedAt }}</td>
+                            <td class="text-end"><b>{{ p.qty | number }}</b> {{ p.uom }}</td>
+                            <td class="text-center"><span class="badge badge-light">#{{ p.fifoRank }}</span></td>
+                            <td class="text-center">
+                              <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(p)">
+                                <i class="fas fa-dolly-flatbed me-1"></i> Store
+                              </button>
+                            </td>
+                          </tr>
+
+                          <tr *ngIf="!pendingItems.length">
+                            <td colspan="7" class="text-center muted py-3">No pending items</td>
+                          </tr>
+                        </ng-container>
+
+                        <!-- SLOT MODE -->
+                        <ng-container *ngIf="viewMode !== 'PENDING'">
+                          <tr *ngFor="let m of (selectedSlot?.materials || [])">
+                            <td><b>{{ m.matCode }}</b></td>
+                            <td class="muted">{{ m.description }}</td>
+                            <td class="muted">{{ m.invNo }}</td>
+                            <td class="muted">{{ m.receivedAt }}</td>
+                            <td class="text-end"><b>{{ m.qty | number }}</b> {{ m.uom }}</td>
+                            <td class="text-center"><span class="badge badge-light">#{{ m.fifoRank }}</span></td>
+                            <td class="text-center muted">—</td>
+                          </tr>
+
+                          <tr *ngIf="!(selectedSlot?.materials?.length)">
+                            <td colspan="7" class="text-center muted py-3">No data</td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+
+             </div>
+
+
+      
+            </div>
+          </div>
         </div>
-
-
-
-
-            <!-- ======================
-          TABLE AREA (2 modes)
-          ====================== -->
-
-            <!-- ✅ PENDING TABLE (รวมทั้งหมด) -->
-            <div class="mt-3" *ngIf="viewMode === 'PENDING'">
-              <div class="selected-title">
-                Pending Area
-                <span class="badge badge-secondary ms-2">PENDING • {{ pendingItems.length }} items</span>
-              </div>
-
-              <div class="table-wrap">
-                <table class="table table-sm table-hover mb-0 wms-table">
-                  <thead>
-                    <tr>
-                      <th>Material</th>
-                      <th>Description</th>
-                      <th>INV</th>
-                      <th>Received</th>
-                      <th class="text-end">Qty</th>
-                      <th class="text-center">FIFO</th>
-                      <th class="text-center">Action</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <tr *ngFor="let p of pendingItems">
-                      <td><b>{{ p.matCode }}</b></td>
-                      <td class="muted">{{ p.description }}</td>
-                      <td class="muted">{{ p.invNo }}</td>
-                      <td class="muted">{{ p.receivedAt }}</td>
-                      <td class="text-end"><b>{{ p.qty | number }}</b> {{ p.uom }}</td>
-                      <td class="text-center"><span class="badge badge-light">#{{ p.fifoRank }}</span></td>
-                      <td class="text-center">
-                        <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(p)">
-                          <i class="fas fa-dolly-flatbed me-1"></i> Store
-                        </button>
-                      </td>
-                    </tr>
-
-                    <tr *ngIf="!pendingItems.length">
-                      <td colspan="7" class="text-center muted py-3">No pending items</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-
-            <!-- Selected slot table (เหมือนเดิม) -->
-            <div class="mt-3" *ngIf="selectedSlot">
-              <div class="selected-title">
-                Slot <b>{{ selectedSlot.id }}</b> materials
-                <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
-              </div>
-
-              <div class="table-wrap">
-                <table class="table table-sm table-hover mb-0 wms-table">
-                  <thead>
-                  <tr>
-                    <th>Material</th>
-                    <th>Description</th>
-                    <th>INV</th>
-                    <th>Received</th>
-                    <th class="text-end">Qty</th>
-                    <th class="text-center">FIFO</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let m of selectedSlot.materials">
-                    <td><b>{{ m.matCode }}</b></td>
-                    <td class="muted">{{ m.description }}</td>
-                    <td class="muted">{{ m.invNo }}</td>
-                    <td class="muted">{{ m.receivedAt }}</td>
-                    <td class="text-end"><b>{{ m.qty | number }}</b> {{ m.uom }}</td>
-                    <td class="text-center"><span class="badge badge-light">#{{ m.fifoRank }}</span></td>
-                  </tr>
-
-                  <tr *ngIf="!selectedSlot.materials.length">
-                    <td colspan="6" class="text-center muted py-3">No material in this slot</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
       </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
 
   </div>
