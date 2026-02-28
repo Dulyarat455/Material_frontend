@@ -6,24 +6,25 @@ import Swal from 'sweetalert2';
 type SlotStatus = 'OCCUPIED' | 'PARTIAL' | 'EMPTY' | 'REJECTED';
 
 type MaterialItem = {
-  matCode: string;        // MATS1
-  description: string;    // SteelRod12mm
+  matCode: string;
+  description: string;
   qty: number;
-  uom: string;            // pcs
-  invNo: string;          // INV-011
-  receivedAt: string;     // 2025-12-25
-  fifoRank: number;       // 1 = oldest
+  uom: string;
+  invNo: string;
+  receivedAt: string;
+  fifoRank: number;
   urgent?: boolean;
 };
 
 type SlotRow = {
-  id: string;             // 3201
+  id: string;                     // 3201 / 2101 / 1101 ...
   zone: 'A' | 'B' | 'C' | 'D';
-  row: 'TOP' | 'MID' | 'BTM' | 'OVERFLOW';
+  row: 'TOP' | 'BTM';             // ✅ ให้ตรงรูป (TOP/BTM)
   status: SlotStatus;
-  usedQty?: number;       // badge number ในช่อง
+  usedQty?: number;
   materials: MaterialItem[];
 };
+
 
 
 @Component({
@@ -35,16 +36,20 @@ type SlotRow = {
 })
 export class StorageComponent {
   
+  viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
 
-     // ====== mock: pending items (ยังไม่จัดเก็บ) ======
+
   pendingItems: MaterialItem[] = [
     { matCode:'MATS5', description:'Bolt M10', qty:2000, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 },
     { matCode:'MATS1', description:'SteelRod12mm', qty:600,  uom:'pcs', invNo:'INV-011', receivedAt:'2025-12-26', fifoRank:2, urgent:true },
     { matCode:'MATS6', description:'Paint Can Blue', qty:50,  uom:'pcs', invNo:'INV-012', receivedAt:'2025-12-27', fifoRank:1 },
   ];
 
-  // ====== mock: storage slots ======
+  // ✅ slots ครบตามรูปที่ 2
   slots: SlotRow[] = [
+    // -------------------------
+    // A: 32xx (BTM)
+    // -------------------------
     { id:'3201', zone:'A', row:'BTM', status:'OCCUPIED', usedQty:500,  materials:[ { matCode:'MATS5', description:'Bolt M10', qty:500, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 } ] },
     { id:'3202', zone:'A', row:'BTM', status:'OCCUPIED', usedQty:1500, materials:[ { matCode:'MATS1', description:'SteelRod12mm', qty:1500, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 } ] },
     { id:'3203', zone:'A', row:'BTM', status:'OCCUPIED', usedQty:1200, materials:[ { matCode:'MATS1', description:'SteelRod12mm', qty:1200, uom:'pcs', invNo:'INV-011', receivedAt:'2025-12-27', fifoRank:2 } ] },
@@ -52,6 +57,9 @@ export class StorageComponent {
     { id:'3205', zone:'A', row:'BTM', status:'EMPTY', materials:[] },
     { id:'3206', zone:'A', row:'BTM', status:'EMPTY', materials:[] },
 
+    // -------------------------
+    // B: 31xx (TOP)
+    // -------------------------
     { id:'3101', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
     { id:'3102', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
     { id:'3103', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
@@ -59,30 +67,65 @@ export class StorageComponent {
     { id:'3105', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
     { id:'3106', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
 
-    { id:'2101', zone:'C', row:'MID', status:'PARTIAL', usedQty:300, materials:[ { matCode:'MATS9', description:'Washer', qty:300, uom:'pcs', invNo:'INV-007', receivedAt:'2025-12-18', fifoRank:1 } ] },
-    { id:'2102', zone:'C', row:'MID', status:'EMPTY', materials:[] },
-    { id:'2103', zone:'C', row:'MID', status:'EMPTY', materials:[] },
-    { id:'2104', zone:'C', row:'MID', status:'EMPTY', materials:[] },
-    { id:'2105', zone:'C', row:'MID', status:'EMPTY', materials:[] },
-    { id:'2106', zone:'C', row:'MID', status:'EMPTY', materials:[] },
+    // -------------------------
+    // C: 21xx (TOP) / 22xx (BTM)
+    // -------------------------
+    { id:'2101', zone:'C', row:'TOP', status:'PARTIAL', usedQty:300, materials:[ { matCode:'MATS9', description:'Washer', qty:300, uom:'pcs', invNo:'INV-007', receivedAt:'2025-12-18', fifoRank:1 } ] },
+    { id:'2102', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'2103', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'2104', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'2105', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'2106', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
+
+    // ✅ 2201 เป็น Reject ตามรูป
+    { id:'2201', zone:'C', row:'BTM', status:'REJECTED', materials:[] },
+    { id:'2202', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'2203', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'2204', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'2205', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'2206', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
+
+    // -------------------------
+    // D: Right column 11xx (TOP) / 12xx (BTM)
+    // -------------------------
+    { id:'1101', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1102', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1103', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1104', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1105', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1106', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1107', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1108', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1109', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1110', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+    { id:'1111', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
+
+    { id:'1201', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1202', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1203', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1204', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1205', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1206', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1207', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1208', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1209', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1210', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
+    { id:'1211', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
   ];
 
-  // ====== UI state ======
-  selectedSlot: SlotRow | null = null;
-  hoveredSlot: SlotRow | null = null;
 
-  // ====== summary cards ======
+
+
+
+   selectedSlot: SlotRow | null = null;
+  hoveredSlot: SlotRow | null = null;
+  // ✅ pending selection
+
+
   get totalSlots() { return this.slots.length; }
   get occupiedCount() { return this.slots.filter(s => s.status === 'OCCUPIED').length; }
   get pendingCount() { return this.pendingItems.length; }
   get rejectedCount() { return this.slots.filter(s => s.status === 'REJECTED').length; }
-
-  // group rows (ตามภาพ)
-  zoneRows = [
-    { title: 'ZONE A - BTM ROW', zone:'A', row:'BTM' as const },
-    { title: 'ZONE B - TOP ROW', zone:'B', row:'TOP' as const },
-    { title: 'ZONE C - MIDDLE',  zone:'C', row:'MID' as const },
-  ];
 
   slotsBy(zone: any, row: any) {
     return this.slots.filter(s => s.zone === zone && s.row === row);
@@ -100,12 +143,21 @@ export class StorageComponent {
   }
 
   onClickSlot(s: SlotRow) {
+    this.viewMode = 'SLOT';
     this.selectedSlot = s;
   }
 
-  onHoverSlot(s: SlotRow | null) {
+
+  onHoverSlot(s: SlotRow | null) { 
     this.hoveredSlot = s;
+   }
+
+   onClickPendingArea() {
+    this.viewMode = 'PENDING';
+    this.selectedSlot = null;
   }
+  
+   
 
   // demo: assign pending → slot (mock)
   assignPendingToSlot(p: MaterialItem, slot: SlotRow) {
@@ -125,7 +177,8 @@ export class StorageComponent {
     slot.status = slot.usedQty > 0 ? 'OCCUPIED' : 'EMPTY';
 
     this.selectedSlot = slot;
-
+    this.viewMode = 'SLOT'; // ✅ ให้ไปโชว์ slot table ทันที
+    
     Swal.fire({ icon:'success', title:'Stored', text:`จัดเก็บ ${p.matCode} เข้าช่อง ${slot.id} แล้ว`, timer: 900, showConfirmButton:false });
   }
 

@@ -30,54 +30,228 @@
         </div>
       </div>
     </div>
+
+
+
+
+
+
   
     <div class="row g-3">
-      <!-- Storage Map -->
-      <div class="col-lg-8">
-        <div class="card wms-card">
-          <div class="card-header wms-card-header">
-            <div class="hdr-left">
-              <span class="dot"></span>
-              <b>STORAGE MAP</b>
-            </div>
-  
-            <div class="legend">
-              <span class="lg"><i class="b occupied"></i> Occupied</span>
-              <span class="lg"><i class="b partial"></i> Partial</span>
-              <span class="lg"><i class="b empty"></i> Empty</span>
-              <span class="lg"><i class="b rejected"></i> Rejected</span>
-            </div>
-          </div>
-  
-          <div class="card-body">
-            <div *ngFor="let zr of zoneRows" class="zone-block">
-              <div class="zone-title">{{ zr.title }}</div>
-  
-              <div class="slot-grid">
-                <button
-                  *ngFor="let s of slotsBy(zr.zone, zr.row)"
-                  type="button"
-                  [ngClass]="slotClass(s)"
-                  (click)="onClickSlot(s)"
-                  (mouseenter)="onHoverSlot(s)"
-                  (mouseleave)="onHoverSlot(null)"
-                >
-                  <div class="slot-id">{{ s.id }}</div>
-                  <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                  <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
-                </button>
+  <!-- MAP + PENDING แบบแปลน -->
+  <div class="col-12">
+    <div class="card wms-card">
+      <div class="card-header wms-card-header">
+        <div class="hdr-left">
+          <span class="dot"></span>
+          <b>STORAGE MAP</b>
+        </div>
+
+        <div class="legend">
+          <span class="lg"><i class="b occupied"></i> Occupied</span>
+          <span class="lg"><i class="b partial"></i> Partial</span>
+          <span class="lg"><i class="b empty"></i> Empty</span>
+          <span class="lg"><i class="b rejected"></i> Rejected</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        
+        <!-- ====== FLOORPLAN GRID ====== -->
+        <div class="floorplan">
+
+       
+
+            <!-- PENDING AREA (กล่องเดียว) -->
+            <div class="fp-pending fp-pending-compact" (click)="onClickPendingArea()" role="button" tabindex="0">
+              <div class="fp-title">
+                <span class="dot warn"></span>
+                <b>PENDING AREA</b>
+                <span class="pill ms-2">{{ pendingItems.length }} ITEMS</span>
               </div>
-  
-              <hr class="zone-sep" />
+
+              <div class="pending-hint muted">
+                Click to view pending list
+              </div>
             </div>
-  
-            <!-- Selected slot table -->
-            <div class="mt-3" *ngIf="selectedSlot">
+
+
+
+                        <!-- LEFT CLUSTER -->
+              <div class="fp-left">
+
+                <!-- BLOCK 1: 3201-3203 + 3101-3103 -->
+                <div class="fp-block">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">BTM</span>
+                    <span class="mini-pill">TOP</span>
+                  </div>
+
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('A','BTM') | slice:0:3"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('B','TOP') | slice:0:3"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BLOCK 2: 2101-2103 + 2201-2203 -->
+                <div class="fp-block">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">TOP</span>
+                    <span class="mini-pill">BTM</span>
+                  </div>
+
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('C','TOP') | slice:0:3"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('C','BTM') | slice:0:3"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BLOCK 3: 3204-3206 + 3104-3106 -->
+                <div class="fp-block">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">BTM</span>
+                    <span class="mini-pill">TOP</span>
+                  </div>
+
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('A','BTM') | slice:3:6"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('B','TOP') | slice:3:6"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BLOCK 4: 2104-2106 + 2204-2206 -->
+                <div class="fp-block">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">TOP</span>
+                    <span class="mini-pill">BTM</span>
+                  </div>
+
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('C','TOP') | slice:3:6"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button *ngFor="let s of slotsBy('C','BTM') | slice:3:6"
+                        type="button" [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        <div class="slot-id">{{ s.id }}</div>
+                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- RIGHT COLUMN -->
+              <div class="fp-right">
+                <div class="fp-right-head">
+                  <span class="mini-pill">BTM</span>
+                  <span class="mini-pill">TOP</span>
+                </div>
+
+                <div class="fp-two-col">
+                  <!-- 12xx (BTM) -->
+                  <div class="fp-col">
+                    <button *ngFor="let s of slotsBy('D','BTM')"
+                      type="button" [ngClass]="slotClass(s)"
+                      (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                      <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                    </button>
+                  </div>
+
+                  <!-- 11xx (TOP) -->
+                  <div class="fp-col">
+                    <button *ngFor="let s of slotsBy('D','TOP')"
+                      type="button" [ngClass]="slotClass(s)"
+                      (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
+                      <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+
+
+        </div>
+
+
+
+
+            <!-- ======================
+          TABLE AREA (2 modes)
+          ====================== -->
+
+            <!-- ✅ PENDING TABLE (รวมทั้งหมด) -->
+            <div class="mt-3" *ngIf="viewMode === 'PENDING'">
               <div class="selected-title">
-                Slot <b>{{ selectedSlot.id }}</b> materials
-                <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
+                Pending Area
+                <span class="badge badge-secondary ms-2">PENDING • {{ pendingItems.length }} items</span>
               </div>
-  
+
               <div class="table-wrap">
                 <table class="table table-sm table-hover mb-0 wms-table">
                   <thead>
@@ -88,80 +262,79 @@
                       <th>Received</th>
                       <th class="text-end">Qty</th>
                       <th class="text-center">FIFO</th>
+                      <th class="text-center">Action</th>
                     </tr>
                   </thead>
+
                   <tbody>
-                    <tr *ngFor="let m of selectedSlot.materials">
-                      <td><b>{{ m.matCode }}</b></td>
-                      <td class="muted">{{ m.description }}</td>
-                      <td class="muted">{{ m.invNo }}</td>
-                      <td class="muted">{{ m.receivedAt }}</td>
-                      <td class="text-end"><b>{{ m.qty | number }}</b> {{ m.uom }}</td>
+                    <tr *ngFor="let p of pendingItems">
+                      <td><b>{{ p.matCode }}</b></td>
+                      <td class="muted">{{ p.description }}</td>
+                      <td class="muted">{{ p.invNo }}</td>
+                      <td class="muted">{{ p.receivedAt }}</td>
+                      <td class="text-end"><b>{{ p.qty | number }}</b> {{ p.uom }}</td>
+                      <td class="text-center"><span class="badge badge-light">#{{ p.fifoRank }}</span></td>
                       <td class="text-center">
-                        <span class="badge badge-light">#{{ m.fifoRank }}</span>
+                        <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(p)">
+                          <i class="fas fa-dolly-flatbed me-1"></i> Store
+                        </button>
                       </td>
                     </tr>
-  
-                    <tr *ngIf="!selectedSlot.materials.length">
-                      <td colspan="6" class="text-center muted py-3">No material in this slot</td>
+
+                    <tr *ngIf="!pendingItems.length">
+                      <td colspan="7" class="text-center muted py-3">No pending items</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-  
-              <!-- Hover preview (เหมือน tooltip ลอย) -->
-              <div class="hover-preview" *ngIf="hoveredSlot && hoveredSlot.id === selectedSlot.id">
-                <div class="hp-title">Preview</div>
-                <div class="hp-line muted">hovered: {{ hoveredSlot.id }} • items: {{ hoveredSlot.materials.length }}</div>
+            </div>
+
+
+            <!-- Selected slot table (เหมือนเดิม) -->
+            <div class="mt-3" *ngIf="selectedSlot">
+              <div class="selected-title">
+                Slot <b>{{ selectedSlot.id }}</b> materials
+                <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
+              </div>
+
+              <div class="table-wrap">
+                <table class="table table-sm table-hover mb-0 wms-table">
+                  <thead>
+                  <tr>
+                    <th>Material</th>
+                    <th>Description</th>
+                    <th>INV</th>
+                    <th>Received</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-center">FIFO</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let m of selectedSlot.materials">
+                    <td><b>{{ m.matCode }}</b></td>
+                    <td class="muted">{{ m.description }}</td>
+                    <td class="muted">{{ m.invNo }}</td>
+                    <td class="muted">{{ m.receivedAt }}</td>
+                    <td class="text-end"><b>{{ m.qty | number }}</b> {{ m.uom }}</td>
+                    <td class="text-center"><span class="badge badge-light">#{{ m.fifoRank }}</span></td>
+                  </tr>
+
+                  <tr *ngIf="!selectedSlot.materials.length">
+                    <td colspan="6" class="text-center muted py-3">No material in this slot</td>
+                  </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-  
-          </div>
-        </div>
+
       </div>
-  
-      <!-- Pending Area -->
-      <div class="col-lg-4">
-        <div class="card wms-card">
-          <div class="card-header wms-card-header">
-            <div class="hdr-left">
-              <span class="dot warn"></span>
-              <b>PENDING AREA</b>
-            </div>
-  
-            <span class="pill">{{ pendingItems.length }} ITEMS</span>
-          </div>
-  
-          <div class="card-body pending-body">
-            <div *ngFor="let p of pendingItems" class="pending-item">
-              <div class="pi-top">
-                <div>
-                  <div class="pi-title">{{ p.matCode }}</div>
-                  <div class="pi-sub muted">{{ p.description }} • {{ p.invNo }} • {{ p.receivedAt }}</div>
-                </div>
-                <div class="pi-qty">
-                  <b>{{ p.qty | number }}</b> {{ p.uom }}
-                </div>
-              </div>
-  
-              <div class="pi-tags">
-                <span class="tag fifo"><i class="fas fa-bolt me-1"></i> FIFO #{{ p.fifoRank }} in queue</span>
-                <span class="tag urgent" *ngIf="p.urgent">※ Urgent</span>
-              </div>
-  
-              <div class="pi-actions">
-                <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(p)">
-                  <i class="fas fa-dolly-flatbed me-1"></i> Store
-                </button>
-              </div>
-            </div>
-  
-            <div *ngIf="!pendingItems.length" class="text-center muted py-3">
-              No pending items
-            </div>
-          </div>
-        </div>
-      </div>
-  
     </div>
+  </div>
+</div>
+
+
+
+
+
+
   </div>
