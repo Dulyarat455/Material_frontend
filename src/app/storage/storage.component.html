@@ -1,6 +1,6 @@
 <div class="wms-page">
     <!-- Top cards -->
-    <div class="row g-3 mb-3">
+    <!-- <div class="row g-3 mb-3">
       <div class="col-md-3">
         <div class="stat-card st-a">
           <div class="stat-title">TOTAL SLOTS</div>
@@ -29,7 +29,7 @@
           <div class="stat-sub">needs review</div>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
 
@@ -81,7 +81,7 @@
               <div class="fp-left">
 
                 <!-- BLOCK 1: 3201-3203 + 3101-3103 -->
-                <div class="fp-block">
+                <div class="fp-block b1">
                   <div class="fp-block-head">
                     <span class="mini-pill">BTM</span>
                     <span class="mini-pill">TOP</span>
@@ -93,8 +93,7 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                       
                       </button>
                     </div>
 
@@ -103,15 +102,14 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                       
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <!-- BLOCK 2: 2101-2103 + 2201-2203 -->
-                <div class="fp-block">
+                <div class="fp-block b2">
                   <div class="fp-block-head">
                     <span class="mini-pill">TOP</span>
                     <span class="mini-pill">BTM</span>
@@ -123,8 +121,7 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                     
                       </button>
                     </div>
 
@@ -133,15 +130,14 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <!-- BLOCK 3: 3204-3206 + 3104-3106 -->
-                <div class="fp-block">
+                <div class="fp-block b3">
                   <div class="fp-block-head">
                     <span class="mini-pill">BTM</span>
                     <span class="mini-pill">TOP</span>
@@ -153,8 +149,7 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                    
                       </button>
                     </div>
 
@@ -163,15 +158,14 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                      
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <!-- BLOCK 4: 2104-2106 + 2204-2206 -->
-                <div class="fp-block">
+                <div class="fp-block b4">
                   <div class="fp-block-head">
                     <span class="mini-pill">TOP</span>
                     <span class="mini-pill">BTM</span>
@@ -183,8 +177,7 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                    
                       </button>
                     </div>
 
@@ -193,8 +186,7 @@
                         type="button" [ngClass]="slotClass(s)"
                         (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                         <div class="slot-id">{{ s.id }}</div>
-                        <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                        <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                     
                       </button>
                     </div>
                   </div>
@@ -216,8 +208,7 @@
                       type="button" [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                       <div class="slot-id">{{ s.id }}</div>
-                      <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                      <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                   
                     </button>
                   </div>
 
@@ -227,8 +218,7 @@
                       type="button" [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
                       <div class="slot-id">{{ s.id }}</div>
-                      <div class="slot-qty" *ngIf="s.usedQty">{{ s.usedQty | number }}</div>
-                      <div class="slot-qty empty-mark" *ngIf="!s.usedQty">—</div>
+                
                     </button>
                   </div>
                 </div>

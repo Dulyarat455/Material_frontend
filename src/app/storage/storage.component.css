@@ -271,3 +271,238 @@
 }
 
 
+
+
+
+
+
+
+/* =========================
+   STORAGE MAP - FIT ONE SCREEN (Desktop)
+   วางไว้ท้ายสุดของ storage.css
+   ========================= */
+
+/* ลด padding หน้าทั้งหน้าให้เหลือน้อย */
+.wms-page{
+  padding: 10px;
+}
+
+/* ลดความสูง card header */
+.wms-card-header{
+  padding: 10px 12px;
+}
+.legend{ gap: 10px; font-size: 11px; }
+
+/* Floorplan: ลด gap + ลดความกว้างคอลัมน์ขวา */
+.floorplan{
+  gap: 10px;
+  grid-template-columns: 1fr 300px;   /* เดิม 420 → 300 */
+}
+
+/* Pending: ให้เตี้ยมาก */
+.fp-pending{
+  padding: 10px !important;
+  margin-bottom: 10px !important;    /* อย่าให้กินพื้นที่ */
+  min-height: 86px;                  /* คุมความสูง */
+}
+.fp-title{ margin-bottom: 4px; }
+.pending-hint{ font-size: 11px; margin-top: 2px; }
+
+/* Block ซ้าย: เล็กลง */
+.fp-left{ gap: 10px; }
+.fp-block{
+  padding: 8px;
+  min-width: 210px;                  /* เดิม 260 → 210 */
+  border-radius: 14px;
+}
+.fp-block-head{ margin-bottom: 6px; }
+.mini-pill{
+  font-size: 10px;
+  padding: 3px 8px;
+}
+
+/* ช่อง grid ใน block: ลดช่องว่าง */
+.fp-two-col{ gap: 8px; }
+.fp-col{ gap: 8px; }
+
+/* Slot ให้เล็กลงมาก เพื่อให้ครบ 2 แถว */
+.fp-left .slot-card,
+.fp-right .slot-card{
+  width: 86px;                       /* เดิม 112 → 86 */
+  height: 56px;                      /* เดิม 74 → 56 */
+  padding: 6px 6px;
+  border-radius: 12px;
+  border-width: 2px;
+}
+.slot-id{
+  font-size: 16px;
+  line-height: 1.05;
+}
+.slot-qty{
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* คอลัมน์ขวา: ไม่ scroll + compact */
+.fp-right{
+  overflow: visible !important;
+  max-height: none !important;
+  padding: 8px;
+}
+.fp-right-head{
+  margin-bottom: 6px;
+  gap: 6px;
+}
+
+/* ลด pill / dot ให้กินพื้นที่น้อย */
+.pill{
+  padding: 4px 8px;
+  font-size: 11px;
+}
+.dot{ width: 9px; height: 9px; }
+
+/* (optional) ถ้าตารางด้านล่างทำให้ต้อง scroll
+   ให้มันไม่ใหญ่เกิน: */
+.table-wrap{
+  max-height: 260px;                 /* ถ้าอยากไม่ให้ตารางดันหน้า */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==================================================
+   MICRO FIT (ให้เห็นครบหน้าเดียวแบบรูป 2)
+   วางท้ายสุดของ storage.css
+   ================================================== */
+
+/* ลดพื้นที่ด้านบน/การ์ด */
+.wms-page{ padding: 6px !important; }
+.wms-card-header{ padding: 8px 10px !important; }
+
+/* Floorplan: ขวาให้แคบลง (ช่วยลด wrap ฝั่งซ้าย) */
+.floorplan{
+  gap: 6px !important;
+  grid-template-columns: 1fr 230px !important; /* 300 -> 230 */
+}
+
+/* Pending เตี้ยสุด */
+.fp-pending{
+  padding: 8px !important;
+  margin-bottom: 6px !important;
+  min-height: 56px !important;
+}
+.fp-title{ margin-bottom: 2px !important; gap: 6px !important; }
+.fp-title b{ font-size: 13px !important; }
+.pending-hint{ font-size: 10px !important; margin-top: 2px !important; }
+
+/* Block ซ้าย: ลดขนาดกรอบ + padding */
+.fp-left{ gap: 6px !important; }
+.fp-block{
+  padding: 6px !important;
+  min-width: 170px !important;  /* 210 -> 170 */
+  border-radius: 12px !important;
+}
+.fp-block-head{ margin-bottom: 4px !important; gap: 6px !important; }
+.mini-pill{ font-size: 9px !important; padding: 2px 6px !important; }
+
+/* ลดช่องว่างภายใน */
+.fp-two-col{ gap: 6px !important; }
+.fp-col{ gap: 6px !important; }
+
+/* ===== SLOT: เล็กมาก + ตัวหนังสือเล็กลง ===== */
+.fp-left .slot-card,
+.fp-right .slot-card{
+  width: 66px !important;     /* 86 -> 66 */
+  height: 40px !important;    /* 56 -> 40 */
+  padding: 3px 4px !important;
+  border-radius: 10px !important;
+}
+
+/* ตัวเลข slot */
+.slot-id{
+  font-size: 13px !important;  /* 16 -> 13 */
+  line-height: 1 !important;
+}
+
+/* เผื่อยังมี slot-qty ค้างอยู่ ให้ซ่อนเลย */
+.slot-qty{ display:none !important; }
+
+/* ขวาสุด: compact */
+.fp-right{
+  padding: 6px !important;
+}
+.fp-right-head{ margin-bottom: 4px !important; }
+
+/* pill/dot เล็กลง */
+.pill{ padding: 2px 6px !important; font-size: 10px !important; }
+.dot{ width: 7px !important; height: 7px !important; }
+
+/* เอา hover lift ออก (ไม่ต้องเด้ง) */
+.slot-card:hover{ transform:none !important; box-shadow:none !important; }
+
+
+
+
+/* --- lock left blocks to 2 rows like floorplan --- */
+.fp-left{
+  display: grid !important;
+  grid-template-columns: repeat(2, max-content) !important; /* 2 คอลัมน์ */
+  grid-auto-rows: max-content !important;
+  gap: 6px !important;
+  align-content: start !important;
+  justify-content: start !important;
+}
+
+/* กำหนดตำแหน่งแต่ละก้อน */
+.fp-left .b1{ grid-column: 1; grid-row: 1; } /* 3201/3101 */
+.fp-left .b2{ grid-column: 2; grid-row: 1; } /* 2101/2201 */
+.fp-left .b3{ grid-column: 1; grid-row: 2; } /* 3204/3104 */
+.fp-left .b4{ grid-column: 2; grid-row: 2; } /* 2104/2204 */
+
+/* กัน block ยืดแปลกๆ */
+.fp-block{ width: max-content !important; }
+
+
+
+
+
+/* ------------------------------
+   Pending ไม่ให้ยาวเต็มแถว
+   ------------------------------ */
+
+/* ให้คอลัมน์ซ้าย (pending/left) เป็นความกว้างตาม content */
+.floorplan{
+  grid-template-columns: max-content 230px !important; /* ซ้าย = กว้างเท่าที่ต้องใช้, ขวา = D */
+}
+
+/* pending กว้างเท่ากับ left cluster */
+.fp-pending{
+  width: fit-content !important;
+  max-width: none !important;
+}
+
+/* กัน pending บีบเกินไป (ปรับเลขได้) */
+.fp-pending-compact{
+  min-width: 360px;  /* ถ้าอยากให้ยาวขึ้น/สั้นลง ปรับตรงนี้ */
+}
+
+
+
+
+/* ---------------------------
+   เพิ่ม gap ใต้ Pending
+   --------------------------- */
+
+   .fp-pending{
+    margin-bottom: 60px !important;   /* ปรับ 12–20px ตามชอบ */
+  }
