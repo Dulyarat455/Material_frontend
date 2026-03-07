@@ -89,18 +89,19 @@
 
                   <div class="fp-two-col">
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('A','BTM') | slice:0:3"
-                        type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                      <button *ngFor="let s of slotsBy('A','BTM') | slice:0:3; trackBy: trackSlot"
+                      type="button"
+                      [ngClass]="slotClass(s)"
+                      (click)="onClickSlot(s)">
                         <div class="slot-id">{{ s.id }}</div>
-                       
                       </button>
                     </div>
 
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('B','TOP') | slice:0:3"
-                        type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                      <button *ngFor="let s of slotsBy('B','TOP') | slice:0:3 trackBy: trackSlot"
+                        type="button" 
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)" >
                         <div class="slot-id">{{ s.id }}</div>
                        
                       </button>
@@ -117,18 +118,18 @@
 
                   <div class="fp-two-col">
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('C','TOP') | slice:0:3"
+                      <button *ngFor="let s of slotsBy('C','TOP') | slice:0:3 trackBy: trackSlot"
                         type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        (click)="onClickSlot(s)" >
                         <div class="slot-id">{{ s.id }}</div>
                      
                       </button>
                     </div>
 
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('C','BTM') | slice:0:3"
+                      <button *ngFor="let s of slotsBy('C','BTM') | slice:0:3 trackBy: trackSlot"
                         type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        (click)="onClickSlot(s)">
                         <div class="slot-id">{{ s.id }}</div>
                       
                       </button>
@@ -145,18 +146,18 @@
 
                   <div class="fp-two-col">
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('A','BTM') | slice:3:6"
+                      <button *ngFor="let s of slotsBy('A','BTM') | slice:3:6 trackBy: trackSlot"
                         type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        (click)="onClickSlot(s)" >
                         <div class="slot-id">{{ s.id }}</div>
                     
                       </button>
                     </div>
 
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('B','TOP') | slice:3:6"
+                      <button *ngFor="let s of slotsBy('B','TOP') | slice:3:6 trackBy: trackSlot"
                         type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        (click)="onClickSlot(s)" >
                         <div class="slot-id">{{ s.id }}</div>
                       
                       </button>
@@ -173,18 +174,18 @@
 
                   <div class="fp-two-col">
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('C','TOP') | slice:3:6"
+                      <button *ngFor="let s of slotsBy('C','TOP') | slice:3:6  trackBy: trackSlot"
                         type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        (click)="onClickSlot(s)" >
                         <div class="slot-id">{{ s.id }}</div>
                     
                       </button>
                     </div>
 
                     <div class="fp-col">
-                      <button *ngFor="let s of slotsBy('C','BTM') | slice:3:6"
+                      <button *ngFor="let s of slotsBy('C','BTM') | slice:3:6 trackBy: trackSlot"
                         type="button" [ngClass]="slotClass(s)"
-                        (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                        (click)="onClickSlot(s)">
                         <div class="slot-id">{{ s.id }}</div>
                      
                       </button>
@@ -204,9 +205,9 @@
                 <div class="fp-two-col fp-right-two-col">
                   <!-- 12xx (BTM) -->
                   <div class="fp-col">
-                    <button *ngFor="let s of slotsBy('D','BTM')"
+                    <button *ngFor="let s of slotsBy('D','BTM') trackBy: trackSlot"
                       type="button" [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                      (click)="onClickSlot(s)">
                       <div class="slot-id">{{ s.id }}</div>
                    
                     </button>
@@ -214,9 +215,9 @@
 
                   <!-- 11xx (TOP) -->
                   <div class="fp-col">
-                    <button *ngFor="let s of slotsBy('D','TOP')"
+                    <button *ngFor="let s of slotsBy('D','TOP') trackBy: trackSlot"
                       type="button" [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)" (mouseenter)="onHoverSlot(s)" (mouseleave)="onHoverSlot(null)">
+                      (click)="onClickSlot(s)">
                       <div class="slot-id">{{ s.id }}</div>
                 
                     </button>

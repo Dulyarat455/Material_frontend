@@ -17,15 +17,13 @@ type MaterialItem = {
 };
 
 type SlotRow = {
-  id: string;                     // 3201 / 2101 / 1101 ...
+  id: string;
   zone: 'A' | 'B' | 'C' | 'D';
-  row: 'TOP' | 'BTM';             // ✅ ให้ตรงรูป (TOP/BTM)
+  row: 'TOP' | 'BTM';
   status: SlotStatus;
   usedQty?: number;
   materials: MaterialItem[];
 };
-
-
 
 @Component({
   selector: 'app-storage',
@@ -35,9 +33,7 @@ type SlotRow = {
   styleUrl: './storage.component.css'
 })
 export class StorageComponent {
-  
   viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
-
 
   pendingItems: MaterialItem[] = [
     { matCode:'MATS5', description:'Bolt M10', qty:2000, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 },
@@ -45,11 +41,7 @@ export class StorageComponent {
     { matCode:'MATS6', description:'Paint Can Blue', qty:50,  uom:'pcs', invNo:'INV-012', receivedAt:'2025-12-27', fifoRank:1 },
   ];
 
-  // ✅ slots ครบตามรูปที่ 2
   slots: SlotRow[] = [
-    // -------------------------
-    // A: 32xx (BTM)
-    // -------------------------
     { id:'3201', zone:'A', row:'BTM', status:'OCCUPIED', usedQty:500,  materials:[ { matCode:'MATS5', description:'Bolt M10', qty:500, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 } ] },
     { id:'3202', zone:'A', row:'BTM', status:'OCCUPIED', usedQty:1500, materials:[ { matCode:'MATS1', description:'SteelRod12mm', qty:1500, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 } ] },
     { id:'3203', zone:'A', row:'BTM', status:'OCCUPIED', usedQty:1200, materials:[ { matCode:'MATS1', description:'SteelRod12mm', qty:1200, uom:'pcs', invNo:'INV-011', receivedAt:'2025-12-27', fifoRank:2 } ] },
@@ -57,9 +49,6 @@ export class StorageComponent {
     { id:'3205', zone:'A', row:'BTM', status:'EMPTY', materials:[] },
     { id:'3206', zone:'A', row:'BTM', status:'EMPTY', materials:[] },
 
-    // -------------------------
-    // B: 31xx (TOP)
-    // -------------------------
     { id:'3101', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
     { id:'3102', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
     { id:'3103', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
@@ -67,9 +56,6 @@ export class StorageComponent {
     { id:'3105', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
     { id:'3106', zone:'B', row:'TOP', status:'EMPTY', materials:[] },
 
-    // -------------------------
-    // C: 21xx (TOP) / 22xx (BTM)
-    // -------------------------
     { id:'2101', zone:'C', row:'TOP', status:'PARTIAL', usedQty:300, materials:[ { matCode:'MATS9', description:'Washer', qty:300, uom:'pcs', invNo:'INV-007', receivedAt:'2025-12-18', fifoRank:1 } ] },
     { id:'2102', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
     { id:'2103', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
@@ -77,7 +63,6 @@ export class StorageComponent {
     { id:'2105', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
     { id:'2106', zone:'C', row:'TOP', status:'EMPTY', materials:[] },
 
-    // ✅ 2201 เป็น Reject ตามรูป
     { id:'2201', zone:'C', row:'BTM', status:'REJECTED', materials:[] },
     { id:'2202', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
     { id:'2203', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
@@ -85,9 +70,6 @@ export class StorageComponent {
     { id:'2205', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
     { id:'2206', zone:'C', row:'BTM', status:'EMPTY', materials:[] },
 
-    // -------------------------
-    // D: Right column 11xx (TOP) / 12xx (BTM)
-    // -------------------------
     { id:'1101', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
     { id:'1102', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
     { id:'1103', zone:'D', row:'TOP', status:'EMPTY', materials:[] },
@@ -113,22 +95,19 @@ export class StorageComponent {
     { id:'1211', zone:'D', row:'BTM', status:'EMPTY', materials:[] },
   ];
 
-
-
-
-
-   selectedSlot: SlotRow | null = null;
-  hoveredSlot: SlotRow | null = null;
-  // ✅ pending selection
-
+  selectedSlot: SlotRow | null = null;
 
   get totalSlots() { return this.slots.length; }
   get occupiedCount() { return this.slots.filter(s => s.status === 'OCCUPIED').length; }
   get pendingCount() { return this.pendingItems.length; }
   get rejectedCount() { return this.slots.filter(s => s.status === 'REJECTED').length; }
 
-  slotsBy(zone: any, row: any) {
+  slotsBy(zone: SlotRow['zone'], row: SlotRow['row']) {
     return this.slots.filter(s => s.zone === zone && s.row === row);
+  }
+
+  trackSlot(index: number, s: SlotRow) {
+    return s.id;
   }
 
   slotClass(s: SlotRow) {
@@ -147,19 +126,11 @@ export class StorageComponent {
     this.selectedSlot = s;
   }
 
-
-  onHoverSlot(s: SlotRow | null) { 
-    this.hoveredSlot = s;
-   }
-
-   onClickPendingArea() {
+  onClickPendingArea() {
     this.viewMode = 'PENDING';
     this.selectedSlot = null;
   }
-  
-   
 
-  // demo: assign pending → slot (mock)
   assignPendingToSlot(p: MaterialItem, slot: SlotRow) {
     if (!slot) return;
 
@@ -168,22 +139,25 @@ export class StorageComponent {
       return;
     }
 
-    // remove from pending
     this.pendingItems = this.pendingItems.filter(x => x !== p);
 
-    // push to slot
     slot.materials = [...(slot.materials || []), { ...p }];
     slot.usedQty = (slot.usedQty || 0) + p.qty;
     slot.status = slot.usedQty > 0 ? 'OCCUPIED' : 'EMPTY';
 
     this.selectedSlot = slot;
-    this.viewMode = 'SLOT'; // ✅ ให้ไปโชว์ slot table ทันที
-    
-    Swal.fire({ icon:'success', title:'Stored', text:`จัดเก็บ ${p.matCode} เข้าช่อง ${slot.id} แล้ว`, timer: 900, showConfirmButton:false });
+    this.viewMode = 'SLOT';
+
+    Swal.fire({
+      icon:'success',
+      title:'Stored',
+      text:`จัดเก็บ ${p.matCode} เข้าช่อง ${slot.id} แล้ว`,
+      timer: 900,
+      showConfirmButton:false
+    });
   }
 
   openQuickStoreSwal(p: MaterialItem) {
-    // เลือก slot ว่างตัวอย่าง (EMPTY ก่อน)
     const empty = this.slots.find(s => s.status === 'EMPTY');
     if (!empty) {
       Swal.fire({ icon:'info', title:'No empty slot', text:'ไม่มีช่องว่างใน mock ตอนนี้' });
@@ -208,6 +182,4 @@ export class StorageComponent {
       this.assignPendingToSlot(p, empty);
     });
   }
-
-
 }
