@@ -34,6 +34,19 @@ type SlotRow = {
 })
 export class StorageComponent {
   viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
+  panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' = 'TABLE';
+
+
+  stockForm = {
+    itemNo: '',
+    itemName: '',
+    specDwg: '',
+    lotNo: '',
+    quantity: '',
+    storageArea: '',
+    stockNote: ''
+  };
+
 
   pendingItems: MaterialItem[] = [
     { matCode:'MATS5', description:'Bolt M10', qty:2000, uom:'pcs', invNo:'INV-010', receivedAt:'2025-12-25', fifoRank:1 },
@@ -182,4 +195,11 @@ export class StorageComponent {
       this.assignPendingToSlot(p, empty);
     });
   }
+
+  
+
+
+
+
+
 }

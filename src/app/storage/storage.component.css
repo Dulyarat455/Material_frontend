@@ -1,633 +1,359 @@
-.wms-page { padding: 14px; background:#f3f6fb; min-height: calc(100vh - 56px); }
+/* ==================================================
+   STORAGE MAP - CLEAN VERSION
+   ใช้กับ storage.html ปัจจุบัน
+   ================================================== */
 
-/* summary cards */
-.stat-card{
-  background:#fff; border-radius:14px; padding:16px 18px;
-  box-shadow: 0 6px 16px rgba(15,23,42,.08);
-  border-top: 4px solid transparent;
-}
-.stat-title{ font-size:12px; letter-spacing:.08em; color:#64748b; font-weight:800; }
-.stat-value{ font-size:38px; font-weight:900; color:#0f172a; margin-top:6px; }
-.stat-sub{ color:#94a3b8; font-size:13px; margin-top:4px; }
-
-.st-a{ border-top-color:#10b981;}
-.st-b{ border-top-color:#2563eb;}
-.st-c{ border-top-color:#f59e0b;}
-.st-d{ border-top-color:#ef4444;}
-
-/* cards */
-.wms-card{ border-radius:14px; border:1px solid rgba(2,6,23,.08); overflow:hidden; }
-.wms-card-header{
-  display:flex; align-items:center; justify-content:space-between;
-  background:#fff; border-bottom:1px solid rgba(2,6,23,.06);
-}
-.hdr-left{ display:flex; align-items:center; gap:10px; }
-.dot{ width:10px; height:10px; border-radius:999px; background:#2563eb; display:inline-block; }
-.dot.warn{ background:#f59e0b; }
-.pill{ background:rgba(245,158,11,.14); color:#b45309; font-weight:900; padding:6px 10px; border-radius:999px; font-size:12px; }
-
-.legend{ display:flex; gap:12px; align-items:center; color:#64748b; font-size:12px; }
-.legend .b{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px; }
-.b.occupied{ background:#10b981; }
-.b.partial{ background:#f59e0b; }
-.b.empty{ background:#e2e8f0; }
-.b.rejected{ background:#ef4444; }
-
-.zone-block{ margin-top:6px; }
-.zone-title{ font-weight:900; letter-spacing:.15em; color:#94a3b8; font-size:12px; margin:10px 0; }
-.zone-sep{ margin:14px 0 6px; opacity:.12; }
-
-.slot-grid{ display:flex; flex-wrap:wrap; gap:10px; }
-.slot-card{
-  width:92px; height:68px; border-radius:12px;
-  border:2px solid rgba(148,163,184,.4);
-  background:#fff; text-align:center;
-  padding:10px 8px;
-  position:relative;
-  transition: transform .12s ease, box-shadow .12s ease;
-}
-.slot-card:hover{ transform: translateY(-1px); box-shadow: 0 10px 18px rgba(15,23,42,.10); }
-.slot-id{ font-weight:900; color:#0f172a; }
-.slot-qty{ font-size:12px; color:#64748b; margin-top:4px; }
-.empty-mark{ color:#cbd5e1; font-weight:900; }
-
-.st-occupied{ border-color: rgba(16,185,129,.45); background: rgba(16,185,129,.08); }
-.st-partial{ border-color: rgba(245,158,11,.55); background: rgba(245,158,11,.08); }
-.st-empty{ border-color: rgba(148,163,184,.35); background: #fff; }
-.st-rejected{ border-color: rgba(239,68,68,.55); background: rgba(239,68,68,.08); }
-
-.is-selected{ outline: 3px solid rgba(37,99,235,.22); }
-
-.selected-title{ font-weight:900; color:#0f172a; margin-bottom:10px; }
-.muted{ color:#64748b; }
-
-.table-wrap{
-  overflow:auto;
-  border:1px solid rgba(2,6,23,.08);
-  border-radius:12px;
-  background:#fff;
-}
-.wms-table thead th{
-  position: sticky; top:0; background:#f8fafc;
-  z-index: 5;
-  border-bottom: 1px solid rgba(2,6,23,.08);
-  font-size:12px; letter-spacing:.08em; color:#94a3b8;
-}
-.wms-table td{ vertical-align:middle; }
-
-.hover-preview{
-  margin-top:10px;
-  border:1px dashed rgba(37,99,235,.35);
-  border-radius:12px;
-  padding:10px 12px;
-  background: rgba(37,99,235,.05);
-}
-.hp-title{ font-weight:900; color:#1d4ed8; }
-
-/* pending */
-.pending-body{ max-height: 640px; overflow:auto; }
-.pending-item{
-  border:1px solid rgba(2,6,23,.08);
-  border-radius:14px;
-  padding:12px 12px;
-  background:#fff;
-  margin-bottom:12px;
-}
-.pi-top{ display:flex; justify-content:space-between; gap:10px; }
-.pi-title{ font-weight:900; color:#0f172a; }
-.pi-sub{ font-size:12px; }
-.pi-qty{ color:#10b981; white-space:nowrap; }
-.pi-tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-.tag{
-  font-size:12px; padding:4px 10px; border-radius:999px;
-  border:1px solid rgba(2,6,23,.08);
-  background:#f8fafc;
-}
-.tag.fifo{ border-color: rgba(245,158,11,.35); color:#b45309; background: rgba(245,158,11,.10); }
-.tag.urgent{ border-color: rgba(239,68,68,.35); color:#b91c1c; background: rgba(239,68,68,.10); }
-
-.pi-actions{ margin-top:10px; display:flex; justify-content:flex-end; }
-
-
-
-
-
-
-
-/* =========================
-   FLOORPLAN (layout แบบรูป 2)
-   ========================= */
-   .floorplan{
+   .wms-page {
+    padding: 6px;
+    background: #f3f6fb;
+    min-height: calc(100vh - 56px);
+  }
+  
+  /* =========================
+     CARD / HEADER
+     ========================= */
+  .wms-card {
+    border-radius: 14px;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    overflow: hidden;
+  }
+  
+  .wms-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-bottom: 1px solid rgba(2, 6, 23, 0.06);
+    padding: 8px 10px;
+  }
+  
+  .hdr-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #2563eb;
+    display: inline-block;
+  }
+  
+  .dot.warn {
+    background: #f59e0b;
+  }
+  
+  .legend {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #64748b;
+    font-size: 11px;
+  }
+  
+  .legend .b {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  .b.occupied { background: #10b981; }
+  .b.partial  { background: #f59e0b; }
+  .b.empty    { background: #e2e8f0; }
+  .b.rejected { background: #ef4444; }
+  
+  .pill {
+    background: rgba(245, 158, 11, 0.14);
+    color: #b45309;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+  }
+  
+  .muted {
+    color: #64748b;
+  }
+  
+  .selected-title {
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+  
+  /* =========================
+     FLOORPLAN LAYOUT
+     left / zoneD / table
+     ========================= */
+  .floorplan {
     display: grid;
-    grid-template-columns: 1fr 420px;     /* ซ้าย=แปลน / ขวา=คอลัมน์ยาว */
-    grid-template-rows: auto 1fr;
+    grid-template-columns: max-content max-content minmax(0, 1fr);
     grid-template-areas:
-      "pending right"
-      "left    right";
-    gap: 14px;
+      "pending right table"
+      "left    right table";
+    column-gap: 6px;
+    row-gap: 6px;
+    align-items: start;
   }
   
-  .fp-pending{
+  /* =========================
+     PENDING AREA
+     ========================= */
+  .fp-pending {
     grid-area: pending;
-    border:1px solid rgba(2,6,23,.08);
-    border-radius:14px;
-    background:#fff;
-    padding:18px;
-    margin-bottom: 46px;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 14px;
+    background: #fff;
+    padding: 8px;
+    min-height: 56px;
+    width: fit-content;
+    max-width: none;
+    margin-bottom: 60px;
   }
   
-  .fp-title{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    justify-content:flex-start;
-    margin-bottom:10px;
+  .fp-pending-compact {
+    cursor: pointer;
+    user-select: none;
+    min-width: 360px;
   }
   
-  .fp-left{
+  .fp-pending-compact:hover {
+    box-shadow: 0 10px 18px rgba(15, 23, 42, 0.10);
+    transform: translateY(-1px);
+    transition: 0.12s ease;
+  }
+  
+  .fp-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-start;
+    margin-bottom: 2px;
+  }
+  
+  .fp-title b {
+    font-size: 13px;
+  }
+  
+  .pending-hint {
+    font-size: 10px;
+    margin-top: 2px;
+  }
+  
+  /* =========================
+     LEFT CLUSTER
+     ========================= */
+  .fp-left {
     grid-area: left;
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap; /* ถ้าจอแคบจะไหลลง */
-    align-items:flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    grid-auto-rows: max-content;
+    gap: 6px;
+    align-content: start;
+    justify-content: start;
   }
   
-  .fp-block{
-    border:1px solid rgba(2,6,23,.08);
-    border-radius:14px;
-    background:#fff;
-    padding:10px;
-    min-width: 260px; /* ปรับได้ */
+  .fp-left .b1 { grid-column: 1; grid-row: 1; }
+  .fp-left .b2 { grid-column: 2; grid-row: 1; }
+  .fp-left .b3 { grid-column: 1; grid-row: 2; }
+  .fp-left .b4 { grid-column: 2; grid-row: 2; }
+  
+  .fp-block {
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 12px;
+    background: #fff;
+    padding: 6px;
+    width: max-content;
   }
   
-  .fp-block-head{
-    display:flex;
-    gap:8px;
-    margin-bottom:10px;
+  .fp-block-head {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
   }
   
-  .mini-pill{
-    font-size:11px;
-    font-weight:900;
-    padding:4px 10px;
-    border-radius:999px;
-    border:1px solid rgba(2,6,23,.08);
-    background:#f8fafc;
-    color:#475569;
+  .mini-pill {
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    background: #f8fafc;
+    color: #475569;
   }
   
-  .fp-two-col{
-    display:grid;
+  .fp-two-col {
+    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap:10px;
+    gap: 6px;
   }
   
-  .fp-col{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+  .fp-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
   }
   
-  /* ขวาสุด: คอลัมน์ยาว */
-  .fp-right{
+  /* =========================
+     RIGHT COLUMN (ZONE D)
+     ========================= */
+  .fp-right {
     grid-area: right;
-    border:1px solid rgba(2,6,23,.08);
-    border-radius:14px;
-    background:#fff;
-    padding:10px;
-    overflow:auto;
-    max-height: 720px; /* ให้ใกล้เคียงแบบแปลน */
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 14px;
+    background: #fff;
+    padding: 6px;
+    width: max-content;
+    justify-self: start;
   }
   
-  .fp-right-head{
-    display:flex;
-    gap:8px;
-    margin-bottom:10px;
-    justify-content:flex-end;
+  .fp-right-head {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+    justify-content: flex-end;
   }
   
-  .fp-right-grid{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+  .fp-right .fp-right-two-col {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    column-gap: 4px;
+    row-gap: 6px;
+    justify-content: start;
+    align-content: start;
   }
   
-  /* placeholder */
-  .fp-placeholder .ph,
-  .ph{
-    border:1px dashed rgba(148,163,184,.6);
-    border-radius:12px;
-    padding:12px;
-    color:#94a3b8;
-    font-weight:800;
-    text-align:center;
-  }
-  .ph.big{ padding:22px; }
-  
-  /* ปรับ slot-card ให้ดู “แปลน” มากขึ้นนิด */
-  .fp-left .slot-card,
-  .fp-right .slot-card{
-    width: 112px;
-    height: 74px;
+  .fp-right .fp-col {
+    align-items: flex-start;
+    gap: 6px;
   }
   
-  /* responsive: ถ้าจอเล็ก ให้ right ลงล่าง */
-  @media (max-width: 992px){
-    .floorplan{
+  /* =========================
+     SLOT CARD
+     ========================= */
+  .slot-card {
+    width: 66px;
+    height: 40px;
+    padding: 3px 4px;
+    border-radius: 10px;
+    border: 2px solid rgba(148, 163, 184, 0.4);
+    background: #fff;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  
+  .slot-id {
+    font-weight: 900;
+    color: #0f172a;
+    font-size: 13px;
+    line-height: 1;
+  }
+  
+  .slot-qty {
+    display: none;
+  }
+  
+  .empty-mark {
+    color: #cbd5e1;
+    font-weight: 900;
+  }
+  
+  .st-occupied {
+    border-color: rgba(16, 185, 129, 0.45);
+    background: rgba(16, 185, 129, 0.08);
+  }
+  
+  .st-partial {
+    border-color: rgba(245, 158, 11, 0.55);
+    background: rgba(245, 158, 11, 0.08);
+  }
+  
+  .st-empty {
+    border-color: rgba(148, 163, 184, 0.35);
+    background: #fff;
+  }
+  
+  .st-rejected {
+    border-color: rgba(239, 68, 68, 0.55);
+    background: rgba(239, 68, 68, 0.08);
+  }
+  
+  .slot-card:hover {
+    border-color: rgba(37, 99, 235, 0.55) !important;
+    background: rgba(37, 99, 235, 0.06) !important;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .is-selected {
+    outline: 3px solid rgba(37, 99, 235, 0.22);
+    border-color: rgba(37, 99, 235, 0.8) !important;
+    background: rgba(37, 99, 235, 0.10) !important;
+  }
+  
+  /* =========================
+     TABLE PANEL
+     ========================= */
+  .fp-table {
+    grid-area: table;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 14px;
+    background: #fff;
+    padding: 10px;
+    min-width: 0;
+    width: 100%;
+    justify-self: stretch;
+    margin-left: 0;
+  }
+  
+  .table-wrap {
+    overflow: auto;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 12px;
+    background: #fff;
+    max-height: 520px;
+  }
+  
+  .wms-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    z-index: 5;
+    border-bottom: 1px solid rgba(2, 6, 23, 0.08);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+  }
+  
+  .wms-table td {
+    vertical-align: middle;
+  }
+  
+  /* =========================
+     RESPONSIVE
+     ========================= */
+  @media (max-width: 992px) {
+    .floorplan {
       grid-template-columns: 1fr;
       grid-template-areas:
         "pending"
         "left"
-        "right";
+        "right"
+        "table";
     }
-    .fp-right{ max-height: none; }
+  
+    .fp-pending {
+      margin-bottom: 10px;
+    }
+  
+    .fp-table {
+      width: 100%;
+    }
   }
-
-
-
-
-
-
-  /* ===== Pending compact card ===== */
-.fp-pending-compact{
-  cursor: pointer;
-  user-select: none;
-  padding: 14px;
-}
-.fp-pending-compact:hover{
-  box-shadow: 0 10px 18px rgba(15,23,42,.10);
-  transform: translateY(-1px);
-  transition: .12s ease;
-}
-.pending-hint{
-  font-size: 12px;
-  margin-top: 6px;
-}
-
-/* ===== Right column: show full (no scroll) ===== */
-.fp-right{
-  overflow: visible !important;
-  max-height: none !important;
-}
-
-
-
-
-
-
-
-
-/* =========================
-   STORAGE MAP - FIT ONE SCREEN (Desktop)
-   วางไว้ท้ายสุดของ storage.css
-   ========================= */
-
-/* ลด padding หน้าทั้งหน้าให้เหลือน้อย */
-.wms-page{
-  padding: 10px;
-}
-
-/* ลดความสูง card header */
-.wms-card-header{
-  padding: 10px 12px;
-}
-.legend{ gap: 10px; font-size: 11px; }
-
-/* Floorplan: ลด gap + ลดความกว้างคอลัมน์ขวา */
-.floorplan{
-  gap: 10px;
-  grid-template-columns: 1fr 300px;   /* เดิม 420 → 300 */
-}
-
-/* Pending: ให้เตี้ยมาก */
-.fp-pending{
-  padding: 10px !important;
-  margin-bottom: 10px !important;    /* อย่าให้กินพื้นที่ */
-  min-height: 86px;                  /* คุมความสูง */
-}
-.fp-title{ margin-bottom: 4px; }
-.pending-hint{ font-size: 11px; margin-top: 2px; }
-
-/* Block ซ้าย: เล็กลง */
-.fp-left{ gap: 10px; }
-.fp-block{
-  padding: 8px;
-  min-width: 210px;                  /* เดิม 260 → 210 */
-  border-radius: 14px;
-}
-.fp-block-head{ margin-bottom: 6px; }
-.mini-pill{
-  font-size: 10px;
-  padding: 3px 8px;
-}
-
-/* ช่อง grid ใน block: ลดช่องว่าง */
-.fp-two-col{ gap: 8px; }
-.fp-col{ gap: 8px; }
-
-/* Slot ให้เล็กลงมาก เพื่อให้ครบ 2 แถว */
-.fp-left .slot-card,
-.fp-right .slot-card{
-  width: 86px;                       /* เดิม 112 → 86 */
-  height: 56px;                      /* เดิม 74 → 56 */
-  padding: 6px 6px;
-  border-radius: 12px;
-  border-width: 2px;
-}
-.slot-id{
-  font-size: 16px;
-  line-height: 1.05;
-}
-.slot-qty{
-  font-size: 10px;
-  margin-top: 2px;
-}
-
-/* คอลัมน์ขวา: ไม่ scroll + compact */
-.fp-right{
-  overflow: visible !important;
-  max-height: none !important;
-  padding: 8px;
-}
-.fp-right-head{
-  margin-bottom: 6px;
-  gap: 6px;
-}
-
-/* ลด pill / dot ให้กินพื้นที่น้อย */
-.pill{
-  padding: 4px 8px;
-  font-size: 11px;
-}
-.dot{ width: 9px; height: 9px; }
-
-/* (optional) ถ้าตารางด้านล่างทำให้ต้อง scroll
-   ให้มันไม่ใหญ่เกิน: */
-.table-wrap{
-  max-height: 260px;                 /* ถ้าอยากไม่ให้ตารางดันหน้า */
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ==================================================
-   MICRO FIT (ให้เห็นครบหน้าเดียวแบบรูป 2)
-   วางท้ายสุดของ storage.css
-   ================================================== */
-
-/* ลดพื้นที่ด้านบน/การ์ด */
-.wms-page{ padding: 6px !important; }
-.wms-card-header{ padding: 8px 10px !important; }
-
-/* Floorplan: ขวาให้แคบลง (ช่วยลด wrap ฝั่งซ้าย) */
-.floorplan{
-  gap: 6px !important;
-  grid-template-columns: 1fr 230px !important; /* 300 -> 230 */
-}
-
-/* Pending เตี้ยสุด */
-.fp-pending{
-  padding: 8px !important;
-  margin-bottom: 6px !important;
-  min-height: 56px !important;
-}
-.fp-title{ margin-bottom: 2px !important; gap: 6px !important; }
-.fp-title b{ font-size: 13px !important; }
-.pending-hint{ font-size: 10px !important; margin-top: 2px !important; }
-
-/* Block ซ้าย: ลดขนาดกรอบ + padding */
-.fp-left{ gap: 6px !important; }
-.fp-block{
-  padding: 6px !important;
-  min-width: 170px !important;  /* 210 -> 170 */
-  border-radius: 12px !important;
-}
-.fp-block-head{ margin-bottom: 4px !important; gap: 6px !important; }
-.mini-pill{ font-size: 9px !important; padding: 2px 6px !important; }
-
-/* ลดช่องว่างภายใน */
-.fp-two-col{ gap: 6px !important; }
-.fp-col{ gap: 6px !important; }
-
-/* ===== SLOT: เล็กมาก + ตัวหนังสือเล็กลง ===== */
-.fp-left .slot-card,
-.fp-right .slot-card{
-  width: 66px !important;     /* 86 -> 66 */
-  height: 40px !important;    /* 56 -> 40 */
-  padding: 3px 4px !important;
-  border-radius: 10px !important;
-}
-
-/* ตัวเลข slot */
-.slot-id{
-  font-size: 13px !important;  /* 16 -> 13 */
-  line-height: 1 !important;
-}
-
-/* เผื่อยังมี slot-qty ค้างอยู่ ให้ซ่อนเลย */
-.slot-qty{ display:none !important; }
-
-/* ขวาสุด: compact */
-.fp-right{
-  padding: 6px !important;
-}
-.fp-right-head{ margin-bottom: 4px !important; }
-
-/* pill/dot เล็กลง */
-.pill{ padding: 2px 6px !important; font-size: 10px !important; }
-.dot{ width: 7px !important; height: 7px !important; }
-
-/* เอา hover lift ออก (ไม่ต้องเด้ง) */
-.slot-card:hover{ transform:none !important; box-shadow:none !important; }
-
-
-
-
-/* --- lock left blocks to 2 rows like floorplan --- */
-.fp-left{
-  display: grid !important;
-  grid-template-columns: repeat(2, max-content) !important; /* 2 คอลัมน์ */
-  grid-auto-rows: max-content !important;
-  gap: 6px !important;
-  align-content: start !important;
-  justify-content: start !important;
-}
-
-/* กำหนดตำแหน่งแต่ละก้อน */
-.fp-left .b1{ grid-column: 1; grid-row: 1; } /* 3201/3101 */
-.fp-left .b2{ grid-column: 2; grid-row: 1; } /* 2101/2201 */
-.fp-left .b3{ grid-column: 1; grid-row: 2; } /* 3204/3104 */
-.fp-left .b4{ grid-column: 2; grid-row: 2; } /* 2104/2204 */
-
-/* กัน block ยืดแปลกๆ */
-.fp-block{ width: max-content !important; }
-
-
-
-
-
-/* ------------------------------
-   Pending ไม่ให้ยาวเต็มแถว
-   ------------------------------ */
-
-/* ให้คอลัมน์ซ้าย (pending/left) เป็นความกว้างตาม content */
-.floorplan{
-  grid-template-columns: max-content 230px !important; /* ซ้าย = กว้างเท่าที่ต้องใช้, ขวา = D */
-}
-
-/* pending กว้างเท่ากับ left cluster */
-.fp-pending{
-  width: fit-content !important;
-  max-width: none !important;
-}
-
-/* กัน pending บีบเกินไป (ปรับเลขได้) */
-.fp-pending-compact{
-  min-width: 360px;  /* ถ้าอยากให้ยาวขึ้น/สั้นลง ปรับตรงนี้ */
-}
-
-
-
-
-/* ---------------------------
-   เพิ่ม gap ใต้ Pending
-   --------------------------- */
-
-   .fp-pending{
-    margin-bottom: 60px !important;   /* ปรับ 12–20px ตามชอบ */
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /* ===== floorplan: 3 columns (left / zoneD / table) ===== */
-.floorplan{
-  grid-template-columns: max-content 230px minmax(420px, 1fr) !important;
-  grid-template-areas:
-    "pending right table"
-    "left    right table" !important;
-  column-gap: 12px !important;
-}
-
-/* โซนตาราง */
-.fp-table{
-  grid-area: table;
-  border:1px solid rgba(2,6,23,.08);
-  border-radius:14px;
-  background:#fff;
-  padding:10px;
-  min-width: 420px;
-}
-
-/* ตารางใน panel ให้สูงพอดีและ scroll ภายใน (ไม่ทำให้หน้าเลื่อน) */
-.fp-table .table-wrap{
-  max-height: 520px;      /* ปรับตามจอ */
-  overflow: auto;
-}
-
-/* แคบ gap เฉพาะ zone D */
-.fp-right .fp-two-col{
-  column-gap: 6px !important;
-}
-.fp-right .fp-col{
-  gap: 6px !important;
-}
-
-
-
-
-
-
-/* ================================
-   FIX: ให้ BTM/TOP ชิดกันจริงๆ (Zone D)
-   ================================ */
-
-/* แทนที่ 1fr 1fr ด้วย max-content */
-.fp-right .fp-right-two-col{
-  display: grid !important;
-  grid-template-columns: max-content max-content !important; /* ✅ ชิดตามขนาด card */
-  column-gap: 4px !important;   /* ✅ ระยะห่างระหว่าง BTM/TOP */
-  row-gap: 6px !important;
-  justify-content: start !important; /* ✅ ไม่ดันไปกินเต็มกล่อง */
-  align-content: start !important;
-}
-
-/* กัน fp-col ไป stretch แล้วทำให้ดูห่าง */
-.fp-right .fp-col{
-  align-items: flex-start !important;
-  gap: 6px !important;
-}
-
-/* (ถ้ายังรู้สึกว่ากล่อง fp-right กว้างเกิน) ให้ตัว fp-right หดตามเนื้อหา */
-.fp-right{
-  width: fit-content !important;
-}
-
-
-
-
-
-
-/* =========================================
-   FINAL FIX: ชิดจริง (Area ↔ Table)
-   วางท้ายสุดของ storage.css
-   ========================================= */
-
-/* 3 columns: left / zoneD / table */
-.floorplan{
-  grid-template-columns: max-content max-content minmax(0, 1fr) !important; /* ✅ 230px -> max-content */
-  column-gap: 6px !important; /* ระยะห่างจริงระหว่างคอลัมน์ */
-}
-
-/* กัน item ใน grid ถูก stretch จนกินที่ */
-.fp-right{
-  width: max-content !important;
-  justify-self: start !important;
-}
-
-.fp-table{
-  min-width: 0 !important;
-  width: 100% !important;
-  justify-self: stretch !important;
-  margin-left: 0 !important;
-}
-
-
-
-
-.slot-card{
-  cursor: pointer;
-}
-
-.slot-card:hover{
-  border-color: rgba(37,99,235,.55) !important;
-  background: rgba(37,99,235,.06) !important;
-}
-
-.is-selected{
-  outline: 3px solid rgba(37,99,235,.22);
-  border-color: rgba(37,99,235,.8) !important;
-  background: rgba(37,99,235,.10) !important;
-}
