@@ -4,6 +4,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { StorageComponent } from './storage/storage.component';
 import { IssueComponent } from './issue/issue.component';
 import { ReturnComponent } from './return/return.component';
+import { JobTransactionComponent } from './job-transaction/job-transaction.component';
 
 export const routes: Routes = [
   {
@@ -28,11 +29,18 @@ export const routes: Routes = [
     component: ReturnComponent,
   },
 
+
+  {
+    path: 'jobTransaction',
+    component: JobTransactionComponent,
+  },
+
   
   {
     path: '404',
     component: NotFoundComponent,
   },
+  
   {
     path: '**',
     redirectTo: '404',

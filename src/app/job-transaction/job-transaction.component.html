@@ -1,0 +1,151 @@
+<div class="jobtx-page">
+    <!-- Summary -->
+    <!-- <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <div class="tx-stat stat-issue">
+          <div class="tx-stat-icon">
+            <i class="fas fa-arrow-up-right-from-square"></i>
+          </div>
+          <div>
+            <div class="tx-stat-label">ISSUE JOBS</div>
+            <div class="tx-stat-value">{{ issueJobs.length }}</div>
+            <div class="tx-stat-sub">material requests from production</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-4">
+        <div class="tx-stat stat-return">
+          <div class="tx-stat-icon">
+            <i class="fas fa-rotate-left"></i>
+          </div>
+          <div>
+            <div class="tx-stat-label">RETURN JOBS</div>
+            <div class="tx-stat-value">{{ returnJobs.length }}</div>
+            <div class="tx-stat-sub">materials returned to store</div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-4">
+        <div class="tx-stat stat-total">
+          <div class="tx-stat-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <div>
+            <div class="tx-stat-label">TOTAL TRANSACTIONS</div>
+            <div class="tx-stat-value">{{ issueJobs.length + returnJobs.length }}</div>
+            <div class="tx-stat-sub">issue + return activity</div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  
+    <!-- Issue Section -->
+    <div class="tx-card issue-card mb-4">
+      <div class="tx-card-header">
+        <div class="tx-title-wrap">
+          <div class="tx-title-icon issue-icon">
+            <i class="fas fa-dolly-flatbed"></i>
+          </div>
+          <div>
+            <div class="tx-title">Issue Job Table</div>
+            <div class="tx-subtitle">Production material requests</div>
+          </div>
+        </div>
+  
+        <div class="tx-count-badge issue-badge">
+          {{ issueJobs.length }} jobs
+        </div>
+      </div>
+  
+      <div class="tx-table-wrap">
+        <table class="table tx-table issue-table mb-0">
+          <thead>
+            <tr>
+              <th>DateTime PD</th>
+              <th>Job No</th>
+              <th>Type</th>
+              <th>Material No</th>
+              <th>Material Name</th>
+              <th>Material Spec</th>
+              <th>M/C No</th>
+              <th>Request By</th>
+              <th>Remark</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of issueJobs; trackBy: trackIssue">
+              <td>{{ row.dateTimePD }}</td>
+              <td><span class="job-no">{{ row.jobNo }}</span></td>
+              <td><span class="type-pill type-issue">{{ row.type }}</span></td>
+              <td>{{ row.materialNo }}</td>
+              <td>{{ row.materialName }}</td>
+              <td>{{ row.materialSpec }}</td>
+              <td><span class="mc-badge">{{ row.mcNo }}</span></td>
+              <td>{{ row.requestBy }}</td>
+              <td class="remark-cell">{{ row.remark || '-' }}</td>
+            </tr>
+  
+            <tr *ngIf="!issueJobs.length">
+              <td colspan="9" class="empty-cell">No issue jobs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- Return Section -->
+    <div class="tx-card return-card">
+      <div class="tx-card-header">
+        <div class="tx-title-wrap">
+          <div class="tx-title-icon return-icon">
+            <i class="fas fa-undo"></i>
+          </div>
+          <div>
+            <div class="tx-title">Return Job Table</div>
+            <div class="tx-subtitle">Returned materials from production</div>
+          </div>
+        </div>
+  
+        <div class="tx-count-badge return-badge">
+          {{ returnJobs.length }} jobs
+        </div>
+      </div>
+  
+      <div class="tx-table-wrap">
+        <table class="table tx-table return-table mb-0">
+          <thead>
+            <tr>
+              <th>DateTime PD</th>
+              <th>Job No</th>
+              <th>Type</th>
+              <th>Material No</th>
+              <th>Material Name</th>
+              <th>Material Spec</th>
+              <th>M/C No</th>
+              <th>Request By</th>
+              <th>Remark</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of returnJobs; trackBy: trackReturn">
+              <td>{{ row.dateTimePD }}</td>
+              <td><span class="job-no">{{ row.jobNo }}</span></td>
+              <td><span class="type-pill type-return">{{ row.type }}</span></td>
+              <td>{{ row.materialNo }}</td>
+              <td>{{ row.materialName }}</td>
+              <td>{{ row.materialSpec }}</td>
+              <td><span class="mc-badge">{{ row.mcNo }}</span></td>
+              <td>{{ row.requestBy }}</td>
+              <td class="remark-cell">{{ row.remark || '-' }}</td>
+            </tr>
+  
+            <tr *ngIf="!returnJobs.length">
+              <td colspan="9" class="empty-cell">No return jobs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

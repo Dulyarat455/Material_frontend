@@ -1,92 +1,157 @@
-<div class="page">
-    <div class="page-header">
-      <div class="title">
-        <div class="h1">Return Part</div>
-        <div class="sub">Production returns remaining material back to Store</div>
-      </div>
+<div class="return-page">
+  <div class="return-header">
+    <div>
+      <div class="return-title">Return Part</div>
+      <div class="return-subtitle">Production returns remaining material back to Store</div>
     </div>
-  
-    <div class="grid">
-      <!-- left: form -->
-      <div class="card">
-        <div class="card-title">New Return Request</div>
-  
-        <div class="form">
-          <div class="row">
-            <label>Material No</label>
-            <input [(ngModel)]="materialNo" placeholder="MATS1" />
-          </div>
-  
-          <div class="row">
+
+    <div class="return-header-badge">
+      <span class="hb-label">Return Queue</span>
+      <span class="hb-value">{{ requestsAll.length }}</span>
+    </div>
+  </div>
+
+  <div class="return-grid">
+    <!-- LEFT : FORM -->
+    <div class="return-card form-card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">New Return Request</div>
+          <div class="card-subtitle">Create request to return remaining material to store</div>
+        </div>
+        <div class="card-icon return-accent">
+          <i class="fas fa-undo"></i>
+        </div>
+      </div>
+
+      <div class="return-form">
+        <div class="form-row">
+          <label>Material No</label>
+          <input [(ngModel)]="materialNo" placeholder="MATS1" />
+        </div>
+
+        <div class="form-row two-col">
+          <div>
             <label>Quantity</label>
             <input type="number" [(ngModel)]="qty" placeholder="80" />
           </div>
-  
-          <div class="row">
-            <label>From Area (Machine/PD)</label>
+
+          <div>
+            <label>From Area (Machine / PD)</label>
             <input [(ngModel)]="fromArea" placeholder="MC-02" />
           </div>
-  
-          <div class="row">
-            <label>Back to Storage Area (optional)</label>
-            <input [(ngModel)]="backToArea" placeholder="e.g. 3201" />
-          </div>
-  
-          <div class="row">
-            <label>Note</label>
-            <input [(ngModel)]="note" placeholder="Returning FIFO batch B001" />
-          </div>
-  
-          <button class="btn-primary" (click)="submitReturnRequest()">
-            Submit Return Request →
-          </button>
+        </div>
+
+        <div class="form-row">
+          <label>Back to Storage Area (optional)</label>
+          <input [(ngModel)]="backToArea" placeholder="e.g. 3201" />
+        </div>
+
+        <div class="form-row">
+          <label>Note</label>
+          <input [(ngModel)]="note" placeholder="Returning FIFO batch B001" />
+        </div>
+
+        <button class="btn-main return-btn" (click)="submitReturnRequest()">
+          <i class="fas fa-rotate-left me-2"></i>
+          Submit Return Request
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT : QUEUE -->
+    <div class="return-card queue-card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Return Queue</div>
+          <div class="card-subtitle">Track returned materials from production area</div>
+        </div>
+        <div class="queue-count">
+          {{ requestsView.length }} items
         </div>
       </div>
-  
-      <!-- right: list -->
-      <div class="card">
-        <div class="card-title">Return Queue</div>
-  
-        <div class="toolbar">
-          <input [(ngModel)]="q" (ngModelChange)="applyFilters()" placeholder="Search material / from area / user..." />
-          <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
-            <option value="all">All</option>
-            <option value="Waiting">Waiting</option>
-            <option value="Processing">Processing</option>
-            <option value="Completed">Completed</option>
-          </select>
-          <button class="btn-ghost" (click)="resetFilters()">Reset</button>
-        </div>
-  
-        <div class="list">
-          <div class="req" *ngFor="let r of requestsView">
-            <div class="req-head">
-              <div class="mat">{{ r.materialNo }}</div>
-              <div class="badge">{{ r.qty }} pcs</div>
+
+      <div class="queue-toolbar">
+        <input
+          [(ngModel)]="q"
+          (ngModelChange)="applyFilters()"
+          placeholder="Search material / from area / user..."
+        />
+
+        <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+          <option value="all">All Status</option>
+          <option value="Waiting">Waiting</option>
+          <option value="Processing">Processing</option>
+          <option value="Completed">Completed</option>
+        </select>
+
+        <button class="btn-soft" (click)="resetFilters()">Reset</button>
+      </div>
+
+      <div class="queue-list">
+        <div class="req-card" *ngFor="let r of requestsView">
+          <div class="req-top">
+            <div class="req-main">
+              <div class="req-material">{{ r.materialNo }}</div>
+              <div class="req-qty">{{ r.qty }} pcs</div>
             </div>
-  
-            <div class="req-meta">
-              <span>From: <b>{{ r.fromArea }}</b></span>
-              <span *ngIf="r.backToArea">To: {{ r.backToArea }}</span>
-              <span>{{ r.requestBy }}</span>
-              <span>{{ r.requestAt }}</span>
-            </div>
-  
-            <div class="req-note" *ngIf="r.note">⚡ {{ r.note }}</div>
-  
-            <div class="req-foot">
-              <span class="status" [class.wait]="r.status==='Waiting'" [class.proc]="r.status==='Processing'">
-                {{ r.status }}
-              </span>
-  
-              <button class="btn-small" (click)="confirmReceive(r)" [disabled]="r.status!=='Waiting'">
-                Receive
-              </button>
+
+            <div class="return-pill">
+              Return
             </div>
           </div>
-  
-          <div class="empty" *ngIf="!requestsView.length">No requests</div>
+
+          <div class="req-grid">
+            <div class="req-item">
+              <span class="k">From</span>
+              <span class="v">{{ r.fromArea }}</span>
+            </div>
+
+            <div class="req-item" *ngIf="r.backToArea">
+              <span class="k">To Area</span>
+              <span class="v">{{ r.backToArea }}</span>
+            </div>
+
+            <div class="req-item">
+              <span class="k">Request By</span>
+              <span class="v">{{ r.requestBy }}</span>
+            </div>
+
+            <div class="req-item">
+              <span class="k">Request At</span>
+              <span class="v">{{ r.requestAt }}</span>
+            </div>
+          </div>
+
+          <div class="req-note" *ngIf="r.note">
+            <i class="fas fa-bolt me-1"></i>{{ r.note }}
+          </div>
+
+          <div class="req-bottom">
+            <span
+              class="status-pill"
+              [class.wait]="r.status === 'Waiting'"
+              [class.proc]="r.status === 'Processing'"
+              [class.done]="r.status === 'Completed'"
+            >
+              {{ r.status }}
+            </span>
+
+            <button
+              class="btn-process"
+              (click)="confirmReceive(r)"
+              [disabled]="r.status !== 'Waiting'"
+            >
+              <i class="fas fa-inbox me-1"></i>
+              Receive
+            </button>
+          </div>
+        </div>
+
+        <div class="queue-empty" *ngIf="!requestsView.length">
+          No requests
         </div>
       </div>
     </div>
   </div>
+</div>

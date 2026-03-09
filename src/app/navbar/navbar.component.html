@@ -7,6 +7,21 @@
       </a>
     </li>
 
+
+     <!-- Storage (มี icon + active highlight) -->
+     <li class="nav-item">
+      <a
+        [routerLink]="['/jobTransaction']"
+        class="nav-link nav-tab"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <i class="fas fa-warehouse me-2"></i>
+        Transaction
+      </a>
+    </li>
+
+
     <!-- Storage (มี icon + active highlight) -->
     <li class="nav-item">
       <a
@@ -31,7 +46,7 @@
     <!-- Receive -->
     <li class="nav-item">
       <a class="nav-link nav-center-item" [routerLink]="['/return']" routerLinkActive="active">
-        <i class="fas fa-dolly"></i>
+        <i class="fas fa-undo"></i>
         <span>Return Part</span>
       </a>
     </li>
