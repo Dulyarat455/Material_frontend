@@ -60,6 +60,7 @@ export class StorageComponent {
   panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' = 'TABLE';
 
   stockForm = {
+    jobNo: '',
     itemNo: '',
     itemName: '',
     specDwg: '',
@@ -238,6 +239,7 @@ export class StorageComponent {
 
   resetStockForm() {
     this.stockForm = {
+      jobNo: '',
       itemNo: '',
       itemName: '',
       specDwg: '',

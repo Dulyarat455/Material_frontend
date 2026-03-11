@@ -10,10 +10,11 @@ type ReturnRequestRow = {
   qty: number;
   fromArea: string;   // PD/machine
   backToArea: string; // storage area (optional)
+  priority: 'Normal' | 'Urgent';
   requestBy: string;
   requestAt: string;
   status: 'Waiting' | 'Processing' | 'Completed';
-  note?: string;      // e.g. "Returning FIFO batch B001"
+  remark?: string;      // e.g. "Returning FIFO batch B001"
 };
 
 
@@ -31,7 +32,13 @@ export class ReturnComponent {
   qty: number | null = 80;
   fromArea = 'MC-02';
   backToArea = ''; // optional
-  note = '';
+  remark = '';
+  materialName = ''
+  materialSpec = ''
+  priority = 'Normal'
+
+  selectedLine = 'Line A'
+  selectedMachine = ''
 
   requestsAll: ReturnRequestRow[] = [
     {
@@ -43,15 +50,48 @@ export class ReturnComponent {
       requestBy: 'PD-001',
       requestAt: '2025-12-25 14:00',
       status: 'Waiting',
-      note: 'Returning FIFO batch B001',
+      remark: 'Returning FIFO batch B001',
+      priority: 'Normal'
     },
   ];
+
+
+
+
+  lines = [
+    'Line A',
+    'Line B',
+    'Line C'
+  ]
+  
+  machinesByLine: Record<string,string[]> = {
+  
+    'Line A': [
+      'A1',
+      'A2',
+      'A3'
+    ],
+  
+    'Line B': [
+      'B1',
+      'B2',
+      'B3'
+    ],
+  
+    'Line C': [
+      'C1',
+      'C2'
+    ]
+  
+  }
 
   q = '';
   statusFilter: 'all' | ReturnRequestRow['status'] = 'all';
   requestsView: ReturnRequestRow[] = [];
+  machinesView: string[] = []
 
   ngOnInit() {
+    this.onLineChange();
     this.applyFilters();
   }
 
@@ -108,7 +148,8 @@ export class ReturnComponent {
       requestBy: 'PD-001',
       requestAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
       status: 'Waiting',
-      note: (this.note || '').trim(),
+      remark: (this.remark || '').trim(),
+      priority: 'Normal'
     });
 
     this.applyFilters();
@@ -121,7 +162,7 @@ export class ReturnComponent {
       showConfirmButton: false,
     });
 
-    this.note = '';
+    this.remark = '';
   }
 
   async confirmReceive(row: ReturnRequestRow) {
@@ -142,6 +183,19 @@ export class ReturnComponent {
     row.status = 'Processing';
     this.applyFilters();
   }
+
+
+  onLineChange(){
+
+    this.machinesView =
+      this.machinesByLine[this.selectedLine] || []
+  
+    this.selectedMachine =
+      this.machinesView[0] || ''
+  
+  }
+
+
 
 
 

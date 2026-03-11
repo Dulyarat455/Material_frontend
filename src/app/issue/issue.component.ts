@@ -33,6 +33,18 @@ export class IssueComponent {
   priority: 'Normal' | 'Urgent' = 'Normal';
   remark = '';
 
+
+
+  materialName = ''
+  materialSpec = ''
+
+  selectedLine = 'Line A'
+  selectedMachine = ''
+
+
+
+
+
   // ---- list (mock) ----
   requestsAll: IssueRequestRow[] = [
     {
@@ -59,14 +71,53 @@ export class IssueComponent {
     },
   ];
 
+
+
+
+  lines = [
+    'Line A',
+    'Line B',
+    'Line C'
+  ]
+  
+  machinesByLine: Record<string,string[]> = {
+  
+    'Line A': [
+      'A1',
+      'A2',
+      'A3'
+    ],
+  
+    'Line B': [
+      'B1',
+      'B2',
+      'B3'
+    ],
+  
+    'Line C': [
+      'C1',
+      'C2'
+    ]
+  
+  }
+
+
+
+
+
+
   // view
   q = '';
   statusFilter: 'all' | IssueRequestRow['status'] = 'all';
   requestsView: IssueRequestRow[] = [];
+  machinesView: string[] = []
 
   ngOnInit() {
+    this.onLineChange()
     this.applyFilters();
   }
+
+
 
   applyFilters() {
     const q = (this.q || '').trim().toLowerCase();
@@ -108,6 +159,10 @@ export class IssueComponent {
       Swal.fire('Error', 'กรุณากรอก Qty ให้ถูกต้อง', 'error');
       return;
     } 
+    if(!this.selectedMachine){
+      Swal.fire('Error','กรุณาเลือก Machine','error')
+      return
+    }
 
     const nextId = Math.max(0, ...this.requestsAll.map((x) => x.id)) + 1;
 
@@ -115,7 +170,7 @@ export class IssueComponent {
       id: nextId,
       materialNo,
       qty,
-      destination,
+      destination: this.selectedMachine,
       priority: this.priority,
       requestBy: 'PD-001', // mock
       requestAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
@@ -155,6 +210,22 @@ export class IssueComponent {
     row.status = 'Processing';
     this.applyFilters();
   }
+
+
+
+  onLineChange(){
+
+    this.machinesView =
+      this.machinesByLine[this.selectedLine] || []
+  
+    this.selectedMachine =
+      this.machinesView[0] || ''
+  
+  }
+
+
+
+
 
 
 

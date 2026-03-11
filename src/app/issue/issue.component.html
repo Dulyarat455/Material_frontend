@@ -17,49 +17,75 @@
       <div class="card-head">
         <div>
           <div class="card-title">New Issue Request</div>
-          <div class="card-subtitle">Create new material issue request for production</div>
+          <div class="card-subtitle"> issue request for production</div>
         </div>
         <div class="card-icon issue-accent">
           <i class="fas fa-dolly"></i>
         </div>
       </div>
 
-      <div class="issue-form">
-        <div class="form-row">
-          <label>Material No</label>
-          <input [(ngModel)]="materialNo" placeholder="MATS1" />
-        </div>
 
-        <div class="form-row two-col">
-          <div>
-            <label>Quantity</label>
-            <input type="number" [(ngModel)]="qty" placeholder="200" />
-          </div>
 
-          <div>
-            <label>Priority</label>
-            <select [(ngModel)]="priority">
-              <option value="Normal">Normal</option>
-              <option value="Urgent">Urgent</option>
-            </select>
-          </div>
-        </div>
+     <div class="issue-form">
 
-        <div class="form-row">
-          <label>Destination (Machine / Area)</label>
-          <input [(ngModel)]="destination" placeholder="MC-01" />
-        </div>
+  <div class="form-row">
+    <label>Material No</label>
+    <input [(ngModel)]="materialNo" placeholder="MATS1"/>
+  </div>
 
-        <div class="form-row">
-          <label>Remark</label>
-          <input [(ngModel)]="remark" placeholder="Optional..." />
-        </div>
+  <div class="form-row">
+    <label>Material Name</label>
+    <input [(ngModel)]="materialName" placeholder="Bolt M10"/>
+  </div>
 
-        <button class="btn-main" (click)="submitIssueRequest()">
-          <i class="fas fa-paper-plane me-2"></i>
-          Submit Issue Request
-        </button>
-      </div>
+  <div class="form-row">
+    <label>Material Spec / Drawing</label>
+    <input [(ngModel)]="materialSpec" placeholder="M10 x 30mm / DWG-A12"/>
+  </div>
+
+  <div class="form-row two-col">
+
+    <div>
+      <label>Production Line</label>
+      <select [(ngModel)]="selectedLine" (change)="onLineChange()">
+        <option *ngFor="let l of lines" [value]="l">
+          {{ l }}
+        </option>
+      </select>
+    </div>
+  
+    <div>
+      <label>Machine</label>
+      <select [(ngModel)]="selectedMachine">
+        <option *ngFor="let m of machinesView" [value]="m">
+          {{ m }}
+        </option>
+      </select>
+    </div>
+
+   
+  </div>
+  <div class="form-row">
+    <label>Priority</label>
+    <select [(ngModel)]="priority">
+      <option value="Normal">Normal</option>
+      <option value="Urgent">Urgent</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label>Remark</label>
+    <input [(ngModel)]="remark" placeholder="Optional..."/>
+  </div>
+
+  <button class="btn-main" (click)="submitIssueRequest()">
+    <i class="fas fa-paper-plane me-2"></i>
+    Submit Issue Request
+  </button>
+
+</div>
+
+
     </div>
 
     <!-- RIGHT : QUEUE -->
@@ -67,7 +93,7 @@
       <div class="card-head">
         <div>
           <div class="card-title">Request Queue</div>
-          <div class="card-subtitle">Track issue requests from production users</div>
+          <div class="card-subtitle">Requests from production users</div>
         </div>
         <div class="queue-count">
           {{ requestsView.length }} items

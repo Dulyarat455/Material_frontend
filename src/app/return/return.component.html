@@ -17,7 +17,7 @@
       <div class="card-head">
         <div>
           <div class="card-title">New Return Request</div>
-          <div class="card-subtitle">Create request to return remaining material to store</div>
+          <div class="card-subtitle">Return remaining material to store</div>
         </div>
         <div class="card-icon return-accent">
           <i class="fas fa-undo"></i>
@@ -25,38 +25,67 @@
       </div>
 
       <div class="return-form">
+
         <div class="form-row">
           <label>Material No</label>
-          <input [(ngModel)]="materialNo" placeholder="MATS1" />
+          <input [(ngModel)]="materialNo" placeholder="MATS1"/>
         </div>
-
+      
+        <div class="form-row">
+          <label>Material Name</label>
+          <input [(ngModel)]="materialName" placeholder="Bolt M10"/>
+        </div>
+      
+        <div class="form-row">
+          <label>Material Spec / Drawing</label>
+          <input [(ngModel)]="materialSpec" placeholder="M10 x 30mm / DWG-A12"/>
+        </div>
+      
         <div class="form-row two-col">
-          <div>
-            <label>Quantity</label>
-            <input type="number" [(ngModel)]="qty" placeholder="80" />
-          </div>
 
           <div>
-            <label>From Area (Machine / PD)</label>
-            <input [(ngModel)]="fromArea" placeholder="MC-02" />
+            <label>Production Line</label>
+            <select [(ngModel)]="selectedLine" (change)="onLineChange()">
+              <option *ngFor="let l of lines" [value]="l">
+                {{ l }}
+              </option>
+            </select>
           </div>
+        
+          <div>
+            <label>Machine</label>
+            <select [(ngModel)]="selectedMachine">
+              <option *ngFor="let m of machinesView" [value]="m">
+                {{ m }}
+              </option>
+            </select>
+          </div>
+        
         </div>
 
         <div class="form-row">
-          <label>Back to Storage Area (optional)</label>
-          <input [(ngModel)]="backToArea" placeholder="e.g. 3201" />
+          <label>Priority</label>
+          <select [(ngModel)]="priority">
+            <option value="Normal">Normal</option>
+            <option value="Urgent">Urgent</option>
+          </select>
         </div>
-
+      
         <div class="form-row">
-          <label>Note</label>
-          <input [(ngModel)]="note" placeholder="Returning FIFO batch B001" />
+          <label>Remark</label>
+          <input [(ngModel)]="remark" placeholder="Returning unused material"/>
         </div>
-
+      
         <button class="btn-main return-btn" (click)="submitReturnRequest()">
-          <i class="fas fa-rotate-left me-2"></i>
+          <i class="fas fa-undo me-2"></i>
           Submit Return Request
         </button>
+      
       </div>
+
+
+
+
     </div>
 
     <!-- RIGHT : QUEUE -->
@@ -64,7 +93,7 @@
       <div class="card-head">
         <div>
           <div class="card-title">Return Queue</div>
-          <div class="card-subtitle">Track returned materials from production area</div>
+          <div class="card-subtitle"> Returned from production area</div>
         </div>
         <div class="queue-count">
           {{ requestsView.length }} items
@@ -123,8 +152,8 @@
             </div>
           </div>
 
-          <div class="req-note" *ngIf="r.note">
-            <i class="fas fa-bolt me-1"></i>{{ r.note }}
+          <div class="req-note" *ngIf="r.remark">
+            <i class="fas fa-bolt me-1"></i>{{ r.remark }}
           </div>
 
           <div class="req-bottom">

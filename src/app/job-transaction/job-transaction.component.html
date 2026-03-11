@@ -1,6 +1,6 @@
 <div class="jobtx-page">
     <!-- Summary -->
-    <!-- <div class="row g-3 mb-3">
+    <div class="row g-3 mb-3">
       <div class="col-md-4">
         <div class="tx-stat stat-issue">
           <div class="tx-stat-icon">
@@ -39,7 +39,10 @@
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
+
+
+
   
     <!-- Issue Section -->
     <div class="tx-card issue-card mb-4">
@@ -79,7 +82,7 @@
               <td>{{ row.dateTimePD }}</td>
               <td><span class="job-no">{{ row.jobNo }}</span></td>
               <td><span class="type-pill type-issue">{{ row.type }}</span></td>
-              <td>{{ row.materialNo }}</td>
+              <td><span class="material-no">{{ row.materialNo }}</span></td>
               <td>{{ row.materialName }}</td>
               <td>{{ row.materialSpec }}</td>
               <td><span class="mc-badge">{{ row.mcNo }}</span></td>
@@ -133,7 +136,7 @@
               <td>{{ row.dateTimePD }}</td>
               <td><span class="job-no">{{ row.jobNo }}</span></td>
               <td><span class="type-pill type-return">{{ row.type }}</span></td>
-              <td>{{ row.materialNo }}</td>
+              <td><span class="material-no">{{ row.materialNo }}</span></td>
               <td>{{ row.materialName }}</td>
               <td>{{ row.materialSpec }}</td>
               <td><span class="mc-badge">{{ row.mcNo }}</span></td>

@@ -199,7 +199,13 @@
   /* ===== small badges ===== */
   
   .job-no{
-    font-weight:800;
+    font-weight:500;
+    color:#1e293b;
+  }
+
+
+  .material-no{
+    font-weight:600;
     color:#1e293b;
   }
   

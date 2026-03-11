@@ -6,7 +6,7 @@
     style="text-decoration: none; padding: 1rem"
   >
     <img
-      src="dist/img/factory.png"
+      src="dist/img/forklift.png"
       alt="AdminLTE Logo"
       class="brand-image img-circle elevation-2"
     />
@@ -57,18 +57,26 @@
           </a>
         </li>
 
+
+        <li class="nav-item mb-1">
+          <a routerLink="/" class="nav-link" routerLinkActive="active">
+            <i class="nav-icon fas fa-home"></i>
+            <p class="ms-2">Add Member</p>
+          </a>
+        </li>
+
         <!-- Inventory Menu -->
         <!-- @if (level == 'Admin') {} -->
         <li class="nav-item">
           <h6
             class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-light"
           >
-            <span><b>Inventory</b></span>
+            <span><b>Master</b></span>
           </h6>
           <a href="#" class="nav-link">
             <i class="nav-icon fas fa-cofas fa-warehouse"></i>
             <p class="ms-2">
-              Inventory
+              Add Master
               <i class="fas fa-angle-right ms-auto"></i>
             </p>
           </a>
@@ -149,120 +157,8 @@
           </ul>
         </li>
 
-        <!-- Scrap Menu -->
-        <li class="nav-item">
-          <h6
-            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-light"
-          >
-            <span><b>Scrap</b></span>
-          </h6>
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-cofas fas fa-cart-arrow-down"></i>
-            <p class="ms-2">
-              Scrap
-              <i class="fas fa-angle-right ms-auto"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview bg-dark bg-opacity-50 rounded mx-2 mt-1">
-            <li class="nav-item mb-1">
-              <a
-                routerLink="/dashboard"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="nav-icon fas fa-chart-line"></i>
-                <p class="ms-2">Dashboard</p>
-              </a>
-            </li>
-
-            @if(level !== '') {
-            <li class="nav-item mb-1">
-              <a
-                routerLink="/input-scrap"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="nav-icon fa fa-edit"></i>
-                <p class="ms-2">Input Scrap</p>
-              </a>
-            </li>
-            }
-
-            <li class="nav-item mb-1">
-              <a
-                routerLink="/scrap-report"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="nav-icon fas fa-file-alt"></i>
-                <p class="ms-2">Scrap Report</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-
-        <!-- 
-        <li class="nav-item mb-1">
-          <a routerLink="/dashboard" class="nav-link" routerLinkActive="active">
-            <i class="nav-icon fas fa-chart-line"></i>
-            <p class="ms-2">Dashboard</p>
-          </a>
-        </li>
-
-        @if(level !== '') {
-        <li class="nav-item mb-1">
-          <a routerLink="/input-scrap" class="nav-link" routerLinkActive="active">
-            <i class="nav-icon fa fa-edit"></i>
-            <p class="ms-2">Input Scrap</p>
-          </a>
-        </li>
-        }
-
-        <li class="nav-item mb-1">
-          <a routerLink="/scrap-report" class="nav-link" routerLinkActive="active">
-            <i class="nav-icon fas fa-file-alt"></i>
-            <p class="ms-2">Scrap Report</p>
-          </a>
-        </li> -->
-
-        <!-- Scrap Menu -->
-        <!-- <li class="nav-item">
-          <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-light">
-            <span><b>Scrap</b></span>
-          </h6>
-        <a href="#" class="nav-link">
-          <i class="nav-icon far fa-trash-alt"></i>
-          <p class="ms-2">
-            Scrap
-            <i class="fas fa-angle-right ms-auto"></i>
-          </p>
-        </a> 
-        <ul class="nav nav-treeview bg-dark bg-opacity-50 rounded mx-2 mt-1">
-          <li class="nav-item mb-1">
-            <a routerLink="/dashboard" class="nav-link" routerLinkActive="active">
-              <i class="nav-icon fas fa-chart-line"></i>
-              <p class="ms-2">Dashboard</p>
-            </a>
-          </li>
-  
-          @if(level !== '') {
-          <li class="nav-item mb-1">
-            <a routerLink="/input-scrap" class="nav-link" routerLinkActive="active">
-              <i class="nav-icon fa fa-edit"></i>
-              <p class="ms-2">Input Scrap</p>
-            </a>
-          </li>
-          }
-  
-          <li class="nav-item mb-1">
-            <a routerLink="/scrap-report" class="nav-link" routerLinkActive="active">
-              <i class="nav-icon fas fa-file-alt"></i>
-              <p class="ms-2">Scrap Report</p>
-            </a>
-          </li>
-        </ul>
-      </li> -->
-
+       
+        
         <!-- Admin Menu -->
         @if (level == 'Admin') {
         <li class="nav-item">
