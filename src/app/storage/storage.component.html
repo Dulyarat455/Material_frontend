@@ -18,7 +18,8 @@
 
         <div class="card-body">
           <div class="floorplan">
-            <!-- PENDING AREA -->
+            <!-- LEFT SIDE FIXED STACK -->
+          <div class="fp-left-stack">
             <div
               class="fp-pending fp-pending-compact"
               (click)="onClickPendingArea()"
@@ -36,7 +37,6 @@
               </div>
             </div>
 
-            <!-- LEFT CLUSTER -->
             <div class="fp-left">
               <!-- BLOCK 1 -->
               <div class="fp-block b1">
@@ -166,39 +166,39 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- RIGHT COLUMN -->
-            <div class="fp-right">
-              <div class="fp-right-head">
-                <span class="mini-pill">BTM</span>
-                <span class="mini-pill">TOP</span>
-              </div>
-
-              <div class="fp-two-col fp-right-two-col">
-                <div class="fp-col">
-                  <button
-                    *ngFor="let s of slotsBy('D','BTM'); trackBy: trackSlot"
-                    type="button"
-                    [ngClass]="slotClass(s)"
-                    (click)="onClickSlot(s)"
-                  >
-                    <div class="slot-id">{{ s.id }}</div>
-                  </button>
-                </div>
-
-                <div class="fp-col">
-                  <button
-                    *ngFor="let s of slotsBy('D','TOP'); trackBy: trackSlot"
-                    type="button"
-                    [ngClass]="slotClass(s)"
-                    (click)="onClickSlot(s)"
-                  >
-                    <div class="slot-id">{{ s.id }}</div>
-                  </button>
-                </div>
-              </div>
+          <!-- RIGHT COLUMN -->
+          <div class="fp-right">
+            <div class="fp-right-head">
+              <span class="mini-pill">BTM</span>
+              <span class="mini-pill">TOP</span>
             </div>
 
+            <div class="fp-two-col fp-right-two-col">
+              <div class="fp-col">
+                <button
+                  *ngFor="let s of slotsBy('D','BTM'); trackBy: trackSlot"
+                  type="button"
+                  [ngClass]="slotClass(s)"
+                  (click)="onClickSlot(s)"
+                >
+                  <div class="slot-id">{{ s.id }}</div>
+                </button>
+              </div>
+
+              <div class="fp-col">
+                <button
+                  *ngFor="let s of slotsBy('D','TOP'); trackBy: trackSlot"
+                  type="button"
+                  [ngClass]="slotClass(s)"
+                  (click)="onClickSlot(s)"
+                >
+                  <div class="slot-id">{{ s.id }}</div>
+                </button>
+              </div>
+            </div>
+          </div>
 
             
 
@@ -328,33 +328,79 @@
               <!-- STOCK IN / STOCK OUT FORM -->
               <ng-container *ngIf="panelMode === 'STOCK_IN' || panelMode === 'STOCK_OUT'">
                 <div class="stock-panel">
-                  <div class="stock-row">
-                    <label>Job No.</label>
-                    <input type="text" [(ngModel)]="stockForm.jobNo" />
-                  </div>
-                  <div class="stock-row">
-                    <label>Job No.</label>
-                    <input type="text" [(ngModel)]="stockForm.jobNo" />
-                  </div>
-                  <div class="stock-row">
-                    <label>Job No.</label>
-                    <input type="text" [(ngModel)]="stockForm.jobNo" />
-                  </div>
+                 
 
                   <div class="stock-row">
                     <label>Job No.</label>
                     <input type="text" [(ngModel)]="stockForm.jobNo" />
                   </div>
+                  <!-- <div class="stock-row">
+                    <label>yearMonth</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>recivedDate</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>inspector</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>invoiceOne</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>taxLnvNo</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
                   <div class="stock-row">
-                    <label>Item No.</label>
+                    <label>materialNo</label>
                     <input type="text" [(ngModel)]="stockForm.itemNo" />
                   </div>
-            
+                  <!-- <div class="stock-row">
+                    <label>unitPrice</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>qtyOfPalletPack</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <div class="stock-row">
+                    <label>coil</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div>
+                  <div class="stock-row">
+                    <label>qtyKgsPcs</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div>
+                  <!-- <div class="stock-row">
+                    <label>unit</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>kgsCoil</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>odCoil</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>remark</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+                  <!-- <div class="stock-row">
+                    <label>millSheet</label>
+                    <input type="text" [(ngModel)]="stockForm.itemNo" />
+                  </div> -->
+
+
                   <div class="stock-row">
                     <label>Item Name.</label>
                     <input type="text" [(ngModel)]="stockForm.itemName" />
                   </div>
-            
+
                   <div class="stock-row">
                     <label>Spec/Dwg</label>
                     <input type="text" [(ngModel)]="stockForm.specDwg" />
@@ -365,11 +411,26 @@
                     <input type="text" [(ngModel)]="stockForm.lotNo" />
                   </div>
             
-                  <div class="stock-row">
-                    <label>Quantity</label>
+                  <!-- <div class="stock-row">
+                    <label>packing</label>
                     <input type="text" [(ngModel)]="stockForm.quantity" />
-                  </div>
+                  </div> -->
             
+                  <!-- <div class="stock-row">
+                    <label>rosh</label>
+                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
+                  </div> -->
+
+                  <!-- <div class="stock-row">
+                    <label>result</label>
+                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
+                  </div> -->
+
+                  <!-- <div class="stock-row">
+                    <label>supplier</label>
+                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
+                  </div> -->
+
                   <div class="stock-row">
                     <label>Storage Area</label>
                     <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
@@ -387,6 +448,7 @@
                       <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
                     </button>
                   </div>
+
                 </div>
               </ng-container>
             
@@ -486,7 +548,7 @@
 
 
 
-          
+
         </div>
       </div>
     </div>
