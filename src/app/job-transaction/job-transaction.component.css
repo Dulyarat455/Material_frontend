@@ -254,3 +254,125 @@
   .return-card{
     border-top:3px solid #ffb37b;
   }
+
+
+
+
+
+/* cell ปุ่ม */
+.action-cell {
+  white-space: nowrap;
+}
+
+/* ปุ่ม stock out */
+.stockout-btn {
+  min-width: 108px;
+  height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7ea2ff 0%, #5f86f2 100%);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 8px 18px rgba(95, 134, 242, 0.22);
+  transition: all 0.2s ease;
+}
+
+.stockout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(95, 134, 242, 0.28);
+  background: linear-gradient(135deg, #6f95fb 0%, #4f78ec 100%);
+}
+
+.stockout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(95, 134, 242, 0.2);
+}
+
+.stockout-btn:focus-visible {
+  outline: 3px solid rgba(126, 162, 255, 0.28);
+  outline-offset: 2px;
+}
+
+/* disabled */
+.stockout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .stockout-btn {
+    min-width: 94px;
+    height: 34px;
+    font-size: 0.86rem;
+    border-radius: 10px;
+    padding: 0 12px;
+  }
+}
+
+
+
+
+
+/* cell */
+.action-cell{
+  white-space: nowrap;
+}
+
+/* RETURN BUTTON */
+.return-btn{
+  min-width: 100px;
+  height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+
+  background: linear-gradient(135deg,#39c98a,#1ea86a);
+  color: #fff;
+
+  font-size: 0.92rem;
+  font-weight: 700;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  box-shadow: 0 8px 18px rgba(30,168,106,0.25);
+  transition: all .2s ease;
+}
+
+/* hover */
+.return-btn:hover{
+  background: linear-gradient(135deg,#2fbd80,#17945d);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(30,168,106,0.28);
+}
+
+/* click */
+.return-btn:active{
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(30,168,106,0.2);
+}
+
+/* focus */
+.return-btn:focus-visible{
+  outline: 3px solid rgba(39,197,123,0.3);
+  outline-offset: 2px;
+}
+
+/* disabled */
+.return-btn:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}

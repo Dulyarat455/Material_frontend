@@ -75,6 +75,7 @@
               <th>M/C No</th>
               <th>Request By</th>
               <th>Remark</th>
+              <th>StockOut</th>
             </tr>
           </thead>
           <tbody>
@@ -88,10 +89,16 @@
               <td><span class="mc-badge">{{ row.mcNo }}</span></td>
               <td>{{ row.requestBy }}</td>
               <td class="remark-cell">{{ row.remark || '-' }}</td>
+              <td class="action-cell">
+                <button class="stockout-btn" type="button">
+               
+                  Stock Out
+                </button>
+              </td>
             </tr>
   
             <tr *ngIf="!issueJobs.length">
-              <td colspan="9" class="empty-cell">No issue jobs</td>
+              <td colspan="10" class="empty-cell">No issue jobs</td>
             </tr>
           </tbody>
         </table>
@@ -129,6 +136,7 @@
               <th>M/C No</th>
               <th>Request By</th>
               <th>Remark</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -142,6 +150,12 @@
               <td><span class="mc-badge">{{ row.mcNo }}</span></td>
               <td>{{ row.requestBy }}</td>
               <td class="remark-cell">{{ row.remark || '-' }}</td>
+              <td class="action-cell">
+                <button class="return-btn" type="button">
+                  <i class="fa-solid fa-rotate-left me-1"></i>
+                  Return
+                </button>
+              </td>
             </tr>
   
             <tr *ngIf="!returnJobs.length">

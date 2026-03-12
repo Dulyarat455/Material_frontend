@@ -324,133 +324,291 @@
                   </table>
                 </div>
               </ng-container>
+
+
+
+
+
+              
             
-              <!-- STOCK IN / STOCK OUT FORM -->
-              <ng-container *ngIf="panelMode === 'STOCK_IN' || panelMode === 'STOCK_OUT'">
-                <div class="stock-panel">
-                 
+            <!-- STOCK IN / STOCK OUT FORM -->
+          <ng-container *ngIf="panelMode === 'STOCK_IN' || panelMode === 'STOCK_OUT'">
+            <div class="stock-panel">
 
-                  <div class="stock-row">
-                    <label>Job No.</label>
-                    <input type="text" [(ngModel)]="stockForm.jobNo" />
-                  </div>
-                  <!-- <div class="stock-row">
-                    <label>yearMonth</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>recivedDate</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>inspector</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>invoiceOne</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>taxLnvNo</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <div class="stock-row">
-                    <label>materialNo</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div>
-                  <!-- <div class="stock-row">
-                    <label>unitPrice</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>qtyOfPalletPack</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <div class="stock-row">
-                    <label>coil</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div>
-                  <div class="stock-row">
-                    <label>qtyKgsPcs</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div>
-                  <!-- <div class="stock-row">
-                    <label>unit</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>kgsCoil</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>odCoil</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>remark</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
-                  <!-- <div class="stock-row">
-                    <label>millSheet</label>
-                    <input type="text" [(ngModel)]="stockForm.itemNo" />
-                  </div> -->
+              <div class="stock-row">
+                <label>Job No.</label>
+                <input
+                  #scanJobNo
+                  type="text"
+                  [(ngModel)]="stockForm.jobNo"
+                  (keydown.enter)="onStockScanEnter('jobNo', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>yearMonth</label>
+                <input
+                  #scanYearMonth
+                  type="text"
+                  [(ngModel)]="stockForm.yearMonth"
+                  (keydown.enter)="onStockScanEnter('yearMonth', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>recivedDate</label>
+                <input
+                  #scanRecivedDate
+                  type="text"
+                  [(ngModel)]="stockForm.recivedDate"
+                  (keydown.enter)="onStockScanEnter('recivedDate', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>inspector</label>
+                <input
+                  #scanInspector
+                  type="text"
+                  [(ngModel)]="stockForm.inspector"
+                  (keydown.enter)="onStockScanEnter('inspector', $event)"
+                />
+              </div>
+              <div class="stock-row stock-row-hidden">
+                <label>UnloadBy</label>
+                <input
+                  #scanUnloadBy
+                  type="text"
+                  [(ngModel)]="stockForm.unloadBy"
+                  (keydown.enter)="onStockScanEnter('unloadBy', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>invoiceOne</label>
+                <input
+                  #scanInvoiceOne
+                  type="text"
+                  [(ngModel)]="stockForm.invoiceOne"
+                  (keydown.enter)="onStockScanEnter('invoiceOne', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>taxInvNo</label>
+                <input
+                  #scanTaxInvNo
+                  type="text"
+                  [(ngModel)]="stockForm.taxInvNo"
+                  (keydown.enter)="onStockScanEnter('taxInvNo', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>materialNo</label>
+                <input
+                  #scanItemNo
+                  type="text"
+                  [(ngModel)]="stockForm.itemNo"
+                  (keydown.enter)="onStockScanEnter('itemNo', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>unitPrice</label>
+                <input
+                  #scanUnitPrice
+                  type="text"
+                  [(ngModel)]="stockForm.unitPrice"
+                  (keydown.enter)="onStockScanEnter('unitPrice', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>qtyOfPalletPack</label>
+                <input
+                  #scanQtyOfPalletPack
+                  type="text"
+                  [(ngModel)]="stockForm.qtyOfPalletPack"
+                  (keydown.enter)="onStockScanEnter('qtyOfPalletPack', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>coil</label>
+                <input
+                  #scanCoil
+                  type="text"
+                  [(ngModel)]="stockForm.coil"
+                  (keydown.enter)="onStockScanEnter('coil', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>qtyKgsPcs</label>
+                <input
+                  #scanQtyKgsPcs
+                  type="text"
+                  [(ngModel)]="stockForm.qtyKgsPcs"
+                  (keydown.enter)="onStockScanEnter('qtyKgsPcs', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>unit</label>
+                <input
+                  #scanUnit
+                  type="text"
+                  [(ngModel)]="stockForm.unit"
+                  (keydown.enter)="onStockScanEnter('unit', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>kgsCoil</label>
+                <input
+                  #scanKgsCoil
+                  type="text"
+                  [(ngModel)]="stockForm.kgsCoil"
+                  (keydown.enter)="onStockScanEnter('kgsCoil', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>odCoil</label>
+                <input
+                  #scanOdCoil
+                  type="text"
+                  [(ngModel)]="stockForm.odCoil"
+                  (keydown.enter)="onStockScanEnter('odCoil', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>remark</label>
+                <input
+                  #scanRemark
+                  type="text"
+                  [(ngModel)]="stockForm.remark"
+                  (keydown.enter)="onStockScanEnter('remark', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>millSheet</label>
+                <input
+                  #scanMillSheet
+                  type="text"
+                  [(ngModel)]="stockForm.millSheet"
+                  (keydown.enter)="onStockScanEnter('millSheet', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>Item Name.</label>
+                <input
+                  #scanItemName
+                  type="text"
+                  [(ngModel)]="stockForm.itemName"
+                  (keydown.enter)="onStockScanEnter('itemName', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>Spec/Dwg</label>
+                <input
+                  #scanSpecDwg
+                  type="text"
+                  [(ngModel)]="stockForm.specDwg"
+                  (keydown.enter)="onStockScanEnter('specDwg', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>Lot No.</label>
+                <input
+                  #scanLotNo
+                  type="text"
+                  [(ngModel)]="stockForm.lotNo"
+                  (keydown.enter)="onStockScanEnter('lotNo', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>packing</label>
+                <input
+                  #scanQuantity
+                  type="text"
+                  [(ngModel)]="stockForm.quantity"
+                  (keydown.enter)="onStockScanEnter('quantity', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>rosh</label>
+                <input
+                  #scanRosh
+                  type="text"
+                  [(ngModel)]="stockForm.rosh"
+                  (keydown.enter)="onStockScanEnter('rosh', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>result</label>
+                <input
+                  #scanResult
+                  type="text"
+                  [(ngModel)]="stockForm.result"
+                  (keydown.enter)="onStockScanEnter('result', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>supplier</label>
+                <input
+                  #scanSupplier
+                  type="text"
+                  [(ngModel)]="stockForm.supplier"
+                  (keydown.enter)="onStockScanEnter('supplier', $event)"
+                />
+              </div>
+
+              <div class="stock-row stock-row-hidden">
+                <label>amount</label>
+                <input
+                  #scanAmount
+                  type="text"
+                  [(ngModel)]="stockForm.amount"
+                  (keydown.enter)="onStockScanEnter('amount', $event)"
+                />
+              </div>
+
+              <div class="stock-row">
+                <label>Storage Area</label>
+                <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
+              </div>
+
+              <div class="stock-row">
+                <label>Stock Note</label>
+                <textarea rows="3" [(ngModel)]="stockForm.stockNote"></textarea>
+              </div>
+
+              <div class="stock-footer">
+                <button class="btn-soft" type="button" (click)="resetStockForm()">Clear</button>
+                <button class="btn-main" type="button" (click)="confirmStockAction()">
+                  <span *ngIf="panelMode === 'STOCK_IN'">Confirm Stock In</span>
+                  <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
+                </button>
+              </div>
+
+            </div>
+          </ng-container>
 
 
-                  <div class="stock-row">
-                    <label>Item Name.</label>
-                    <input type="text" [(ngModel)]="stockForm.itemName" />
-                  </div>
 
-                  <div class="stock-row">
-                    <label>Spec/Dwg</label>
-                    <input type="text" [(ngModel)]="stockForm.specDwg" />
-                  </div>
-            
-                  <div class="stock-row">
-                    <label>Lot No.</label>
-                    <input type="text" [(ngModel)]="stockForm.lotNo" />
-                  </div>
-            
-                  <!-- <div class="stock-row">
-                    <label>packing</label>
-                    <input type="text" [(ngModel)]="stockForm.quantity" />
-                  </div> -->
-            
-                  <!-- <div class="stock-row">
-                    <label>rosh</label>
-                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
-                  </div> -->
 
-                  <!-- <div class="stock-row">
-                    <label>result</label>
-                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
-                  </div> -->
 
-                  <!-- <div class="stock-row">
-                    <label>supplier</label>
-                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
-                  </div> -->
-
-                  <div class="stock-row">
-                    <label>Storage Area</label>
-                    <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
-                  </div>
-            
-                  <div class="stock-row">
-                    <label>Stock Note</label>
-                    <textarea rows="3" [(ngModel)]="stockForm.stockNote"></textarea>
-                  </div>
-            
-                  <div class="stock-footer">
-                    <button class="btn-soft" (click)="resetStockForm()">Clear</button>
-                    <button class="btn-main">
-                      <span *ngIf="panelMode === 'STOCK_IN'">Confirm Stock In</span>
-                      <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
-                    </button>
-                  </div>
-
-                </div>
-              </ng-container>
             
               <!-- MOVE AREA MODE -->
               <ng-container *ngIf="panelMode === 'MOVE_AREA'">
