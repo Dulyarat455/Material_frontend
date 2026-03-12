@@ -171,9 +171,10 @@ export class StorageComponent {
   };
 
 
-   storeMasters: storeMasterRow[] = []
+  storeMasters: storeMasterRow[] = []
+  isSavingStock = false;
 
-   
+
 
   pendingItems: MaterialItem[] = [
     {
@@ -313,7 +314,7 @@ export class StorageComponent {
 
 
   ngOnInit() {
-   
+    this.fetchStoreMaster();
  }
 
 
@@ -571,6 +572,9 @@ export class StorageComponent {
         width: '720px',
         confirmButtonText: 'OK',
         confirmButtonColor: '#2563eb'
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+        this.submitStockIn();
       });
     
       return;
@@ -617,10 +621,12 @@ export class StorageComponent {
       supplier: '',
       amount: '',
 
-      storageArea: this.selectedSlot?.id || '',
+      storageArea:  '',
       stockNote: '',
       rawScan: ''
     };
+    this.selectedSlot = null;
+    this.viewMode = 'NONE';
 
     setTimeout(() => this.focusScanFirst(), 0);
   }
@@ -836,7 +842,7 @@ export class StorageComponent {
       error: (err) => {
         Swal.fire({
           title: 'Error',
-          text: err.message,
+          text: err.message || err?.message || 'Load store master fail',
           icon: 'error',
         });
       },
@@ -847,6 +853,104 @@ export class StorageComponent {
 
 
 
+
+
+
+
+
+
+
+
+  onChangeStorageArea() {
+    const area = (this.stockForm.storageArea || '').trim();
+  
+    if (!area) {
+      this.selectedSlot = null;
+      if (this.viewMode === 'SLOT') {
+        this.viewMode = 'NONE';
+      }
+      return;
+    }
+  
+    const slot = this.slots.find(s => s.id === area);
+  
+    if (slot) {
+      this.selectedSlot = slot;
+      this.viewMode = 'SLOT';
+    } else {
+      this.selectedSlot = null;
+    }
+  }
+
+
+
+
+// ******** stockIn ************
+
+  submitStockIn() {
+    if (this.isSavingStock) return;
+  
+   
+  
+    this.isSavingStock = true;
+  
+    const body = {
+      jobNo: this.stockForm.jobNo,
+      yearMonth: this.stockForm.yearMonth,
+      recivedDate: this.stockForm.recivedDate,
+      inspector: this.stockForm.inspector,
+      unloadBy: this.stockForm.unloadBy,
+      invoiceOne: this.stockForm.invoiceOne,
+      taxLnvNo: this.stockForm.taxInvNo,
+  
+      materialNo: this.stockForm.itemNo,
+      unitPrice: this.stockForm.unitPrice,
+      qtyOfPalletPack: this.stockForm.qtyOfPalletPack,
+      coil: this.stockForm.coil,
+      qtyKgsPcs: this.stockForm.qtyKgsPcs,
+      unit: this.stockForm.unit,
+      kgsCoil: this.stockForm.kgsCoil,
+      odCoil: this.stockForm.odCoil,
+      remark: this.stockForm.remark,
+      millSheet: this.stockForm.millSheet,
+  
+      itemName: this.stockForm.itemName,
+      itemSpec: this.stockForm.specDwg,
+      lotNo: this.stockForm.lotNo,
+      packing: this.stockForm.quantity,
+      rosh: this.stockForm.rosh,
+      result: this.stockForm.result,
+      supplier: this.stockForm.supplier,
+      amount: this.stockForm.amount,
+  
+      storageArea: this.stockForm.storageArea,
+      userId: 1,
+      stockNote: this.stockForm.stockNote
+    };
+  
+    this.http.post(config.apiServer + '/api/mc/stockIn', body).subscribe({
+      next: (res: any) => {
+        this.isSavingStock = false;
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Stock In Success',
+          text: res?.message || 'บันทึก Stock In สำเร็จ'
+        }).then(() => {
+          this.resetStockForm();
+        });
+      },
+      error: (err) => {
+        this.isSavingStock = false;
+  
+        Swal.fire({
+          icon: 'error',
+          title: 'Stock In Fail',
+          text: err?.error?.message || err?.message || 'บันทึก Stock In ไม่สำเร็จ'
+        });
+      }
+    });
+  }
 
 
 }

@@ -586,7 +586,24 @@
 
               <div class="stock-row">
                 <label>Storage Area</label>
-                <input type="text" [(ngModel)]="stockForm.storageArea" readonly />
+              
+                <div class="storage-area-box">
+                  <select
+                    class="storage-area-select"
+                    [(ngModel)]="stockForm.storageArea"
+                    name="storageArea"
+                    (change)="onChangeStorageArea()"
+                  >
+                    <option value="">Select area</option>
+                    <option
+                      *ngFor="let a of storeMasters"
+                      [value]="a.name"
+                    >
+                      {{ a.name }}
+                    </option>
+                  </select>
+              
+                </div>
               </div>
 
               <div class="stock-row">
@@ -596,10 +613,17 @@
 
               <div class="stock-footer">
                 <button class="btn-soft" type="button" (click)="resetStockForm()">Clear</button>
-                <button class="btn-main" type="button" (click)="confirmStockAction()">
-                  <span *ngIf="panelMode === 'STOCK_IN'">Confirm Stock In</span>
-                  <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
-                </button>
+                <button
+                class="btn-main"
+                type="button"
+                (click)="confirmStockAction()"
+                [disabled]="isSavingStock"
+              >
+                <span *ngIf="panelMode === 'STOCK_IN'">
+                  {{ isSavingStock ? 'Saving...' : 'Confirm Stock In' }}
+                </span>
+                <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
+              </button>
               </div>
 
             </div>
