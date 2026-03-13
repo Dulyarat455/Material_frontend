@@ -53,7 +53,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
 
@@ -64,7 +64,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
                 </div>
@@ -85,7 +85,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
 
@@ -96,7 +96,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
                 </div>
@@ -117,7 +117,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
 
@@ -128,7 +128,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
                 </div>
@@ -149,7 +149,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
 
@@ -160,7 +160,7 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.id }}</div>
+                      <div class="slot-id">{{ s.storeCode }}</div>
                     </button>
                   </div>
                 </div>
@@ -183,7 +183,7 @@
                   [ngClass]="slotClass(s)"
                   (click)="onClickSlot(s)"
                 >
-                  <div class="slot-id">{{ s.id }}</div>
+                  <div class="slot-id">{{ s.storeCode }}</div>
                 </button>
               </div>
 
@@ -194,7 +194,7 @@
                   [ngClass]="slotClass(s)"
                   (click)="onClickSlot(s)"
                 >
-                  <div class="slot-id">{{ s.id }}</div>
+                  <div class="slot-id">{{ s.storeCode }}</div>
                 </button>
               </div>
             </div>
@@ -215,7 +215,7 @@
             
                     <ng-template #slotTitle>
                       <ng-container *ngIf="selectedSlot; else noneTitle">
-                        Slot <b>{{ selectedSlot.id }}</b> materials
+                        Slot <b>{{ selectedSlot.storeCode }}</b> materials
                         <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
                       </ng-container>
             
@@ -694,9 +694,9 @@
                               <option value="">Select area</option>
                               <option
                                 *ngFor="let s of slots; trackBy: trackSlot"
-                                [value]="s.id"
+                                [value]="s.storeCode"
                                 [disabled]="s.status === 'REJECTED'">
-                                {{ s.id }}
+                                {{ s.storeCode }}
                               </option>
                             </select>
                           </td>

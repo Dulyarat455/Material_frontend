@@ -34,7 +34,7 @@ type MaterialItem = {
 };
 
 type SlotRow = {
-  id: string;
+  storeCode: string;
   zone: 'A' | 'B' | 'C' | 'D';
   row: 'TOP' | 'BTM';
   status: SlotStatus;
@@ -56,7 +56,7 @@ type MoveRow = {
   itemName: string;
   itemSpec: string;
 
-  sourceSlotId: string;
+  sourceStoreCode: string;
   sourceInvNo: string;
 };
 
@@ -218,7 +218,7 @@ export class StorageComponent {
 
   slots: SlotRow[] = [
     {
-      id: '3201', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 500,
+      storeCode: '3201', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 500,
       materials: [{
         matCode: 'MATS5', description: 'Bolt M10', qty: 500, uom: 'pcs',
         invNo: 'INV-010', receivedAt: '2025-12-25', fifoRank: 1,
@@ -226,7 +226,7 @@ export class StorageComponent {
       }]
     },
     {
-      id: '3202', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 1500,
+      storeCode: '3202', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 1500,
       materials: [{
         matCode: 'MATS1', description: 'SteelRod12mm', qty: 1500, uom: 'pcs',
         invNo: 'INV-010', receivedAt: '2025-12-25', fifoRank: 1,
@@ -234,75 +234,75 @@ export class StorageComponent {
       }]
     },
     {
-      id: '3203', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 1200,
+      storeCode: '3203', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 1200,
       materials: [{
         matCode: 'MATS1', description: 'SteelRod12mm', qty: 1200, uom: 'pcs',
         invNo: 'INV-011', receivedAt: '2025-12-27', fifoRank: 2,
         itemNo: 'MATS1', itemName: 'Steel Rod', itemSpec: '12mm'
       }]
     },
-    { id: '3204', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '3205', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '3206', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '3204', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '3205', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '3206', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
 
-    { id: '3101', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '3102', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '3103', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '3101', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '3102', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '3103', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
     {
-      id: '3104', zone: 'B', row: 'TOP', status: 'OCCUPIED', usedQty: 800,
+      storeCode: '3104', zone: 'B', row: 'TOP', status: 'OCCUPIED', usedQty: 800,
       materials: [{
         matCode: 'MATS2', description: 'Rubber Pad', qty: 800, uom: 'pcs',
         invNo: 'INV-009', receivedAt: '2025-12-20', fifoRank: 1,
         itemNo: 'MATS2', itemName: 'Rubber Pad', itemSpec: 'STD'
       }]
     },
-    { id: '3105', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '3106', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '3105', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '3106', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
 
     {
-      id: '2101', zone: 'C', row: 'TOP', status: 'PARTIAL', usedQty: 300,
+      storeCode: '2101', zone: 'C', row: 'TOP', status: 'PARTIAL', usedQty: 300,
       materials: [{
         matCode: 'MATS9', description: 'Washer', qty: 300, uom: 'pcs',
         invNo: 'INV-007', receivedAt: '2025-12-18', fifoRank: 1,
         itemNo: 'MATS9', itemName: 'Washer', itemSpec: 'STD'
       }]
     },
-    { id: '2102', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '2103', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '2104', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '2105', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '2106', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '2102', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '2103', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '2104', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '2105', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '2106', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
 
-    { id: '2201', zone: 'C', row: 'BTM', status: 'REJECTED', materials: [] },
-    { id: '2202', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '2203', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '2204', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '2205', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '2206', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '2201', zone: 'C', row: 'BTM', status: 'REJECTED', materials: [] },
+    { storeCode: '2202', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '2203', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '2204', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '2205', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '2206', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
 
-    { id: '1101', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1102', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1103', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1104', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1105', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1106', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1107', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1108', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1109', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1110', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { id: '1111', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1101', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1102', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1103', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1104', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1105', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1106', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1107', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1108', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1109', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1110', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
+    { storeCode: '1111', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
 
-    { id: '1201', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1202', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1203', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1204', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1205', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1206', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1207', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1208', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1209', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1210', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { id: '1211', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1201', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1202', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1203', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1204', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1205', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1206', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1207', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1208', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1209', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1210', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
+    { storeCode: '1211', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
   ];
 
   selectedSlot: SlotRow | null = null;
@@ -325,7 +325,7 @@ export class StorageComponent {
   }
 
   trackSlot(index: number, s: SlotRow) {
-    return s.id;
+    return s.storeCode;
   }
 
   private focusEl(ref?: ElementRef<HTMLInputElement>) {
@@ -452,7 +452,7 @@ export class StorageComponent {
 
   setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA') {
     this.panelMode = mode;
-    this.stockForm.storageArea = this.selectedSlot?.id || '';
+    this.stockForm.storageArea = this.selectedSlot?.storeCode || '';
 
     if (mode !== 'MOVE_AREA') {
       this.moveRows = [];
@@ -638,8 +638,8 @@ export class StorageComponent {
       'st-partial': s.status === 'PARTIAL',
       'st-empty': s.status === 'EMPTY',
       'st-rejected': s.status === 'REJECTED',
-      'is-selected': this.selectedSlot?.id === s.id,
-      'is-move-highlight': this.isMoveHighlighted(s.id)
+      'is-selected': this.selectedSlot?.storeCode === s.storeCode,
+      'is-move-highlight': this.isMoveHighlighted(s.storeCode)
     };
   }
 
@@ -653,7 +653,7 @@ export class StorageComponent {
     this.selectedSlot = s;
 
     if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
-      this.stockForm.storageArea = s.id;
+      this.stockForm.storageArea = s.storeCode;
       setTimeout(() => this.focusScanFirst(), 0);
     }
   }
@@ -688,9 +688,9 @@ export class StorageComponent {
 
         if (itemNo.includes(key)) {
           rows.push({
-            uid: `${slot.id}_${index}_${m.invNo}`,
+            uid: `${slot.storeCode}_${index}_${m.invNo}`,
             checked: false,
-            area: slot.id,
+            area: slot.storeCode,
             receivedDate: m.receivedAt,
             invoice: m.invNo,
             qty: m.qty,
@@ -699,7 +699,7 @@ export class StorageComponent {
             itemNo: m.itemNo || m.matCode || '',
             itemName: m.itemName || m.description || '',
             itemSpec: m.itemSpec || m.description || '',
-            sourceSlotId: slot.id,
+            sourceSlotId: slot.storeCode,
             sourceInvNo: m.invNo
           });
         }
@@ -730,8 +730,8 @@ export class StorageComponent {
     }
 
     selected.forEach(row => {
-      const fromSlot = this.slots.find(s => s.id === row.sourceSlotId);
-      const toSlot = this.slots.find(s => s.id === row.toArea);
+      const fromSlot = this.slots.find(s => s.storeCode === row.sourceSlotId);
+      const toSlot = this.slots.find(s => s.storeCode === row.toArea);
 
       if (!fromSlot || !toSlot) return;
       if (toSlot.status === 'REJECTED') return;
@@ -785,13 +785,13 @@ export class StorageComponent {
     this.viewMode = 'SLOT';
 
     if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
-      this.stockForm.storageArea = slot.id;
+      this.stockForm.storageArea = slot.storeCode;
     }
 
     Swal.fire({
       icon: 'success',
       title: 'Stored',
-      text: `จัดเก็บ ${p.matCode} เข้าช่อง ${slot.id} แล้ว`,
+      text: `จัดเก็บ ${p.matCode} เข้าช่อง ${slot.storeCode} แล้ว`,
       timer: 900,
       showConfirmButton: false
     });
@@ -814,7 +814,7 @@ export class StorageComponent {
       html: `<div style="text-align:left">
         <div><b>Material:</b> ${p.matCode}</div>
         <div><b>Qty:</b> ${p.qty} ${p.uom}</div>
-        <div><b>Suggested Slot:</b> ${empty.id}</div>
+        <div><b>Suggested Slot:</b> ${empty.storeCode}</div>
         <div style="color:#64748b; font-size:12px; margin-top:8px;">(mock) กด Confirm เพื่อย้ายจาก Pending → Slot</div>
       </div>`,
       showCancelButton: true,
@@ -872,7 +872,7 @@ export class StorageComponent {
       return;
     }
   
-    const slot = this.slots.find(s => s.id === area);
+    const slot = this.slots.find(s => s.storeCode === area);
   
     if (slot) {
       this.selectedSlot = slot;
