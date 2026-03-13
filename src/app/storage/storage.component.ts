@@ -645,7 +645,7 @@ export class StorageComponent {
 
   isMoveHighlighted(slotId: string): boolean {
     return this.panelMode === 'MOVE_AREA' &&
-      this.moveRows.some(r => r.sourceSlotId === slotId);
+      this.moveRows.some(r => r.sourceStoreCode === slotId);
   }
 
   onClickSlot(s: SlotRow) {
@@ -699,7 +699,7 @@ export class StorageComponent {
             itemNo: m.itemNo || m.matCode || '',
             itemName: m.itemName || m.description || '',
             itemSpec: m.itemSpec || m.description || '',
-            sourceSlotId: slot.storeCode,
+            sourceStoreCode: slot.storeCode,
             sourceInvNo: m.invNo
           });
         }
@@ -730,7 +730,7 @@ export class StorageComponent {
     }
 
     selected.forEach(row => {
-      const fromSlot = this.slots.find(s => s.storeCode === row.sourceSlotId);
+      const fromSlot = this.slots.find(s => s.storeCode === row.sourceStoreCode);
       const toSlot = this.slots.find(s => s.storeCode === row.toArea);
 
       if (!fromSlot || !toSlot) return;
