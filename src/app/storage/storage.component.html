@@ -696,6 +696,7 @@
                           </td>
                           <td><b>{{ row.area }}</b></td>
                           <td>{{ row.receivedDate }}</td>
+                          <td>{{ row.itemNo }}</td>
                           <td>{{ row.invoice }}</td>
                           <td class="text-end">{{ row.qty | number }}</td>
                           <td>{{ row.remark || '-' }}</td>
@@ -711,9 +712,9 @@
                             </select>
                           </td>
                         </tr>
-            
+                      
                         <tr *ngIf="!moveRows.length">
-                          <td colspan="7" class="text-center muted py-3">No item found</td>
+                          <td colspan="8" class="text-center muted py-3">No item found</td>
                         </tr>
                       </tbody>
                     </table>
@@ -725,8 +726,8 @@
                       (click)="moveSearchItemNo=''; moveRows=[]; moveForm={ itemNo:'', itemName:'', itemSpec:'' }">
                       Clear
                     </button>
-                    <button class="btn-main" (click)="confirmMoveArea()">
-                      Confirm Move Area
+                    <button class="btn-main" (click)="confirmMoveArea()" [disabled]="isMovingArea">
+                      {{ isMovingArea ? 'Moving...' : 'Confirm Move Area' }}
                     </button>
                   </div>
                 </div>
