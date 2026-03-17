@@ -96,7 +96,13 @@
                       [ngClass]="slotClass(s)"
                       (click)="onClickSlot(s)"
                     >
-                      <div class="slot-id">{{ s.storeCode }}</div>
+                      @if (s.storeCode === "2201") {
+                        <div class="slot-id">{{ "Reject" }}</div>
+                      }
+                      @else {
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      }
+                      
                     </button>
                   </div>
                 </div>
@@ -275,16 +281,17 @@
                         <th>MaterialName</th>
                         <th>Spec</th>
                         <th>Coil</th>
-                        <th class="text-end">Kgs</th>
-                        <th class="text-center">Unit</th>
+                        <th>Amount</th>
+                        <th>Unit</th>
                         <th class="text-center">Deatail</th>
+                        <th class="text-center">Stock Out</th>
                       </tr>
                     </thead>
             
                     <tbody>
                       <ng-container *ngIf="viewMode === 'PENDING'">
                         <tr *ngFor="let p of pendingItems">
-                          <td><b>{{ p.matCode }}</b></td>
+                          <td><b>{{ p.materialNo }}</b></td>
                           <td class="muted">{{ p.description }}</td>
                           <td class="muted">{{ p.invNo }}</td>
                           <td class="muted">{{ p.receivedAt }}</td>
@@ -300,25 +307,27 @@
                         </tr>
             
                         <tr *ngIf="!pendingItems.length">
-                          <td colspan="7" class="text-center muted py-3">No pending items</td>
+                          <td colspan="9" class="text-center muted py-3">No pending items</td>
                         </tr>
                       </ng-container>
             
                       <ng-container *ngIf="viewMode !== 'PENDING'">
                         <tr *ngFor="let m of (selectedSlot?.materials || [])">
-                          <td><b>{{ m.matCode }}</b></td>
-                          <td class="muted">{{ m.description }}</td>
-                          <td class="muted">{{ m.invNo }}</td>
-                          <td class="muted">{{ m.receivedAt }}</td>
-                          <td class="text-end"><b>{{ m.qty | number }}</b> {{ m.uom }}</td>
-                          <td class="text-center">
-                            <span class="badge badge-light">#{{ m.fifoRank }}</span>
-                          </td>
-                          <td class="text-center muted">—</td>
+                          <td><b>{{ m.jobNo }}</b></td>
+                          <td class="muted">{{ m.materialNo }}</td>
+                          <td class="muted">{{ m.itemName }}</td>
+                          <td class="muted">{{ m.itemSpec }}</td>
+                          <td class="text-center">{{ m.coil | number }}</td>
+                          <td class="text-center">{{ m.qty }}</td>
+                          <td class="muted">{{ m.uom }}</td>
+
+                         <td class="muted"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
+                         <td class="text-center"><button >out </button></td>
                         </tr>
+
             
                         <tr *ngIf="!(selectedSlot?.materials?.length)">
-                          <td colspan="7" class="text-center muted py-3">No data</td>
+                          <td colspan="9" class="text-center muted py-3">No data</td>
                         </tr>
                       </ng-container>
                     </tbody>
@@ -673,7 +682,8 @@
                           <th style="width:50px;">✓</th>
                           <th>Area</th>
                           <th>Received Date</th>
-                          <th>Invoice</th>
+                          <th>Job No</th>
+                          <th>Invoice1</th>
                           <th class="text-end">Qty</th>
                           <th>Remark</th>
                           <th>To Area</th>

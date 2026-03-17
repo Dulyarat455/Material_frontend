@@ -2,23 +2,20 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-
-import { Router,RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 
 import Swal from 'sweetalert2';
 import config from '../../config';
-
 
 type storeMasterRow = {
   id: number;
   name: string;
 };
 
-
 type SlotStatus = 'OCCUPIED' | 'PARTIAL' | 'EMPTY' | 'REJECTED';
 
 type MaterialItem = {
-  matCode: string;
+  materialNo: string;
   description: string;
   qty: number;
   uom: string;
@@ -31,9 +28,24 @@ type MaterialItem = {
   itemName?: string;
   itemSpec?: string;
   remark?: string;
+
+  // ใช้สำหรับ table mode
+  jobNo?: string;
+  coil?: number;
+  //part user 
+  timestmp: string;
+  stockNote?: string;
+  userId: number;
+  userName: string;
+  userEmpNo: string;
+
+  incomingId?: number;   // ✅ เพิ่ม
+  storeId?: number;      // ✅ เพิ่ม
+
 };
 
 type SlotRow = {
+  storeId?: number; // ✅ เพิ่ม
   storeCode: string;
   zone: 'A' | 'B' | 'C' | 'D';
   row: 'TOP' | 'BTM';
@@ -58,6 +70,10 @@ type MoveRow = {
 
   sourceStoreCode: string;
   sourceInvNo: string;
+
+  incomingId: number;   // ✅ เพิ่ม
+  storeId: number;      // ✅ เพิ่ม
+  stockNote?: string;   // ✅ เพิ่ม
 };
 
 type StockScanField =
@@ -95,9 +111,10 @@ type StockScanField =
   styleUrl: './storage.component.css'
 })
 export class StorageComponent {
-
-  constructor(private http: HttpClient, private router: Router) {}
-
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   @ViewChild('scanJobNo') scanJobNo?: ElementRef<HTMLInputElement>;
   @ViewChild('scanYearMonth') scanYearMonth?: ElementRef<HTMLInputElement>;
@@ -170,27 +187,34 @@ export class StorageComponent {
     itemSpec: ''
   };
 
-
-  storeMasters: storeMasterRow[] = []
+  storeMasters: storeMasterRow[] = [];
   isSavingStock = false;
 
-
-
+  // pending area ยังไม่มี API ตอนนี้ ปล่อย mock ไว้ก่อน
   pendingItems: MaterialItem[] = [
     {
-      matCode: 'MATS5',
+      jobNo: 'JOB-25001',
+      materialNo: 'MATS5',
       description: 'Bolt M10',
       qty: 2000,
       uom: 'pcs',
       invNo: 'INV-010',
       receivedAt: '2025-12-25',
       fifoRank: 1,
+      coil: 2,
       itemNo: 'MATS5',
       itemName: 'Bolt M10',
-      itemSpec: 'M10'
+      itemSpec: 'M10',
+  
+      timestmp: '10',
+      stockNote: '',
+      userId: 1,
+      userName: 'Mock User',
+      userEmpNo: 'EMP001'
     },
     {
-      matCode: 'MATS1',
+      jobNo: 'JOB-25002',
+      materialNo: 'MATS1',
       description: 'SteelRod12mm',
       qty: 600,
       uom: 'pcs',
@@ -198,127 +222,64 @@ export class StorageComponent {
       receivedAt: '2025-12-26',
       fifoRank: 2,
       urgent: true,
+      coil: 1,
       itemNo: 'MATS1',
       itemName: 'Steel Rod',
-      itemSpec: '12mm'
+      itemSpec: '12mm',
+  
+      timestmp: '11',
+      stockNote: '',
+      userId: 1,
+      userName: 'Mock User',
+      userEmpNo: 'EMP001'
     },
     {
-      matCode: 'MATS6',
+      jobNo: 'JOB-25003',
+      materialNo: 'MATS6',
       description: 'Paint Can Blue',
       qty: 50,
       uom: 'pcs',
       invNo: 'INV-012',
       receivedAt: '2025-12-27',
       fifoRank: 1,
+      coil: 0,
       itemNo: 'MATS6',
       itemName: 'Paint Can',
-      itemSpec: 'Blue'
+      itemSpec: 'Blue',
+  
+      timestmp: '12',
+      stockNote: '',
+      userId: 1,
+      userName: 'Mock User',
+      userEmpNo: 'EMP001'
     }
   ];
 
-  slots: SlotRow[] = [
-    {
-      storeCode: '3201', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 500,
-      materials: [{
-        matCode: 'MATS5', description: 'Bolt M10', qty: 500, uom: 'pcs',
-        invNo: 'INV-010', receivedAt: '2025-12-25', fifoRank: 1,
-        itemNo: 'MATS5', itemName: 'Bolt M10', itemSpec: 'M10'
-      }]
-    },
-    {
-      storeCode: '3202', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 1500,
-      materials: [{
-        matCode: 'MATS1', description: 'SteelRod12mm', qty: 1500, uom: 'pcs',
-        invNo: 'INV-010', receivedAt: '2025-12-25', fifoRank: 1,
-        itemNo: 'MATS1', itemName: 'Steel Rod', itemSpec: '12mm'
-      }]
-    },
-    {
-      storeCode: '3203', zone: 'A', row: 'BTM', status: 'OCCUPIED', usedQty: 1200,
-      materials: [{
-        matCode: 'MATS1', description: 'SteelRod12mm', qty: 1200, uom: 'pcs',
-        invNo: 'INV-011', receivedAt: '2025-12-27', fifoRank: 2,
-        itemNo: 'MATS1', itemName: 'Steel Rod', itemSpec: '12mm'
-      }]
-    },
-    { storeCode: '3204', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '3205', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '3206', zone: 'A', row: 'BTM', status: 'EMPTY', materials: [] },
-
-    { storeCode: '3101', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '3102', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '3103', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    {
-      storeCode: '3104', zone: 'B', row: 'TOP', status: 'OCCUPIED', usedQty: 800,
-      materials: [{
-        matCode: 'MATS2', description: 'Rubber Pad', qty: 800, uom: 'pcs',
-        invNo: 'INV-009', receivedAt: '2025-12-20', fifoRank: 1,
-        itemNo: 'MATS2', itemName: 'Rubber Pad', itemSpec: 'STD'
-      }]
-    },
-    { storeCode: '3105', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '3106', zone: 'B', row: 'TOP', status: 'EMPTY', materials: [] },
-
-    {
-      storeCode: '2101', zone: 'C', row: 'TOP', status: 'PARTIAL', usedQty: 300,
-      materials: [{
-        matCode: 'MATS9', description: 'Washer', qty: 300, uom: 'pcs',
-        invNo: 'INV-007', receivedAt: '2025-12-18', fifoRank: 1,
-        itemNo: 'MATS9', itemName: 'Washer', itemSpec: 'STD'
-      }]
-    },
-    { storeCode: '2102', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '2103', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '2104', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '2105', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '2106', zone: 'C', row: 'TOP', status: 'EMPTY', materials: [] },
-
-    { storeCode: '2201', zone: 'C', row: 'BTM', status: 'REJECTED', materials: [] },
-    { storeCode: '2202', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '2203', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '2204', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '2205', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '2206', zone: 'C', row: 'BTM', status: 'EMPTY', materials: [] },
-
-    { storeCode: '1101', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1102', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1103', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1104', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1105', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1106', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1107', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1108', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1109', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1110', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-    { storeCode: '1111', zone: 'D', row: 'TOP', status: 'EMPTY', materials: [] },
-
-    { storeCode: '1201', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1202', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1203', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1204', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1205', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1206', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1207', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1208', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1209', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1210', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-    { storeCode: '1211', zone: 'D', row: 'BTM', status: 'EMPTY', materials: [] },
-  ];
+  // ใช้ API แทน mock
+  slots: SlotRow[] = [];
 
   selectedSlot: SlotRow | null = null;
 
-  get totalSlots() { return this.slots.length; }
-  get occupiedCount() { return this.slots.filter(s => s.status === 'OCCUPIED').length; }
-  get pendingCount() { return this.pendingItems.length; }
-  get rejectedCount() { return this.slots.filter(s => s.status === 'REJECTED').length; }
+  get totalSlots() {
+    return this.slots.length;
+  }
 
+  get occupiedCount() {
+    return this.slots.filter(s => s.status === 'OCCUPIED').length;
+  }
+
+  get pendingCount() {
+    return this.pendingItems.length;
+  }
+
+  get rejectedCount() {
+    return this.slots.filter(s => s.status === 'REJECTED').length;
+  }
 
   ngOnInit() {
     this.fetchStoreMaster();
- }
-
-
-
+    this.fetchStorageMap();
+  }
 
   slotsBy(zone: SlotRow['zone'], row: SlotRow['row']) {
     return this.slots.filter(s => s.zone === zone && s.row === row);
@@ -363,7 +324,7 @@ export class StorageComponent {
       case 'inspector':
         if (!this.stockForm.inspector) return;
         return this.focusEl(this.scanUnloadBy);
-        
+
       case 'unloadBy':
         if (!this.stockForm.unloadBy) return;
         return this.focusEl(this.scanInvoiceOne);
@@ -446,7 +407,7 @@ export class StorageComponent {
 
       case 'amount':
         if (!this.stockForm.amount) return;
-        return ; //stop here 
+        return;
     }
   }
 
@@ -469,9 +430,7 @@ export class StorageComponent {
     }
   }
 
-
-
-  private escapeHtml(value: string): string {
+  private escapeHtml(value: string) {
     return value
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -479,8 +438,6 @@ export class StorageComponent {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
-
-
 
   confirmStockAction() {
     const requiredFields = [
@@ -522,7 +479,7 @@ export class StorageComponent {
       unloadBy: payload.unloadBy,
       invoiceOne: payload.invoiceOne,
       taxInvNo: payload.taxInvNo,
-    
+
       itemNo: payload.itemNo,
       unitPrice: payload.unitPrice,
       qtyOfPalletPack: payload.qtyOfPalletPack,
@@ -533,7 +490,7 @@ export class StorageComponent {
       odCoil: payload.odCoil,
       remark: payload.remark,
       millSheet: payload.millSheet,
-    
+
       itemName: payload.itemName,
       specDwg: payload.specDwg,
       lotNo: payload.lotNo,
@@ -542,13 +499,11 @@ export class StorageComponent {
       result: payload.result,
       supplier: payload.supplier,
       amount: payload.amount,
-    
+
       storageArea: payload.storageArea,
       stockNote: payload.stockNote,
       rawScan: payload.rawScan
     };
-    
-    
 
     if (this.panelMode === 'STOCK_IN') {
       Swal.fire({
@@ -576,7 +531,7 @@ export class StorageComponent {
         if (!result.isConfirmed) return;
         this.submitStockIn();
       });
-    
+
       return;
     } else if (this.panelMode === 'STOCK_OUT') {
       console.log('CONFIRM STOCK OUT DATA = ', payload);
@@ -621,10 +576,11 @@ export class StorageComponent {
       supplier: '',
       amount: '',
 
-      storageArea:  '',
+      storageArea: '',
       stockNote: '',
       rawScan: ''
     };
+
     this.selectedSlot = null;
     this.viewMode = 'NONE';
 
@@ -668,176 +624,212 @@ export class StorageComponent {
     }
   }
 
+  openMaterialDetailSwal(item: MaterialItem) {
+    Swal.fire({
+      title: 'Material Detail',
+      icon: 'info',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div><b>Material No:</b> ${item.itemNo || item.materialNo || '-'}</div>
+          <div><b>Material Name:</b> ${item.itemName || item.description || '-'}</div>
+          <div><b>D/O NO:</b> ${item.invNo || '-'}</div>
+          <div><b>ReceivedDate:</b> ${item.receivedAt || '-'}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
+  // ใช้ในโหมด Move Area
   searchMoveItem() {
-    const key = this.moveSearchItemNo.trim().toLowerCase();
+    // const key = this.moveSearchItemNo.trim().toLowerCase();
 
-    this.moveRows = [];
-    this.moveForm = {
-      itemNo: '',
-      itemName: '',
-      itemSpec: ''
-    };
+    // this.moveRows = [];
+    // this.moveForm = {
+    //   itemNo: '',
+    //   itemName: '',
+    //   itemSpec: ''
+    // };
 
-    if (!key) return;
+    // if (!key) return;
 
-    const rows: MoveRow[] = [];
+    // const rows: MoveRow[] = [];
 
-    this.slots.forEach(slot => {
-      slot.materials.forEach((m, index) => {
-        const itemNo = (m.itemNo || m.matCode || '').toLowerCase();
+    // this.slots.forEach(slot => {
+    //   slot.materials.forEach((m, index) => {
+    //     const itemNo = (m.itemNo || m.matCode || '').toLowerCase();
 
-        if (itemNo.includes(key)) {
-          rows.push({
-            uid: `${slot.storeCode}_${index}_${m.invNo}`,
-            checked: false,
-            area: slot.storeCode,
-            receivedDate: m.receivedAt,
-            invoice: m.invNo,
-            qty: m.qty,
-            remark: m.remark || '',
-            toArea: '',
-            itemNo: m.itemNo || m.matCode || '',
-            itemName: m.itemName || m.description || '',
-            itemSpec: m.itemSpec || m.description || '',
-            sourceStoreCode: slot.storeCode,
-            sourceInvNo: m.invNo
-          });
-        }
-      });
-    });
+    //     if (itemNo.includes(key)) {
+    //       rows.push({
+    //         uid: `${slot.storeCode}_${index}_${m.invNo}`,
+    //         checked: false,
+    //         area: slot.storeCode,
+    //         receivedDate: m.receivedAt,
+    //         invoice: m.invNo,
+    //         qty: m.qty,
+    //         remark: m.remark || '',
+    //         toArea: '',
+    //         itemNo: m.itemNo || m.matCode || '',
+    //         itemName: m.itemName || m.description || '',
+    //         itemSpec: m.itemSpec || m.description || '',
+    //         sourceStoreCode: slot.storeCode,
+    //         sourceInvNo: m.invNo
+    //       });
+    //     }
+    //   });
+    // });
 
-    this.moveRows = rows;
+    // this.moveRows = rows;
 
-    if (rows.length) {
-      this.moveForm = {
-        itemNo: rows[0].itemNo,
-        itemName: rows[0].itemName,
-        itemSpec: rows[0].itemSpec
-      };
-    }
+    // if (rows.length) {
+    //   this.moveForm = {
+    //     itemNo: rows[0].itemNo,
+    //     itemName: rows[0].itemName,
+    //     itemSpec: rows[0].itemSpec
+    //   };
+    // }
   }
 
+  // ใช้ในโหมด Move Area
   confirmMoveArea() {
-    const selected = this.moveRows.filter(r => r.checked && r.toArea);
+    // const selected = this.moveRows.filter(r => r.checked && r.toArea);
 
-    if (!selected.length) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'No selection',
-        text: 'กรุณาเลือกรายการและกำหนด To Area'
-      });
-      return;
-    }
+    // if (!selected.length) {
+    //   Swal.fire({
+    //     icon: 'warning',
+    //     title: 'No selection',
+    //     text: 'กรุณาเลือกรายการและกำหนด To Area'
+    //   });
+    //   return;
+    // }
 
-    selected.forEach(row => {
-      const fromSlot = this.slots.find(s => s.storeCode === row.sourceStoreCode);
-      const toSlot = this.slots.find(s => s.storeCode === row.toArea);
+    // selected.forEach(row => {
+    //   const fromSlot = this.slots.find(s => s.storeCode === row.sourceStoreCode);
+    //   const toSlot = this.slots.find(s => s.storeCode === row.toArea);
 
-      if (!fromSlot || !toSlot) return;
-      if (toSlot.status === 'REJECTED') return;
+    //   if (!fromSlot || !toSlot) return;
+    //   if (toSlot.status === 'REJECTED') return;
 
-      const materialIndex = fromSlot.materials.findIndex(m =>
-        (m.invNo === row.sourceInvNo) &&
-        ((m.itemNo || m.matCode) === row.itemNo)
-      );
+    //   const materialIndex = fromSlot.materials.findIndex(m =>
+    //     (m.invNo === row.sourceInvNo) &&
+    //     ((m.itemNo || m.matCode) === row.itemNo)
+    //   );
 
-      if (materialIndex < 0) return;
+    //   if (materialIndex < 0) return;
 
-      const [material] = fromSlot.materials.splice(materialIndex, 1);
-      if (!material) return;
+    //   const [material] = fromSlot.materials.splice(materialIndex, 1);
+    //   if (!material) return;
 
-      fromSlot.usedQty = Math.max(0, (fromSlot.usedQty || 0) - material.qty);
-      fromSlot.status = fromSlot.materials.length ? 'OCCUPIED' : 'EMPTY';
+    //   fromSlot.usedQty = Math.max(0, (fromSlot.usedQty || 0) - material.qty);
+    //   fromSlot.status = fromSlot.materials.length ? 'OCCUPIED' : 'EMPTY';
 
-      toSlot.materials = [...toSlot.materials, material];
-      toSlot.usedQty = (toSlot.usedQty || 0) + material.qty;
-      toSlot.status = 'OCCUPIED';
-    });
+    //   toSlot.materials = [...toSlot.materials, material];
+    //   toSlot.usedQty = (toSlot.usedQty || 0) + material.qty;
+    //   toSlot.status = 'OCCUPIED';
+    // });
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Move completed',
-      text: 'ย้าย Area เรียบร้อยแล้ว'
-    });
+    // Swal.fire({
+    //   icon: 'success',
+    //   title: 'Move completed',
+    //   text: 'ย้าย Area เรียบร้อยแล้ว'
+    // });
 
-    this.searchMoveItem();
+    // this.searchMoveItem();
   }
 
-  assignPendingToSlot(p: MaterialItem, slot: SlotRow) {
-    if (!slot) return;
 
-    if (slot.status === 'REJECTED') {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Slot rejected',
-        text: 'ช่องนี้ถูก Reject ไม่สามารถจัดเก็บได้'
-      });
-      return;
-    }
 
-    this.pendingItems = this.pendingItems.filter(x => x !== p);
 
-    slot.materials = [...(slot.materials || []), { ...p }];
-    slot.usedQty = (slot.usedQty || 0) + p.qty;
-    slot.status = slot.usedQty > 0 ? 'OCCUPIED' : 'EMPTY';
+  // pending area ยังเป็น mock อยู่ ใช้ย้ายของจาก pending เข้า slot ชั่วคราว
+  // assignPendingToSlot(p: MaterialItem, slot: SlotRow) {
+  //   if (!slot) return;
 
-    this.selectedSlot = slot;
-    this.viewMode = 'SLOT';
+  //   if (slot.status === 'REJECTED') {
+  //     Swal.fire({
+  //       icon: 'warning',
+  //       title: 'Slot rejected',
+  //       text: 'ช่องนี้ถูก Reject ไม่สามารถจัดเก็บได้'
+  //     });
+  //     return;
+  //   }
 
-    if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
-      this.stockForm.storageArea = slot.storeCode;
-    }
+  //   this.pendingItems = this.pendingItems.filter(x => x !== p);
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Stored',
-      text: `จัดเก็บ ${p.matCode} เข้าช่อง ${slot.storeCode} แล้ว`,
-      timer: 900,
-      showConfirmButton: false
-    });
-  }
+  //   slot.materials = [...(slot.materials || []), { ...p }];
+  //   slot.usedQty = (slot.usedQty || 0) + p.qty;
+  //   slot.status = slot.usedQty > 0 ? 'OCCUPIED' : 'EMPTY';
 
+  //   this.selectedSlot = slot;
+  //   this.viewMode = 'SLOT';
+
+  //   if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
+  //     this.stockForm.storageArea = slot.storeCode;
+  //   }
+
+  //   Swal.fire({
+  //     icon: 'success',
+  //     title: 'Stored',
+  //     text: `จัดเก็บ ${p.matCode} เข้าช่อง ${slot.storeCode} แล้ว`,
+  //     timer: 900,
+  //     showConfirmButton: false
+  //   });
+  // }
+
+
+
+
+
+
+  // pending area ยังเป็น mock อยู่
   openQuickStoreSwal(p: MaterialItem) {
-    const empty = this.slots.find(s => s.status === 'EMPTY');
-    if (!empty) {
-      Swal.fire({
-        icon: 'info',
-        title: 'No empty slot',
-        text: 'ไม่มีช่องว่างใน mock ตอนนี้'
-      });
-      return;
-    }
+  //   const empty = this.slots.find(s => s.status === 'EMPTY');
+  //   if (!empty) {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No empty slot',
+  //       text: 'ไม่มีช่องว่างในระบบตอนนี้'
+  //     });
+  //     return;
+  //   }
 
-    Swal.fire({
-      title: 'Store material',
-      icon: 'question',
-      html: `<div style="text-align:left">
-        <div><b>Material:</b> ${p.matCode}</div>
-        <div><b>Qty:</b> ${p.qty} ${p.uom}</div>
-        <div><b>Suggested Slot:</b> ${empty.storeCode}</div>
-        <div style="color:#64748b; font-size:12px; margin-top:8px;">(mock) กด Confirm เพื่อย้ายจาก Pending → Slot</div>
-      </div>`,
-      showCancelButton: true,
-      confirmButtonText: 'Confirm',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#2563eb',
-    }).then(r => {
-      if (!r.isConfirmed) return;
-      this.assignPendingToSlot(p, empty);
-    });
+  //   Swal.fire({
+  //     title: 'Store material',
+  //     icon: 'question',
+  //     html: `<div style="text-align:left">
+  //       <div><b>Material:</b> ${p.matCode}</div>
+  //       <div><b>Qty:</b> ${p.qty} ${p.uom}</div>
+  //       <div><b>Suggested Slot:</b> ${empty.storeCode}</div>
+  //       <div style="color:#64748b; font-size:12px; margin-top:8px;">กด Confirm เพื่อย้ายจาก Pending → Slot</div>
+  //     </div>`,
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Confirm',
+  //     cancelButtonText: 'Cancel',
+  //     confirmButtonColor: '#2563eb',
+  //   }).then(r => {
+  //     if (!r.isConfirmed) return;
+  //     this.assignPendingToSlot(p, empty);
+  //   });
   }
 
 
-  //**********fetch Data ***************************************
 
-  fetchStoreMaster(){
 
+
+
+
+
+
+
+
+  // โหลด dropdown storage area
+  fetchStoreMaster() {
     this.http.get(config.apiServer + '/api/storeMaster/list').subscribe({
       next: (res: any) => {
-    this.storeMasters = (res.results || []).map((r: any) => ({
+        this.storeMasters = (res.results || []).map((r: any) => ({
           id: r.id,
           name: r.name,
-        }))
+        }));
       },
       error: (err) => {
         Swal.fire({
@@ -847,23 +839,72 @@ export class StorageComponent {
         });
       },
     });
-
-
   }
 
 
 
 
+  // โหลด layout + material จาก API จริง
+  fetchStorageMap() {
+    this.http.get(config.apiServer + '/api/mc/fetchIncomingAll').subscribe({
+      next: (res: any) => {
+        const rows = res?.results || [];
 
+        this.slots = rows.map((r: any) => ({
+          storeCode: r.storeCode || '',
+          zone: (r.zone || '').toUpperCase() as 'A' | 'B' | 'C' | 'D',
+          row: (r.row || '').toUpperCase() as 'TOP' | 'BTM',
+          status: this.normalizeSlotStatus(r.status),
+          usedQty: Number(r.usedQty || 0),
+          materials: (r.materials || []).map((m: any) => ({
+            jobNo: m.jobNo || '',
+            materialNo: m.materialNo || m.matCode || '',
+            qty: Number(m.qtyKgsPcs || m.qty || 0),
+            uom: m.unit || m.uom || '',
+            invNo: m.invoiceOne || m.invNo || '',
+            receivedAt: m.recivedDate || m.receivedAt || '',
+            fifoRank: Number(m.fifoRank || 0),
+            coil: m.coil != null ? Number(m.coil) : undefined,
+            itemNo: m.materialNo || m.itemNo || '',
+            itemName: m.itemName || '',
+            itemSpec: m.itemSpec || '',
+            remark: m.remark || '',
+            stockNote: m.stockNote || ''
+          }))
+        }));
 
+        // ถ้าเลือก slot ค้างอยู่ ให้ sync object ใหม่จาก API
+        if (this.selectedSlot?.storeCode) {
+          const freshSelected = this.slots.find(s => s.storeCode === this.selectedSlot?.storeCode);
+          this.selectedSlot = freshSelected || null;
 
+          if (!freshSelected && this.viewMode === 'SLOT') {
+            this.viewMode = 'NONE';
+          }
+        }
+      },
+      error: (err) => {
+        Swal.fire({
+          title: 'Error',
+          text: err?.error?.message || err?.message || 'Load storage map fail',
+          icon: 'error',
+        });
+      }
+    });
+  }
 
+  private normalizeSlotStatus(status: any): SlotStatus {
+    const value = String(status || '').toUpperCase();
 
-
+    if (value === 'OCCUPIED') return 'OCCUPIED';
+    if (value === 'PARTIAL') return 'PARTIAL';
+    if (value === 'REJECTED') return 'REJECTED';
+    return 'EMPTY';
+  }
 
   onChangeStorageArea() {
     const area = (this.stockForm.storageArea || '').trim();
-  
+
     if (!area) {
       this.selectedSlot = null;
       if (this.viewMode === 'SLOT') {
@@ -871,9 +912,9 @@ export class StorageComponent {
       }
       return;
     }
-  
+
     const slot = this.slots.find(s => s.storeCode === area);
-  
+
     if (slot) {
       this.selectedSlot = slot;
       this.viewMode = 'SLOT';
@@ -885,15 +926,12 @@ export class StorageComponent {
 
 
 
-// ******** stockIn ************
-
+  // ******** stockIn ************
   submitStockIn() {
     if (this.isSavingStock) return;
-  
-   
-  
+
     this.isSavingStock = true;
-  
+
     const body = {
       jobNo: this.stockForm.jobNo,
       yearMonth: this.stockForm.yearMonth,
@@ -902,7 +940,7 @@ export class StorageComponent {
       unloadBy: this.stockForm.unloadBy,
       invoiceOne: this.stockForm.invoiceOne,
       taxLnvNo: this.stockForm.taxInvNo,
-  
+
       materialNo: this.stockForm.itemNo,
       unitPrice: this.stockForm.unitPrice,
       qtyOfPalletPack: this.stockForm.qtyOfPalletPack,
@@ -913,7 +951,7 @@ export class StorageComponent {
       odCoil: this.stockForm.odCoil,
       remark: this.stockForm.remark,
       millSheet: this.stockForm.millSheet,
-  
+
       itemName: this.stockForm.itemName,
       itemSpec: this.stockForm.specDwg,
       lotNo: this.stockForm.lotNo,
@@ -922,27 +960,28 @@ export class StorageComponent {
       result: this.stockForm.result,
       supplier: this.stockForm.supplier,
       amount: this.stockForm.amount,
-  
+
       storageArea: this.stockForm.storageArea,
       userId: 1,
       stockNote: this.stockForm.stockNote
     };
-  
+
     this.http.post(config.apiServer + '/api/mc/stockIn', body).subscribe({
       next: (res: any) => {
         this.isSavingStock = false;
-  
+
         Swal.fire({
           icon: 'success',
           title: 'Stock In Success',
           text: res?.message || 'บันทึก Stock In สำเร็จ'
         }).then(() => {
           this.resetStockForm();
+          this.fetchStorageMap();
         });
       },
       error: (err) => {
         this.isSavingStock = false;
-  
+
         Swal.fire({
           icon: 'error',
           title: 'Stock In Fail',
@@ -951,6 +990,4 @@ export class StorageComponent {
       }
     });
   }
-
-
 }
