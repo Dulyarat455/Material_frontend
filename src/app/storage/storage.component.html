@@ -686,7 +686,6 @@
                           <th>Invoice1</th>
                           <th class="text-end">Qty</th>
                           <th>Remark</th>
-                          <th>To Area</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -699,33 +698,39 @@
                           <td>{{ row.itemNo }}</td>
                           <td>{{ row.invoice }}</td>
                           <td class="text-end">{{ row.qty | number }}</td>
-                          <td>{{ row.remark || '-' }}</td>
-                          <td>
-                            <select [(ngModel)]="row.toArea" class="move-select">
-                              <option value="">Select area</option>
-                              <option
-                                *ngFor="let s of slots; trackBy: trackSlot"
-                                [value]="s.storeCode"
-                                [disabled]="s.status === 'REJECTED'">
-                                {{ s.storeCode }}
-                              </option>
-                            </select>
-                          </td>
+                          <td>{{ row.stockNote || '-' }}</td>
                         </tr>
                       
                         <tr *ngIf="!moveRows.length">
-                          <td colspan="8" class="text-center muted py-3">No item found</td>
+                          <td colspan="7" class="text-center muted py-3">No item found</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
+
+                  <div class="move-destination-row" *ngIf="moveRows.length">
+                    <label>Destination Area</label>
+                    <select 
+                    [(ngModel)]="moveDestinationArea" 
+                    class="move-select"
+                    (change)="onChangeMoveDestinationArea()"
+                    >
+                      <option value="">Select destination area</option>
+                      <option
+                        *ngFor="let s of slots; trackBy: trackSlot"
+                        [value]="s.storeCode"
+                        [disabled]="s.status === 'REJECTED'">
+                        {{ s.storeCode }}
+                      </option>
+                    </select>
+                  </div>
             
                   <div class="stock-footer">
                     <button
-                      class="btn-soft"
-                      (click)="moveSearchItemNo=''; moveRows=[]; moveForm={ itemNo:'', itemName:'', itemSpec:'' }">
-                      Clear
-                    </button>
+                    class="btn-soft"
+                    (click)="moveSearchItemNo=''; moveRows=[]; moveForm={ itemNo:'', itemName:'', itemSpec:'' }">
+                    Clear
+                  </button>
                     <button class="btn-main" (click)="confirmMoveArea()" [disabled]="isMovingArea">
                       {{ isMovingArea ? 'Moving...' : 'Confirm Move Area' }}
                     </button>

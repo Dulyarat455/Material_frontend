@@ -181,6 +181,7 @@ export class StorageComponent {
 
   moveSearchItemNo = '';
   moveRows: MoveRow[] = [];
+  moveDestinationArea = '';
   moveForm = {
     itemNo: '',
     itemName: '',
@@ -419,6 +420,7 @@ export class StorageComponent {
     if (mode !== 'MOVE_AREA') {
       this.moveRows = [];
       this.moveSearchItemNo = '';
+      this.moveDestinationArea = '';
       this.moveForm = {
         itemNo: '',
         itemName: '',
@@ -605,15 +607,32 @@ export class StorageComponent {
       this.moveRows.some(r => r.sourceStoreCode === slotId);
   }
 
+
+
+
   onClickSlot(s: SlotRow) {
     this.viewMode = 'SLOT';
     this.selectedSlot = s;
-
-    if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
-      this.stockForm.storageArea = s.storeCode;
-      setTimeout(() => this.focusScanFirst(), 0);
+    this.stockForm.storageArea = s.storeCode;
+  
+    switch (this.panelMode) {
+      case 'MOVE_AREA':
+        this.moveDestinationArea = s.storeCode;
+        return;
+  
+      case 'STOCK_IN':
+      case 'STOCK_OUT':
+        setTimeout(() => this.focusScanFirst(), 0);
+        return;
+  
+      case 'TABLE':
+      default:
+        return;
     }
   }
+
+
+
 
   onClickPendingArea() {
     this.viewMode = 'PENDING';
@@ -624,6 +643,25 @@ export class StorageComponent {
       setTimeout(() => this.focusScanFirst(), 0);
     }
   }
+
+
+  onChangeMoveDestinationArea() {
+    const area = (this.moveDestinationArea || '').trim();
+  
+    if (!area) {
+      this.selectedSlot = null;
+      return;
+    }
+  
+    const slot = this.slots.find(s => s.storeCode === area);
+  
+    if (slot) {
+      this.selectedSlot = slot;
+      this.viewMode = 'SLOT';
+    }
+  }
+
+  
 
   openMaterialDetailSwal(item: MaterialItem) {
     Swal.fire({
@@ -647,6 +685,7 @@ export class StorageComponent {
     const key = (this.moveSearchItemNo || '').trim().toLowerCase();
   
     this.moveRows = [];
+    this.moveDestinationArea = '';
     this.moveForm = {
       itemNo: '',
       itemName: '',
@@ -731,33 +770,35 @@ export class StorageComponent {
       return;
     }
   
-    const invalidRows = selected.filter(r => !r.toArea || r.toArea.trim() === '');
-    if (invalidRows.length) {
+    if (!this.moveDestinationArea || this.moveDestinationArea.trim() === '') {
       Swal.fire({
         icon: 'warning',
         title: 'Missing destination area',
-        text: 'กรุณาเลือก To Area ให้ครบทุกแถวที่ติ๊ก'
+        text: 'กรุณาเลือก Area ปลายทาง'
       });
       return;
     }
   
-    const sameAreaRows = selected.filter(r => r.toArea === r.sourceStoreCode);
+    const sameAreaRows = selected.filter(r => r.sourceStoreCode === this.moveDestinationArea);
     if (sameAreaRows.length) {
       Swal.fire({
         icon: 'warning',
         title: 'Invalid destination',
-        text: 'To Area ต้องไม่เป็น area เดิม'
+        text: 'Area ปลายทางต้องไม่ใช่ area เดิมของรายการที่เลือก'
       });
       return;
     }
   
     const html = `
       <div style="text-align:left; max-height:360px; overflow:auto;">
+        <div style="margin-bottom:12px;">
+          <b>Destination Area:</b> ${this.moveDestinationArea}
+        </div>
         ${selected.map((r, i) => `
           <div style="padding:10px 0; border-bottom:1px solid #e2e8f0;">
             <div><b>${i + 1}. Material:</b> ${r.itemNo}</div>
             <div><b>From:</b> ${r.sourceStoreCode}</div>
-            <div><b>To:</b> ${r.toArea}</div>
+            <div><b>To:</b> ${this.moveDestinationArea}</div>
             <div><b>Qty:</b> ${r.qty}</div>
             <div><b>Invoice:</b> ${r.invoice || '-'}</div>
           </div>
@@ -784,7 +825,7 @@ export class StorageComponent {
           incomingId: row.incomingId,
           storeId: row.storeId,
           userId: 1,
-          storeCodeDestination: row.toArea,
+          storeCodeDestination: this.moveDestinationArea,
           stockNote: row.stockNote || row.remark || ''
         };
   
@@ -802,6 +843,7 @@ export class StorageComponent {
           }).then(() => {
             this.moveSearchItemNo = '';
             this.moveRows = [];
+            this.moveDestinationArea = '';
             this.moveForm = {
               itemNo: '',
               itemName: '',
@@ -821,7 +863,6 @@ export class StorageComponent {
         });
     });
   }
-
 
 
   // pending area ยังเป็น mock อยู่ ใช้ย้ายของจาก pending เข้า slot ชั่วคราว
@@ -995,17 +1036,18 @@ export class StorageComponent {
 
   onChangeStorageArea() {
     const area = (this.stockForm.storageArea || '').trim();
-
+  
     if (!area) {
       this.selectedSlot = null;
+  
       if (this.viewMode === 'SLOT') {
         this.viewMode = 'NONE';
       }
       return;
     }
-
+  
     const slot = this.slots.find(s => s.storeCode === area);
-
+  
     if (slot) {
       this.selectedSlot = slot;
       this.viewMode = 'SLOT';
