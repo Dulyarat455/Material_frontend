@@ -287,7 +287,7 @@ export class StorageComponent {
 
   ngOnInit() {
 
-    this.userId = Number(localStorage.getItem('_userId')) || null;
+    this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.fetchStoreMaster();
     this.fetchStorageMap();
   }
@@ -872,7 +872,7 @@ export class StorageComponent {
         const body = {
           incomingId: row.incomingId,
           storeId: row.storeId,
-          userId: 1,
+          userId: this.userId,
           storeCodeDestination: this.moveDestinationArea,
           stockNote: row.stockNote || row.remark || ''
         };

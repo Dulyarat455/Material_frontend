@@ -26,6 +26,8 @@ type IssueRequestRow = {
 })
 export class IssueComponent {
 
+
+
      // ---- form (mock) ----
   materialNo = 'MATS1';
   qty: number | null = 200;
@@ -41,7 +43,7 @@ export class IssueComponent {
   selectedLine = 'Line A'
   selectedMachine = ''
 
-
+  
 
 
 
@@ -102,19 +104,20 @@ export class IssueComponent {
   }
 
 
-
-
-
-
   // view
   q = '';
   statusFilter: 'all' | IssueRequestRow['status'] = 'all';
   requestsView: IssueRequestRow[] = [];
   machinesView: string[] = []
 
+  userId: number | null = null;
+
   ngOnInit() {
+
+    this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.onLineChange()
     this.applyFilters();
+
   }
 
 
