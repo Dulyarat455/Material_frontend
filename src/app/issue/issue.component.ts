@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import config from '../../config';
 
 type IssueRequestRow = {
   id: number;
@@ -16,6 +18,16 @@ type IssueRequestRow = {
 };
 
 
+type MaterialRow = {
+  id: number;
+  materialNo: string;
+  materialName: string;
+  materialSpec: string;
+}
+
+
+
+
 
 @Component({
   selector: 'app-issue',
@@ -25,29 +37,47 @@ type IssueRequestRow = {
   styleUrl: './issue.component.css'
 })
 export class IssueComponent {
+  constructor(private http: HttpClient) {}
 
-
-
-     // ---- form (mock) ----
+  // ---- form ----
   materialNo = 'MATS1';
   qty: number | null = 200;
   destination = 'MC-01';
   priority: 'Normal' | 'Urgent' = 'Normal';
   remark = '';
 
+  materialName = '';
+  materialSpec = '';
 
+  selectedLine = 'Line A';
+  selectedMachine = '';
 
-  materialName = ''
-  materialSpec = ''
+  userId: number | null = null;
+  isSubmitting = false;
 
-  selectedLine = 'Line A'
-  selectedMachine = ''
+  // ---- mock map สำหรับยิง backend ----
+  // ตอนนี้ยัง hardcode ไว้ก่อน เพื่อให้ใช้กับ HTML เดิมได้
+  materialMap: Record<string, number> = {
+    MATS1: 1,
+    MATS2: 2,
+    MATS3: 3,
+    MATS4: 4,
+    MATS5: 5,
+    MATS6: 6
+  };
 
-  
+  machineAreaMap: Record<string, number> = {
+    A1: 1,
+    A2: 2,
+    A3: 3,
+    B1: 4,
+    B2: 5,
+    B3: 6,
+    C1: 7,
+    C2: 8
+  };
 
-
-
-  // ---- list (mock) ----
+  // ---- list (mock/ui queue เดิม) ----
   requestsAll: IssueRequestRow[] = [
     {
       id: 1,
@@ -73,54 +103,40 @@ export class IssueComponent {
     },
   ];
 
-
-
-
   lines = [
     'Line A',
     'Line B',
     'Line C'
-  ]
-  
-  machinesByLine: Record<string,string[]> = {
-  
+  ];
+
+  machinesByLine: Record<string, string[]> = {
     'Line A': [
       'A1',
       'A2',
       'A3'
     ],
-  
     'Line B': [
       'B1',
       'B2',
       'B3'
     ],
-  
     'Line C': [
       'C1',
       'C2'
     ]
-  
-  }
-
+  };
 
   // view
   q = '';
   statusFilter: 'all' | IssueRequestRow['status'] = 'all';
   requestsView: IssueRequestRow[] = [];
-  machinesView: string[] = []
-
-  userId: number | null = null;
+  machinesView: string[] = [];
 
   ngOnInit() {
-
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
-    this.onLineChange()
+    this.onLineChange();
     this.applyFilters();
-
   }
-
-
 
   applyFilters() {
     const q = (this.q || '').trim().toLowerCase();
@@ -132,8 +148,10 @@ export class IssueComponent {
           x.materialNo.toLowerCase().includes(q) ||
           x.destination.toLowerCase().includes(q) ||
           x.requestBy.toLowerCase().includes(q);
+
         if (!hit) return false;
       }
+
       if (s !== 'all' && x.status !== s) return false;
       return true;
     });
@@ -145,7 +163,9 @@ export class IssueComponent {
     this.applyFilters();
   }
 
-  submitIssueRequest() : void{
+  submitIssueRequest(): void {
+    if (this.isSubmitting) return;
+
     const materialNo = (this.materialNo || '').trim().toUpperCase();
     const destination = (this.destination || '').trim().toUpperCase();
     const qty = Number(this.qty || 0);
@@ -153,46 +173,94 @@ export class IssueComponent {
     if (!materialNo) {
       Swal.fire('Error', 'กรุณากรอก Material No', 'error');
       return;
-    } 
-    if (!destination){
-      Swal.fire('Error', 'กรุณากรอก Destination', 'error');
-      return;
-    } 
-    if (!qty || qty <= 0){
-      Swal.fire('Error', 'กรุณากรอก Qty ให้ถูกต้อง', 'error');
-      return;
-    } 
-    if(!this.selectedMachine){
-      Swal.fire('Error','กรุณาเลือก Machine','error')
-      return
     }
 
-    const nextId = Math.max(0, ...this.requestsAll.map((x) => x.id)) + 1;
+    if (!destination) {
+      Swal.fire('Error', 'กรุณากรอก Destination', 'error');
+      return;
+    }
 
-    this.requestsAll.unshift({
-      id: nextId,
-      materialNo,
-      qty,
-      destination: this.selectedMachine,
-      priority: this.priority,
-      requestBy: 'PD-001', // mock
-      requestAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      status: 'Waiting',
-      fifoHint: 'FIFO#?',
+    if (!qty || qty <= 0) {
+      Swal.fire('Error', 'กรุณากรอก Qty ให้ถูกต้อง', 'error');
+      return;
+    }
+
+    if (!this.selectedMachine) {
+      Swal.fire('Error', 'กรุณาเลือก Machine', 'error');
+      return;
+    }
+
+    if (!this.userId) {
+      Swal.fire('Error', 'User not found', 'error');
+      return;
+    }
+
+    const materialId = this.materialMap[materialNo];
+    const areaId = this.machineAreaMap[this.selectedMachine];
+
+    if (!materialId) {
+      Swal.fire('Error', `ไม่พบ Material No : ${materialNo} ในระบบ`, 'error');
+      return;
+    }
+
+    if (!areaId) {
+      Swal.fire('Error', `ไม่พบ Area ของ Machine : ${this.selectedMachine}`, 'error');
+      return;
+    }
+
+    const body = {
+      areaId,
+      requestByUserId: this.userId,
+      materialId,
+      remark: this.remark || null,
+      priority: this.priority
+    };
+
+    this.isSubmitting = true;
+
+    this.http.post(config.apiServer + '/api/issue/create', body).subscribe({
+      next: (res: any) => {
+        this.isSubmitting = false;
+
+        const nextId = Math.max(0, ...this.requestsAll.map((x) => x.id)) + 1;
+
+        this.requestsAll.unshift({
+          id: res?.data?.id || nextId,
+          materialNo,
+          qty,
+          destination: this.selectedMachine,
+          priority: this.priority,
+          requestBy: `USER-${this.userId}`,
+          requestAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          status: 'Waiting',
+          fifoHint: res?.data?.jobNo ? `JOB#${res.data.jobNo}` : 'FIFO#?'
+        });
+
+        this.applyFilters();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Created',
+          text: res?.data?.jobNo
+            ? `Issue created success : ${res.data.jobNo}`
+            : (res?.message || `Issue request ${materialNo} ส่งเรียบร้อย`),
+          timer: 1400,
+          showConfirmButton: false,
+        });
+
+        // clear form บางส่วน แต่ยังคง line/machine เดิมไว้
+        this.remark = '';
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+
+        Swal.fire(
+          'Error',
+          err?.error?.message || err?.error?.error || err?.message || 'Create issue fail',
+          'error'
+        );
+      }
     });
-
-    this.applyFilters();
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Created',
-      text: `Issue request ${materialNo} (${qty}) ส่งเรียบร้อย`,
-      timer: 1200,
-      showConfirmButton: false,
-    });
-
-    // clear form
-    this.remark = '';
   }
 
   async confirmProcess(row: IssueRequestRow) {
@@ -214,22 +282,9 @@ export class IssueComponent {
     this.applyFilters();
   }
 
-
-
-  onLineChange(){
-
-    this.machinesView =
-      this.machinesByLine[this.selectedLine] || []
-  
-    this.selectedMachine =
-      this.machinesView[0] || ''
-  
+  onLineChange() {
+    this.machinesView = this.machinesByLine[this.selectedLine] || [];
+    this.selectedMachine = this.machinesView[0] || '';
+    this.destination = this.selectedMachine || '';
   }
-
-
-
-
-
-
-
 }
