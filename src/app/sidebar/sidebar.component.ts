@@ -30,24 +30,26 @@ export class SidebarComponent {
 
   ngOnInit() {
     this.authService.refreshComponents$.subscribe(() => {
-       //this.loadUserData();
+       this.loadUserData();
     });
-    this.name = localStorage.getItem('angular_name')!;
-    this.empNo = localStorage.getItem('angular_empNo')!;
-    // if (!this.name) {
-    //   // เปลี่ยนเส้นทางไปที่หน้า LoginPage ก่อน
-    //   this.router.navigate(['/']).then(() => {
-    //     // this.router.navigate(['/ScrapPress']).then(() => {
-    //     // แสดง Swal หลังจากเปลี่ยนหน้าเรียบร้อยแล้ว
-    //     Swal.fire({
-    //       title: 'กรุณาเข้าสู่ระบบ',
-    //       text: 'คุณยังไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบก่อนดำเนินการ',
-    //       icon: 'warning',
-    //       confirmButtonText: 'ตกลง',
-    //     });
-    //   });
-    // }
-    this.getLevelFromToken();
+    this.name = localStorage.getItem('materialStore_name')!;
+    this.empNo = localStorage.getItem('materialStore_empNo')!;
+
+    if (!this.name) {
+      // เปลี่ยนเส้นทางไปที่หน้า LoginPage ก่อน
+      this.router.navigate(['/']).then(() => {
+        // this.router.navigate(['/ScrapPress']).then(() => {
+        // แสดง Swal หลังจากเปลี่ยนหน้าเรียบร้อยแล้ว
+        Swal.fire({
+          title: 'กรุณาเข้าสู่ระบบ',
+          text: 'คุณยังไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบก่อนดำเนินการ',
+          icon: 'warning',
+          confirmButtonText: 'ตกลง',
+        });
+      });
+    }
+
+
   }
 
   async signout() {
@@ -60,38 +62,18 @@ export class SidebarComponent {
     });
 
     if (button.isConfirmed) {
-      // localStorage.removeItem('angular_token');
-      // localStorage.removeItem('angular_name');
-      // localStorage.removeItem('angular_id');
-      // localStorage.removeItem('angular_empNo');
+  
       this.authService.logout();
-      // localStorage.removeItem('angular_level');
-
-      // location.reload();
+     
       this.router.navigate(['/']);
-      // window.location.href = '/ScrapPress';
+ 
     }
   }
-  // getLevelFromToken() {
-  //   const token = localStorage.getItem('angular_token');
-  //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-  //   this.http
-  //     .get(config.apiServer + '/api/user/getLevelFromToken', {
-  //       headers: headers,
-  //     })
-  //     .subscribe((res: any) => {
-  //       this.level = res.level;
-  //     });
-  // }
-  getLevelFromToken() {
-    this.authService.getUserLevel().subscribe((res: any) => {
-      this.level = res.level;
-    });
-  }
+
   loadUserData() {
-    this.name = localStorage.getItem('angular_name') || '';
-    this.empNo = localStorage.getItem('angular_empNo') || '';
+    this.name = localStorage.getItem('materialStore_name') || '';
+    this.empNo = localStorage.getItem('materialStore_empNo') || '';
 
     if (!this.name) {
       this.router.navigate(['/']).then(() => {
@@ -105,6 +87,6 @@ export class SidebarComponent {
       return;
     }
 
-    this.getLevelFromToken();
+    
   }
 }

@@ -7,10 +7,22 @@ import { ReturnComponent } from './return/return.component';
 import { JobTransactionComponent } from './job-transaction/job-transaction.component';
 
 export const routes: Routes = [
+
   {
     path: '',
-    component: SignInComponent,
+    component: JobTransactionComponent,
   },
+
+  {
+    path: 'jobTransaction',
+    component: JobTransactionComponent,
+  },
+
+  {
+    path: 'signin',
+    component: SignInComponent
+  },
+
 
   {
     path: 'storage',
@@ -30,10 +42,7 @@ export const routes: Routes = [
   },
 
 
-  {
-    path: 'jobTransaction',
-    component: JobTransactionComponent,
-  },
+ 
 
   
   {

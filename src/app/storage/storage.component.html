@@ -649,13 +649,40 @@
                 <div class="move-panel">
                   <div class="move-search-row">
                     <label>Material No</label>
-                    <input
-                      type="text"
-                      [(ngModel)]="moveSearchItemNo"
-                      placeholder="Search item no..."
-                      (keyup.enter)="searchMoveItem()"
-                    />
-                    <button class="btn-main" (click)="searchMoveItem()">Search</button>
+                  
+                    <div class="move-search-group">
+                      <div class="move-search-autocomplete">
+                        <input
+                          type="text"
+                          [(ngModel)]="moveSearchItemNo"
+                          placeholder="Search item no..."
+                          (input)="onMoveMaterialInput()"
+                          (focus)="onMoveMaterialInput()"
+                          (blur)="hideMaterialSuggestions()"
+                          (keyup.enter)="searchMoveItem(); showMaterialSuggestions = false"
+                          autocomplete="off"
+                        />
+                  
+                        <div class="move-suggest-box" *ngIf="showMaterialSuggestions">
+                          <button
+                            type="button"
+                            class="move-suggest-item"
+                            *ngFor="let item of materialSuggestions"
+                            (mousedown)="selectMaterialSuggestion(item)"
+                          >
+                            {{ item }}
+                          </button>
+                        </div>
+                      </div>
+                  
+                      <button
+                        type="button"
+                        class="btn-main move-search-btn"
+                        (click)="searchMoveItem()"
+                      >
+                        Search
+                      </button>
+                    </div>
                   </div>
             
                   <div class="move-info-grid">
@@ -684,7 +711,7 @@
                           <th>Received Date</th>
                           <th>Job No</th>
                           <th>Invoice1</th>
-                          <th class="text-end">Qty</th>
+                          <th class="text-center">Qty</th>
                           <th>Remark</th>
                         </tr>
                       </thead>
@@ -697,7 +724,7 @@
                           <td>{{ row.receivedDate }}</td>
                           <td>{{ row.itemNo }}</td>
                           <td>{{ row.invoice }}</td>
-                          <td class="text-end">{{ row.qty | number }}</td>
+                          <td class="text-center">{{ row.qty | number }}</td>
                           <td>{{ row.stockNote || '-' }}</td>
                         </tr>
                       

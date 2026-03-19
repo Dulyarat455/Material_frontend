@@ -253,3 +253,91 @@
       height: 40px;
     }
   }
+
+
+
+
+  /* =========================
+   PUBLIC NAV (no token)
+   ========================= */
+.public-nav-item {
+  margin-left: 0 !important;
+}
+
+.public-tab {
+  height: 56px;
+  display: inline-flex !important;
+  align-items: center;
+  padding: 0 14px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #6b7280 !important;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  box-shadow: none !important;
+  position: relative;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.public-tab:hover {
+  background: transparent !important;
+  color: #111827 !important;
+}
+
+.public-tab.active {
+  color: #111827 !important;
+  font-weight: 700;
+  background: transparent !important;
+}
+
+.public-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 6px;
+  height: 2px;
+  background: #b08968;
+  border-radius: 999px;
+}
+
+
+.public-nav {
+  padding-left: 24px;
+}
+
+
+/* ==============
+text title material 
+============== */
+
+.public-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a !important;
+  letter-spacing: 0.3px;
+  padding-right: 10px;
+}
+
+.public-title b {
+  color: #1d4ed8;   /* น้ำเงิน theme เดียวกับระบบ */
+  font-weight: 800;
+}
+
+
+
+.brand-highlight {
+  color: #2563eb;
+  font-weight: 900;
+}
+
+
+
+  /* =================
+  for not have token login
+  ================= */
+  :host(.no-sidebar) .main-header {
+    margin-left: 0 !important;
+  }

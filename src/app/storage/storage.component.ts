@@ -145,6 +145,8 @@ export class StorageComponent {
   viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
   panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' = 'TABLE';
 
+
+
   stockForm = {
     jobNo: '',
     yearMonth: '',
@@ -191,6 +193,11 @@ export class StorageComponent {
   storeMasters: storeMasterRow[] = [];
   isSavingStock = false;
   isMovingArea = false;
+
+  materialSuggestions: string[] = [];
+  showMaterialSuggestions = false;
+
+  userId: number | null = null;
 
   // pending area ยังไม่มี API ตอนนี้ ปล่อย mock ไว้ก่อน
   pendingItems: MaterialItem[] = [
@@ -279,6 +286,8 @@ export class StorageComponent {
   }
 
   ngOnInit() {
+
+    this.userId = Number(localStorage.getItem('_userId')) || null;
     this.fetchStoreMaster();
     this.fetchStorageMap();
   }
@@ -610,6 +619,43 @@ export class StorageComponent {
 
 
 
+  onMoveMaterialInput() {
+    const key = (this.moveSearchItemNo || '').trim().toLowerCase();
+  
+    if (!key) {
+      this.materialSuggestions = [];
+      this.showMaterialSuggestions = false;
+      return;
+    }
+  
+    const allMaterialNos = this.slots
+      .flatMap(slot => (slot.materials || []).map(m => (m.materialNo || m.itemNo || '').trim()))
+      .filter(Boolean);
+  
+    const uniqueMaterialNos = Array.from(new Set(allMaterialNos));
+  
+    this.materialSuggestions = uniqueMaterialNos
+      .filter(x => x.toLowerCase().includes(key))
+      .slice(0, 8);
+  
+    this.showMaterialSuggestions = this.materialSuggestions.length > 0;
+  }
+
+
+  selectMaterialSuggestion(materialNo: string) {
+    this.moveSearchItemNo = materialNo;
+    this.showMaterialSuggestions = false;
+    this.materialSuggestions = [];
+    this.searchMoveItem();
+  }
+
+  hideMaterialSuggestions() {
+    setTimeout(() => {
+      this.showMaterialSuggestions = false;
+    }, 150);
+  }
+
+
   onClickSlot(s: SlotRow) {
     this.viewMode = 'SLOT';
     this.selectedSlot = s;
@@ -661,7 +707,7 @@ export class StorageComponent {
     }
   }
 
-  
+
 
   openMaterialDetailSwal(item: MaterialItem) {
     Swal.fire({
@@ -683,7 +729,9 @@ export class StorageComponent {
   // ใช้ในโหมด Move Area
   searchMoveItem() {
     const key = (this.moveSearchItemNo || '').trim().toLowerCase();
-  
+    
+    this.showMaterialSuggestions = false;
+    this.materialSuggestions = [];
     this.moveRows = [];
     this.moveDestinationArea = '';
     this.moveForm = {
@@ -1095,7 +1143,7 @@ export class StorageComponent {
       amount: this.stockForm.amount,
 
       storageArea: this.stockForm.storageArea,
-      userId: 1,
+      userId: this.userId,
       stockNote: this.stockForm.stockNote
     };
 

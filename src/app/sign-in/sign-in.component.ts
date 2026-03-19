@@ -36,10 +36,10 @@ export class SignInComponent {
 
     //localstorage ให้เปลี่ยนชื่อ token ทุกจุดตาม Project ที่ทำ
 
-    if (localStorage.getItem('angular_token')) 
+    if (localStorage.getItem('materialStore_token')) 
       {
-      this.token = localStorage.getItem('angular_token')!;
-      this.empNo = localStorage.getItem('angular_empNo')!;
+      this.token = localStorage.getItem('materialStore_token')!;
+      this.empNo = localStorage.getItem('materialStore_empNo')!;
     } else {
       this.token = undefined;
       this.empNo = '';
@@ -104,13 +104,7 @@ export class SignInComponent {
               return;
             }
 
-            // if (res.token) {
-            //   // Save user data
-            //   this.token = res.token;
-            //   localStorage.setItem('angular_token', res.token);
-            //   localStorage.setItem('angular_name', res.name);
-            //   localStorage.setItem('angular_id', res.id);
-            //   localStorage.setItem('angular_empNo', res.empNo);
+            
             this.authService.login(res);
             // Show success message
             Swal.fire({
@@ -122,8 +116,8 @@ export class SignInComponent {
             }).then(() => {
               // location.reload();
               this.router.navigate(['/']);
-              this.token = localStorage.getItem('angular_token')!;
-              this.empNo = localStorage.getItem('angular_empNo')!;
+              this.token = localStorage.getItem('materialStore_token')!;
+              this.empNo = localStorage.getItem('materialStore_empNo')!;
             });
             // }
           },
@@ -201,11 +195,7 @@ export class SignInComponent {
             return;
           }
 
-          // this.token = res.token;
-          // localStorage.setItem('angular_token', this.token);
-          // localStorage.setItem('angular_name', res.name);
-          // localStorage.setItem('angular_id', res.id);
-          // localStorage.setItem('angular_empNo', res.empNo);
+         
 
           this.authService.login(res);
 
@@ -217,9 +207,11 @@ export class SignInComponent {
             showConfirmButton: true,
           }).then(() => {
             // location.reload();
+           
+            this.token = localStorage.getItem('materialStore_token')!;
+            this.empNo = localStorage.getItem('materialStore_empNo')!;
             this.router.navigate(['/']);
-            this.token = localStorage.getItem('angular_token')!;
-            this.empNo = localStorage.getItem('angular_empNo')!;
+
           });
         },
         error: (error) => {

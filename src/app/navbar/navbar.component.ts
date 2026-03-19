@@ -13,11 +13,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   formattedDate: string = '';
   formattedTime: string = '';
   private timeInterval: any;
+  token: string | undefined = '';
 
   ngOnInit() {
     // Initial update
     this.updateDateTime();
-
+    this.token = localStorage.getItem('materialStore_token')!;
     // Update time every second
     this.timeInterval = setInterval(() => {
       this.updateDateTime();
