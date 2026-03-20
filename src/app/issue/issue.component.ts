@@ -7,7 +7,10 @@ import config from '../../config';
 
 type IssueRequestRow = {
   id: number;
+  jobNo: string;
   materialNo: string;
+  materialName: string;
+  materialSpec: string;
   qty: number;
   destination: string;
   priority: 'Normal' | 'Urgent';
@@ -15,6 +18,7 @@ type IssueRequestRow = {
   requestAt: string;
   status: 'Waiting' | 'Processing' | 'Completed';
   fifoHint?: string;
+  remark?: string;
 };
 
 type MaterialRow = {
@@ -22,6 +26,11 @@ type MaterialRow = {
   materialNo: string;
   materialName: string;
   materialSpec: string;
+};
+
+type AreaRow = {
+  areaId: number;
+  areaName: string;
 };
 
 @Component({
@@ -40,7 +49,6 @@ export class IssueComponent {
   materialNo = '';
   materialName = '';
   materialSpec = '';
-  qty: number | null = null;
   destination = '';
   priority: 'Normal' | 'Urgent' = 'Normal';
   remark = '';
@@ -50,9 +58,11 @@ export class IssueComponent {
 
   userId: number | null = null;
   isSubmitting = false;
+  isLoadingQueue = false;
+  isLoadingMachine = false;
 
   // =========================
-  // MATERIAL (SEARCH)
+  // MATERIAL SEARCH
   // =========================
   materials: MaterialRow[] = [];
   materialDropdown: MaterialRow[] = [];
@@ -60,15 +70,14 @@ export class IssueComponent {
   selectedMaterialId: number | null = null;
 
   // =========================
-  // AREA (LINE → MACHINE)
+  // LINE -> MACHINE
   // =========================
-  areas: { areaId: number; areaName: string }[] = [];
+  areas: AreaRow[] = [];
   machinesView: string[] = [];
-
   lines = ['A', 'B', 'C'];
 
   // =========================
-  // UI LIST (queue เดิม)
+  // QUEUE
   // =========================
   requestsAll: IssueRequestRow[] = [];
   requestsView: IssueRequestRow[] = [];
@@ -76,47 +85,50 @@ export class IssueComponent {
   q = '';
   statusFilter: 'all' | IssueRequestRow['status'] = 'all';
 
-  // =========================
-  // INIT
-  // =========================
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
-
     this.fetchMaterials();
-    this.applyFilters();
+    this.fetchIssueQueueByUserId();
   }
 
   // =========================
-  // FETCH MATERIAL
+  // MATERIAL
   // =========================
   fetchMaterials() {
     this.http.get<any>(config.apiServer + '/api/material/list').subscribe({
       next: (res) => {
-        this.materials = res?.results || [];
+        this.materials = Array.isArray(res?.results) ? res.results : [];
       },
-      error: () => {
-        Swal.fire('Error', 'โหลด Material ไม่สำเร็จ', 'error');
+      error: (err) => {
+        Swal.fire(
+          'Error',
+          err?.error?.message || err?.message || 'โหลด Material ไม่สำเร็จ',
+          'error'
+        );
       }
     });
   }
 
-  // =========================
-  // SEARCH MATERIAL
-  // =========================
   onSearchMaterial() {
-    const keyword = (this.materialNo || '').toLowerCase();
+    const keyword = (this.materialNo || '').trim().toLowerCase();
 
     if (!keyword) {
       this.materialDropdown = [];
       this.showMaterialDropdown = false;
+      this.selectedMaterialId = null;
+      this.materialName = '';
+      this.materialSpec = '';
       return;
     }
 
     this.materialDropdown = this.materials
-      .filter(m => m.materialNo.toLowerCase().includes(keyword))
+      .filter(m =>
+        m.materialNo.toLowerCase().includes(keyword) ||
+        m.materialName.toLowerCase().includes(keyword)
+      )
       .slice(0, 10);
 
-    this.showMaterialDropdown = true;
+    this.showMaterialDropdown = this.materialDropdown.length > 0;
   }
 
   selectMaterial(m: MaterialRow) {
@@ -124,41 +136,63 @@ export class IssueComponent {
     this.materialName = m.materialName;
     this.materialSpec = m.materialSpec;
     this.selectedMaterialId = m.id;
-
     this.showMaterialDropdown = false;
   }
 
+  hideMaterialDropdown() {
+    setTimeout(() => {
+      this.showMaterialDropdown = false;
+    }, 150);
+  }
+
   // =========================
-  // LINE → MACHINE
+  // LINE -> MACHINE
   // =========================
   onLineChange() {
     this.selectedMachine = '';
+    this.destination = '';
     this.machinesView = [];
     this.areas = [];
 
     if (!this.selectedLine) return;
 
+    this.isLoadingMachine = true;
+
     this.http.post<any>(config.apiServer + '/api/area/filterByLineArea', {
       lineName: this.selectedLine
     }).subscribe({
       next: (res) => {
-        this.areas = res?.results || [];
+        this.areas = (res?.results || []).map((x: any) => ({
+          areaId: Number(x.areaId),
+          areaName: x.areaName
+        }));
+
         this.machinesView = this.areas.map(a => a.areaName);
+        this.isLoadingMachine = false;
       },
-      error: () => {
-        Swal.fire('Error', 'โหลด Machine ไม่สำเร็จ', 'error');
+      error: (err) => {
+        this.isLoadingMachine = false;
+        Swal.fire(
+          'Error',
+          err?.error?.message || err?.message || 'โหลด Machine ไม่สำเร็จ',
+          'error'
+        );
       }
     });
   }
 
+  onMachineChange() {
+    this.destination = this.selectedMachine || '';
+  }
+
   // =========================
-  // SUBMIT ISSUE
+  // CREATE ISSUE
   // =========================
   submitIssueRequest(): void {
     if (this.isSubmitting) return;
 
     const materialNo = (this.materialNo || '').trim().toUpperCase();
-    const qty = Number(this.qty || 0);
+    
 
     if (!materialNo) {
       Swal.fire('Error', 'กรุณากรอก Material No', 'error');
@@ -170,15 +204,16 @@ export class IssueComponent {
       return;
     }
 
+    if (!this.selectedLine) {
+      Swal.fire('Error', 'กรุณาเลือก Production Line', 'error');
+      return;
+    }
+
     if (!this.selectedMachine) {
       Swal.fire('Error', 'กรุณาเลือก Machine', 'error');
       return;
     }
 
-    if (!qty || qty <= 0) {
-      Swal.fire('Error', 'กรุณากรอก Qty ให้ถูกต้อง', 'error');
-      return;
-    }
 
     if (!this.userId) {
       Swal.fire('Error', 'User not found', 'error');
@@ -203,25 +238,9 @@ export class IssueComponent {
 
     this.isSubmitting = true;
 
-    this.http.post(config.apiServer + '/api/issue/create', body).subscribe({
-      next: (res: any) => {
+    this.http.post<any>(config.apiServer + '/api/issue/create', body).subscribe({
+      next: (res) => {
         this.isSubmitting = false;
-
-        const nextId = Math.max(0, ...this.requestsAll.map(x => x.id)) + 1;
-
-        this.requestsAll.unshift({
-          id: res?.data?.id || nextId,
-          materialNo,
-          qty,
-          destination: this.selectedMachine,
-          priority: this.priority,
-          requestBy: `USER-${this.userId}`,
-          requestAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
-          status: 'Waiting',
-          fifoHint: res?.data?.jobNo ? `JOB#${res.data.jobNo}` : 'FIFO#?'
-        });
-
-        this.applyFilters();
 
         Swal.fire({
           icon: 'success',
@@ -233,17 +252,11 @@ export class IssueComponent {
           showConfirmButton: false
         });
 
-        // reset form
-        this.materialNo = '';
-        this.materialName = '';
-        this.materialSpec = '';
-        this.qty = null;
-        this.remark = '';
-        this.selectedMaterialId = null;
+        this.resetForm();
+        this.fetchIssueQueueByUserId();
       },
       error: (err) => {
         this.isSubmitting = false;
-
         Swal.fire(
           'Error',
           err?.error?.message || err?.message || 'Create issue fail',
@@ -254,18 +267,82 @@ export class IssueComponent {
   }
 
   // =========================
-  // FILTER (queue เดิม)
+  // FETCH QUEUE
+  // =========================
+  fetchIssueQueueByUserId() {
+    if (!this.userId) {
+      this.requestsAll = [];
+      this.applyFilters();
+      return;
+    }
+
+    this.isLoadingQueue = true;
+
+    this.http.post<any>(config.apiServer + '/api/issue/fetchIssueByUserId', {
+      userId: this.userId
+    }).subscribe({
+      next: (res) => {
+        const rows = Array.isArray(res?.results) ? res.results : [];
+
+        this.requestsAll = rows.map((r: any) => {
+          const rawState = String(r?.state || '').toLowerCase();
+
+          let status: IssueRequestRow['status'] = 'Waiting';
+          if (rawState === 'wait') status = 'Waiting';
+          else if (rawState === 'processing') status = 'Processing';
+          else if (rawState === 'done' || rawState === 'completed') status = 'Completed';
+
+          const requestByText =
+            r?.requestUserEmpNo && r?.requestUserName
+              ? `${r.requestUserEmpNo} - ${r.requestUserName}`
+              : r?.requestUserEmpNo || r?.requestUserName || '-';
+
+          return {
+            id: Number(r?.id || 0),
+            jobNo: r?.jobNo || '',
+            materialNo: r?.materialNo || '-',
+            materialName: r?.materialName || '-',
+            materialSpec: r?.materialSpec || '-',
+            qty: Number(r?.qty || 0),
+            destination: r?.areaName || '-',
+            priority: r?.priority === 'Urgent' ? 'Urgent' : 'Normal',
+            requestBy: requestByText,
+            requestAt: this.formatDateTime(r?.requestTime),
+            status,
+            fifoHint: r?.jobNo ? `JOB#${r.jobNo}` : undefined,
+            remark: r?.remark || ''
+          };
+        });
+
+        this.applyFilters();
+        this.isLoadingQueue = false;
+      },
+      error: (err) => {
+        this.isLoadingQueue = false;
+        Swal.fire(
+          'Error',
+          err?.error?.message || err?.message || 'โหลด Queue ไม่สำเร็จ',
+          'error'
+        );
+      }
+    });
+  }
+
+  // =========================
+  // FILTER
   // =========================
   applyFilters() {
-    const q = (this.q || '').toLowerCase();
+    const q = (this.q || '').trim().toLowerCase();
     const s = this.statusFilter;
 
     this.requestsView = (this.requestsAll || []).filter(x => {
       if (q) {
         const hit =
           x.materialNo.toLowerCase().includes(q) ||
+          x.materialName.toLowerCase().includes(q) ||
           x.destination.toLowerCase().includes(q) ||
-          x.requestBy.toLowerCase().includes(q);
+          x.requestBy.toLowerCase().includes(q) ||
+          x.fifoHint?.toLowerCase().includes(q);
 
         if (!hit) return false;
       }
@@ -286,7 +363,9 @@ export class IssueComponent {
       title: 'Process request?',
       html: `
         <div style="text-align:left">
+          <div><b>Job:</b> ${row.jobNo || '-'}</div>
           <div><b>Material:</b> ${row.materialNo}</div>
+          <div><b>Material Name:</b> ${row.materialName}</div>
           <div><b>Qty:</b> ${row.qty}</div>
           <div><b>To:</b> ${row.destination}</div>
         </div>
@@ -301,4 +380,60 @@ export class IssueComponent {
     row.status = 'Processing';
     this.applyFilters();
   }
+
+  // =========================
+  // HELPERS
+  // =========================
+  resetForm() {
+    this.materialNo = '';
+    this.materialName = '';
+    this.materialSpec = '';
+    this.destination = '';
+    this.priority = 'Normal';
+    this.remark = '';
+    this.selectedMaterialId = null;
+    this.showMaterialDropdown = false;
+  }
+
+  formatDateTime(value: any): string {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return String(value);
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+
+
+  showRemark(row: IssueRequestRow) {
+    const remarkText = (row.remark || '').trim();
+  
+    if (!remarkText) return;
+  
+    Swal.fire({
+      icon: 'info',
+      title: 'Request Remark',
+      html: `
+        <div style="text-align:left; line-height:1.7;">
+          <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
+          <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
+          <div style="
+            padding:12px;
+            border-radius:10px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            color:#0f172a;
+            white-space:pre-wrap;
+            word-break:break-word;
+          ">${remarkText}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
+
+  
 }

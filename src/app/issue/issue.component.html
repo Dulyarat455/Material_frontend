@@ -12,7 +12,7 @@
   </div>
 
   <div class="issue-grid">
-    <!-- ================= LEFT : FORM ================= -->
+    <!-- LEFT : FORM -->
     <div class="issue-card form-card">
       <div class="card-head">
         <div>
@@ -26,23 +26,21 @@
 
       <div class="issue-form">
 
-        <!-- 🔥 MATERIAL SEARCH -->
         <div class="form-row material-search">
           <label>Material No</label>
-
           <input
             [(ngModel)]="materialNo"
             (input)="onSearchMaterial()"
+            (blur)="hideMaterialDropdown()"
             placeholder="Search Material..."
             autocomplete="off"
           />
 
-          <!-- dropdown -->
           <div class="dropdown-material" *ngIf="showMaterialDropdown">
             <div
               class="dropdown-item"
               *ngFor="let m of materialDropdown"
-              (click)="selectMaterial(m)"
+              (mousedown)="selectMaterial(m)"
             >
               <div class="d-code">{{ m.materialNo }}</div>
               <div class="d-name">{{ m.materialName }}</div>
@@ -60,7 +58,6 @@
           <input [(ngModel)]="materialSpec" readonly />
         </div>
 
-        <!-- 🔥 LINE + MACHINE -->
         <div class="form-row two-col">
           <div>
             <label>Production Line</label>
@@ -76,9 +73,12 @@
             <label>Machine</label>
             <select
               [(ngModel)]="selectedMachine"
-              [disabled]="!selectedLine || !machinesView.length"
+              (change)="onMachineChange()"
+              [disabled]="!selectedLine || !machinesView.length || isLoadingMachine"
             >
-              <option value="">-- Select Machine --</option>
+              <option value="">
+                {{ isLoadingMachine ? 'Loading...' : '-- Select Machine --' }}
+              </option>
               <option *ngFor="let m of machinesView" [value]="m">
                 {{ m }}
               </option>
@@ -86,10 +86,6 @@
           </div>
         </div>
 
-        <div class="form-row">
-          <label>Qty</label>
-          <input type="number" [(ngModel)]="qty" placeholder="Enter qty..." />
-        </div>
 
         <div class="form-row">
           <label>Priority</label>
@@ -104,15 +100,15 @@
           <input [(ngModel)]="remark" placeholder="Optional..." />
         </div>
 
-        <button class="btn-main" (click)="submitIssueRequest()">
+        <button class="btn-main" (click)="submitIssueRequest()" [disabled]="isSubmitting">
           <i class="fas fa-paper-plane me-2"></i>
-          Submit Issue Request
+          {{ isSubmitting ? 'Submitting...' : 'Submit Issue Request' }}
         </button>
 
       </div>
     </div>
 
-    <!-- ================= RIGHT : QUEUE ================= -->
+    <!-- RIGHT : QUEUE -->
     <div class="issue-card queue-card">
       <div class="card-head">
         <div>
@@ -128,7 +124,7 @@
         <input
           [(ngModel)]="q"
           (ngModelChange)="applyFilters()"
-          placeholder="Search..."
+          placeholder="Search material / machine / user / job..."
         />
 
         <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
@@ -142,37 +138,71 @@
       </div>
 
       <div class="queue-list">
-        <div class="req-card" *ngFor="let r of requestsView">
-          <div class="req-top">
-            <div class="req-material">{{ r.materialNo }}</div>
-            <div class="priority-pill" [class.urgent]="r.priority === 'Urgent'">
-              {{ r.priority }}
+        <div class="queue-empty" *ngIf="isLoadingQueue">Loading...</div>
+
+        <ng-container *ngIf="!isLoadingQueue">
+          <div class="req-card" *ngFor="let r of requestsView">
+            <div class="req-top">
+              <div class="req-main">
+                <div class="req-material">{{ r.materialNo }}</div>
+                <div class="req-fifo" *ngIf="r.fifoHint">{{ r.fifoHint }}</div>
+              </div>
+
+              <div class="priority-pill" [class.urgent]="r.priority === 'Urgent'">
+                {{ r.priority }}
+              </div>
+            </div>
+
+            <div class="req-grid">
+              <div class="req-item">
+                <span class="k">Material Name</span>
+                <span class="v">{{ r.materialName }}</span>
+              </div>
+
+              <div class="req-item">
+                <span class="k">Material Spec</span>
+                <span class="v">{{ r.materialSpec  }}</span>
+              </div>
+              <div class="req-item">
+                <span class="k">Destination</span>
+                <span class="v">{{ r.destination }}</span>
+              </div>
+              <div class="req-item">
+                <span class="k">Request By</span>
+                <span class="v">{{ r.requestBy }}</span>
+              </div>
+              <div class="req-item">
+                <span class="k">Request At</span>
+                <span class="v">{{ r.requestAt }}</span>
+              </div>
+            </div>
+
+            <div class="req-bottom">
+              <span
+                class="status-pill"
+                [class.wait]="r.status === 'Waiting'"
+                [class.proc]="r.status === 'Processing'"
+                [class.done]="r.status === 'Completed'"
+              >
+                {{ r.status }}
+              </span>
+
+              <button
+              *ngIf="r.remark?.trim()"
+              type="button"
+              class="btn-remark"
+              (click)="showRemark(r)"
+              title="View remark"
+            >
+              <i class="fas fa-comment-dots"></i>
+            </button>
             </div>
           </div>
 
-          <div class="req-grid">
-            <div><b>Qty:</b> {{ r.qty }}</div>
-            <div><b>To:</b> {{ r.destination }}</div>
-            <div><b>User:</b> {{ r.requestBy }}</div>
-            <div><b>Time:</b> {{ r.requestAt }}</div>
+          <div class="queue-empty" *ngIf="!requestsView.length">
+            No requests
           </div>
-
-          <div class="req-bottom">
-            <span class="status-pill">{{ r.status }}</span>
-
-            <button
-              class="btn-process"
-              (click)="confirmProcess(r)"
-              [disabled]="r.status !== 'Waiting'"
-            >
-              Process
-            </button>
-          </div>
-        </div>
-
-        <div class="queue-empty" *ngIf="!requestsView.length">
-          No requests
-        </div>
+        </ng-container>
       </div>
     </div>
   </div>
