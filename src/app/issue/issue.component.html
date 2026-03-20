@@ -12,83 +12,107 @@
   </div>
 
   <div class="issue-grid">
-    <!-- LEFT : FORM -->
+    <!-- ================= LEFT : FORM ================= -->
     <div class="issue-card form-card">
       <div class="card-head">
         <div>
           <div class="card-title">New Issue Request</div>
-          <div class="card-subtitle"> issue request for production</div>
+          <div class="card-subtitle">issue request for production</div>
         </div>
         <div class="card-icon issue-accent">
           <i class="fas fa-dolly"></i>
         </div>
       </div>
 
+      <div class="issue-form">
 
+        <!-- 🔥 MATERIAL SEARCH -->
+        <div class="form-row material-search">
+          <label>Material No</label>
 
-     <div class="issue-form">
+          <input
+            [(ngModel)]="materialNo"
+            (input)="onSearchMaterial()"
+            placeholder="Search Material..."
+            autocomplete="off"
+          />
 
-  <div class="form-row">
-    <label>Material No</label>
-    <input [(ngModel)]="materialNo" placeholder="MATS1"/>
-  </div>
+          <!-- dropdown -->
+          <div class="dropdown-material" *ngIf="showMaterialDropdown">
+            <div
+              class="dropdown-item"
+              *ngFor="let m of materialDropdown"
+              (click)="selectMaterial(m)"
+            >
+              <div class="d-code">{{ m.materialNo }}</div>
+              <div class="d-name">{{ m.materialName }}</div>
+            </div>
+          </div>
+        </div>
 
-  <div class="form-row">
-    <label>Material Name</label>
-    <input [(ngModel)]="materialName" placeholder="Bolt M10"/>
-  </div>
+        <div class="form-row">
+          <label>Material Name</label>
+          <input [(ngModel)]="materialName" readonly />
+        </div>
 
-  <div class="form-row">
-    <label>Material Spec / Drawing</label>
-    <input [(ngModel)]="materialSpec" placeholder="M10 x 30mm / DWG-A12"/>
-  </div>
+        <div class="form-row">
+          <label>Material Spec</label>
+          <input [(ngModel)]="materialSpec" readonly />
+        </div>
 
-  <div class="form-row two-col">
+        <!-- 🔥 LINE + MACHINE -->
+        <div class="form-row two-col">
+          <div>
+            <label>Production Line</label>
+            <select [(ngModel)]="selectedLine" (change)="onLineChange()">
+              <option value="">-- Select Line --</option>
+              <option *ngFor="let l of lines" [value]="l">
+                {{ l }}
+              </option>
+            </select>
+          </div>
 
-    <div>
-      <label>Production Line</label>
-      <select [(ngModel)]="selectedLine" (change)="onLineChange()">
-        <option *ngFor="let l of lines" [value]="l">
-          {{ l }}
-        </option>
-      </select>
+          <div>
+            <label>Machine</label>
+            <select
+              [(ngModel)]="selectedMachine"
+              [disabled]="!selectedLine || !machinesView.length"
+            >
+              <option value="">-- Select Machine --</option>
+              <option *ngFor="let m of machinesView" [value]="m">
+                {{ m }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Qty</label>
+          <input type="number" [(ngModel)]="qty" placeholder="Enter qty..." />
+        </div>
+
+        <div class="form-row">
+          <label>Priority</label>
+          <select [(ngModel)]="priority">
+            <option value="Normal">Normal</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Remark</label>
+          <input [(ngModel)]="remark" placeholder="Optional..." />
+        </div>
+
+        <button class="btn-main" (click)="submitIssueRequest()">
+          <i class="fas fa-paper-plane me-2"></i>
+          Submit Issue Request
+        </button>
+
+      </div>
     </div>
-  
-    <div>
-      <label>Machine</label>
-      <select [(ngModel)]="selectedMachine">
-        <option *ngFor="let m of machinesView" [value]="m">
-          {{ m }}
-        </option>
-      </select>
-    </div>
 
-   
-  </div>
-  <div class="form-row">
-    <label>Priority</label>
-    <select [(ngModel)]="priority">
-      <option value="Normal">Normal</option>
-      <option value="Urgent">Urgent</option>
-    </select>
-  </div>
-
-  <div class="form-row">
-    <label>Remark</label>
-    <input [(ngModel)]="remark" placeholder="Optional..."/>
-  </div>
-
-  <button class="btn-main" (click)="submitIssueRequest()">
-    <i class="fas fa-paper-plane me-2"></i>
-    Submit Issue Request
-  </button>
-
-</div>
-
-
-    </div>
-
-    <!-- RIGHT : QUEUE -->
+    <!-- ================= RIGHT : QUEUE ================= -->
     <div class="issue-card queue-card">
       <div class="card-head">
         <div>
@@ -104,11 +128,11 @@
         <input
           [(ngModel)]="q"
           (ngModelChange)="applyFilters()"
-          placeholder="Search material / destination / user..."
+          placeholder="Search..."
         />
 
         <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
-          <option value="all">All Status</option>
+          <option value="all">All</option>
           <option value="Waiting">Waiting</option>
           <option value="Processing">Processing</option>
           <option value="Completed">Completed</option>
@@ -120,51 +144,27 @@
       <div class="queue-list">
         <div class="req-card" *ngFor="let r of requestsView">
           <div class="req-top">
-            <div class="req-main">
-              <div class="req-material">{{ r.materialNo }}</div>
-              <div class="req-fifo" *ngIf="r.fifoHint">{{ r.fifoHint }}</div>
-            </div>
-
+            <div class="req-material">{{ r.materialNo }}</div>
             <div class="priority-pill" [class.urgent]="r.priority === 'Urgent'">
               {{ r.priority }}
             </div>
           </div>
 
           <div class="req-grid">
-            <div class="req-item">
-              <span class="k">Qty</span>
-              <span class="v">{{ r.qty }}</span>
-            </div>
-            <div class="req-item">
-              <span class="k">Destination</span>
-              <span class="v">{{ r.destination }}</span>
-            </div>
-            <div class="req-item">
-              <span class="k">Request By</span>
-              <span class="v">{{ r.requestBy }}</span>
-            </div>
-            <div class="req-item">
-              <span class="k">Request At</span>
-              <span class="v">{{ r.requestAt }}</span>
-            </div>
+            <div><b>Qty:</b> {{ r.qty }}</div>
+            <div><b>To:</b> {{ r.destination }}</div>
+            <div><b>User:</b> {{ r.requestBy }}</div>
+            <div><b>Time:</b> {{ r.requestAt }}</div>
           </div>
 
           <div class="req-bottom">
-            <span
-              class="status-pill"
-              [class.wait]="r.status === 'Waiting'"
-              [class.proc]="r.status === 'Processing'"
-              [class.done]="r.status === 'Completed'"
-            >
-              {{ r.status }}
-            </span>
+            <span class="status-pill">{{ r.status }}</span>
 
             <button
               class="btn-process"
               (click)="confirmProcess(r)"
               [disabled]="r.status !== 'Waiting'"
             >
-              <i class="fas fa-gear me-1"></i>
               Process
             </button>
           </div>
