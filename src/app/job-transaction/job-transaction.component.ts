@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
+import config from '../../config';
 
 type JobRow = {
+  id: number;
+  incomingId?: number | null;
   dateTimePD: string;
   jobNo: string;
   type: 'Issue' | 'Return';
@@ -11,8 +16,9 @@ type JobRow = {
   mcNo: string;
   requestBy: string;
   remark?: string;
+  state?: string;
+  priority?: string;
 };
-
 
 @Component({
   selector: 'app-job-transaction',
@@ -22,65 +28,194 @@ type JobRow = {
   styleUrl: './job-transaction.component.css'
 })
 export class JobTransactionComponent {
+  constructor(private http: HttpClient) {}
 
-  issueJobs: JobRow[] = [
-    {
-      dateTimePD: '22-12-2025 07:34',
-      jobNo: '20251222006',
-      type: 'Issue',
-      materialNo: 'P07080003400000',
-      materialName: 'SPCEN-SD',
-      materialSpec: '0.8 x 34',
-      mcNo: 'B3',
-      requestBy: 'LA647',
-      remark: ''
-    },
-    {
-      dateTimePD: '22-12-2025 07:34',
-      jobNo: '20251222007',
-      type: 'Issue',
-      materialNo: 'P07080003400000',
-      materialName: 'SPCEN-SD',
-      materialSpec: '0.8 x 34',
-      mcNo: 'B4',
-      requestBy: 'LA647',
-      remark: ''
-    },
-    {
-      dateTimePD: '22-12-2025 08:02',
-      jobNo: '20251222009',
-      type: 'Issue',
-      materialNo: 'P14090008600000',
-      materialName: 'SUYP-1',
-      materialSpec: '0.9 x 86',
-      mcNo: 'B1',
-      requestBy: 'LA440',
-      remark: ''
-    }
-  ];
+  issueJobs: JobRow[] = [];
+  returnJobs: JobRow[] = [];
 
-  returnJobs: JobRow[] = [
-    {
-      dateTimePD: '22-12-2025 07:45',
-      jobNo: '20251222008',
-      type: 'Return',
-      materialNo: 'P13090006500000',
-      materialName: 'SECC-GX-J2',
-      materialSpec: '0.9 x 65',
-      mcNo: 'C3',
-      requestBy: 'LB369',
-      remark: ''
-    }
-  ];
+  isLoading = false;
+
+  ngOnInit() {
+    this.fetchIssueAll();
+
+    setInterval(() => {
+      this.issueJobs = [...this.issueJobs];
+      this.returnJobs = [...this.returnJobs];
+    }, 60000);
+  }
+
+  fetchIssueAll() {
+    this.isLoading = true;
+
+    this.http.get<any>(config.apiServer + '/api/issue/fetIssueAll').subscribe({
+      next: (res) => {
+        const rows = Array.isArray(res?.results) ? res.results : [];
+
+        const mapped: JobRow[] = rows.map((r: any) => {
+          const reqEmpNo = r?.requestUserEmpNo || '';
+          const reqName = r?.requestUserName || '';
+
+          const requestBy =
+            reqEmpNo && reqName
+              ? `${reqEmpNo} - ${reqName}`
+              : reqEmpNo || reqName || '-';
+
+          const rawType = String(r?.type || '').trim().toLowerCase();
+          const type: 'Issue' | 'Return' =
+            rawType === 'return' ? 'Return' : 'Issue';
+
+          return {
+            id: Number(r?.id || 0),
+            incomingId: r?.incomingId ?? null,
+            dateTimePD: this.formatDateTime(r?.requestTime),
+            jobNo: r?.jobNo || '-',
+            type,
+            materialNo: r?.materialNo || '-',
+            materialName: r?.materialName || '-',
+            materialSpec: r?.materialSpec || '-',
+            mcNo: r?.areaName || '-',
+            requestBy,
+            remark: r?.remark || '',
+            state: r?.state || '',
+            priority: r?.priority || ''
+          };
+        });
+
+        this.issueJobs = mapped.filter(x => x.type === 'Issue');
+        this.returnJobs = mapped.filter(x => x.type === 'Return');
+
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        Swal.fire(
+          'Error',
+          err?.error?.message || err?.message || 'Load transaction fail',
+          'error'
+        );
+      }
+    });
+  }
+
+  onClickStockOut(row: JobRow) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Stock Out',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div><b>Job No:</b> ${row.jobNo || '-'}</div>
+          <div><b>Material No:</b> ${row.materialNo || '-'}</div>
+          <div><b>Material Name:</b> ${row.materialName || '-'}</div>
+          <div><b>Material Spec:</b> ${row.materialSpec || '-'}</div>
+          <div><b>M/C No:</b> ${row.mcNo || '-'}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
+  onClickReturn(row: JobRow) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Return',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div><b>Job No:</b> ${row.jobNo || '-'}</div>
+          <div><b>Material No:</b> ${row.materialNo || '-'}</div>
+          <div><b>Material Name:</b> ${row.materialName || '-'}</div>
+          <div><b>Material Spec:</b> ${row.materialSpec || '-'}</div>
+          <div><b>M/C No:</b> ${row.mcNo || '-'}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#16a34a'
+    });
+  }
+
+  showRemark(row: JobRow) {
+    const remarkText = (row.remark || '').trim();
+    if (!remarkText) return;
+
+    Swal.fire({
+      icon: 'info',
+      title: 'Job Remark',
+      html: `
+        <div style="text-align:left; line-height:1.7;">
+          <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
+          <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
+          <div style="
+            padding:12px;
+            border-radius:10px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            color:#0f172a;
+            white-space:pre-wrap;
+            word-break:break-word;
+          ">${this.escapeHtml(remarkText)}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
 
   trackIssue(index: number, row: JobRow) {
-    return row.jobNo;
+    return row.id || row.jobNo;
   }
 
   trackReturn(index: number, row: JobRow) {
-    return row.jobNo;
+    return row.id || row.jobNo;
   }
 
+  formatDateTime(value: any): string {
+    if (!value) return '-';
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return String(value);
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  private escapeHtml(value: string): string {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+
+  isOver10Min(row: JobRow): boolean {
+    if (!row.dateTimePD || row.dateTimePD === '-') return false;
+  
+    const d = this.parseDateTime(row.dateTimePD);
+    if (!d) return false;
+  
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+  
+    const diffMin = diffMs / (1000 * 60);
+  
+    return diffMin >= 10;
+  }
+
+
+  parseDateTime(value: string): Date | null {
+    try {
+      const [datePart, timePart] = value.split(' ');
+  
+      const [dd, mm, yyyy] = datePart.split('-').map(Number);
+      const [hh, min] = timePart.split(':').map(Number);
+  
+      return new Date(yyyy, mm - 1, dd, hh, min);
+    } catch {
+      return null;
+    }
+  }
 
 
 }
