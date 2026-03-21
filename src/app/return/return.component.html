@@ -25,42 +25,60 @@
       </div>
 
       <div class="return-form">
-
-        <div class="form-row">
+        <div class="form-row material-search">
           <label>Material No</label>
-          <input [(ngModel)]="materialNo" placeholder="MATS1"/>
+          <input
+            [(ngModel)]="materialNo"
+            (input)="onSearchMaterial()"
+            (blur)="hideMaterialDropdown()"
+            placeholder="Search Material..."
+            autocomplete="off"
+          />
+
+          <div class="dropdown-material" *ngIf="showMaterialDropdown">
+            <div
+              class="dropdown-item"
+              *ngFor="let m of materialDropdown"
+              (mousedown)="selectMaterial(m)"
+            >
+              <div class="d-code">{{ m.materialNo }}</div>
+              <div class="d-name">{{ m.materialName }}</div>
+            </div>
+          </div>
         </div>
-      
+
         <div class="form-row">
           <label>Material Name</label>
-          <input [(ngModel)]="materialName" placeholder="Bolt M10"/>
+          <input [(ngModel)]="materialName" readonly />
         </div>
-      
+
         <div class="form-row">
           <label>Material Spec / Drawing</label>
-          <input [(ngModel)]="materialSpec" placeholder="M10 x 30mm / DWG-A12"/>
+          <input [(ngModel)]="materialSpec" readonly />
         </div>
-      
-        <div class="form-row two-col">
 
+        <div class="form-row two-col">
           <div>
             <label>Production Line</label>
             <select [(ngModel)]="selectedLine" (change)="onLineChange()">
-              <option *ngFor="let l of lines" [value]="l">
-                {{ l }}
-              </option>
+              <option value="">-- Select Line --</option>
+              <option *ngFor="let l of lines" [value]="l">{{ l }}</option>
             </select>
           </div>
-        
+
           <div>
             <label>Machine</label>
-            <select [(ngModel)]="selectedMachine">
-              <option *ngFor="let m of machinesView" [value]="m">
-                {{ m }}
+            <select
+              [(ngModel)]="selectedMachine"
+              (change)="onMachineChange()"
+              [disabled]="!selectedLine || !machinesView.length || isLoadingMachine"
+            >
+              <option value="">
+                {{ isLoadingMachine ? 'Loading...' : '-- Select Machine --' }}
               </option>
+              <option *ngFor="let m of machinesView" [value]="m">{{ m }}</option>
             </select>
           </div>
-        
         </div>
 
         <div class="form-row">
@@ -70,22 +88,17 @@
             <option value="Urgent">Urgent</option>
           </select>
         </div>
-      
+
         <div class="form-row">
           <label>Remark</label>
-          <input [(ngModel)]="remark" placeholder="Returning unused material"/>
+          <input [(ngModel)]="remark" placeholder="Returning unused material" />
         </div>
-      
-        <button class="btn-main return-btn" (click)="submitReturnRequest()">
+
+        <button class="btn-main return-btn" (click)="submitReturnRequest()" [disabled]="isSubmitting">
           <i class="fas fa-undo me-2"></i>
-          Submit Return Request
+          {{ isSubmitting ? 'Submitting...' : 'Submit Return Request' }}
         </button>
-      
       </div>
-
-
-
-
     </div>
 
     <!-- RIGHT : QUEUE -->
@@ -93,7 +106,7 @@
       <div class="card-head">
         <div>
           <div class="card-title">Return Queue</div>
-          <div class="card-subtitle"> Returned from production area</div>
+          <div class="card-subtitle">Returned from production area</div>
         </div>
         <div class="queue-count">
           {{ requestsView.length }} items
@@ -104,7 +117,7 @@
         <input
           [(ngModel)]="q"
           (ngModelChange)="applyFilters()"
-          placeholder="Search material / from area / user..."
+          placeholder="Search material / area / user / job..."
         />
 
         <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
@@ -118,68 +131,77 @@
       </div>
 
       <div class="queue-list">
-        <div class="req-card" *ngFor="let r of requestsView">
-          <div class="req-top">
-            <div class="req-main">
-              <div class="req-material">{{ r.materialNo }}</div>
-              <div class="req-qty">{{ r.qty }} pcs</div>
+        <div class="queue-empty" *ngIf="isLoadingQueue">Loading...</div>
+
+        <ng-container *ngIf="!isLoadingQueue">
+          <div class="req-card" *ngFor="let r of requestsView">
+            <div class="req-top">
+              <div class="req-main">
+                <div class="req-material">{{ r.materialNo }}</div>
+                <div class="req-qty">{{ r.jobNo || 'RETURN' }}</div>
+              </div>
+
+              <div class="return-pill" [class.urgent]="r.priority === 'Urgent'">
+                {{ r.priority }}
+              </div>
             </div>
 
-            <div class="return-pill">
-              Return
+            <div class="req-grid">
+              <div class="req-item">
+                <span class="k">Material Name</span>
+                <span class="v">{{ r.materialName }}</span>
+              </div>
+
+              <div class="req-item">
+                <span class="k">Material Spec</span>
+                <span class="v">{{ r.materialSpec }}</span>
+              </div>
+
+              <div class="req-item">
+                <span class="k">From</span>
+                <span class="v">{{ r.fromArea }}</span>
+              </div>
+
+              <div class="req-item">
+                <span class="k">Request By</span>
+                <span class="v">{{ r.requestBy }}</span>
+              </div>
+
+              <div class="req-item">
+                <span class="k">Request At</span>
+                <span class="v">{{ r.requestAt }}</span>
+              </div>
+            </div>
+
+            <div class="req-note" *ngIf="r.remark">
+              <i class="fas fa-bolt me-1"></i>{{ r.remark }}
+            </div>
+
+            <div class="req-bottom">
+              <span
+                class="status-pill"
+                [class.wait]="r.status === 'Waiting'"
+                [class.proc]="r.status === 'Processing'"
+                [class.done]="r.status === 'Completed'"
+              >
+                {{ r.status }}
+              </span>
+
+              <button
+                class="btn-process"
+                (click)="confirmReceive(r)"
+                [disabled]="r.status !== 'Waiting'"
+              >
+                <i class="fas fa-inbox me-1"></i>
+                Receive
+              </button>
             </div>
           </div>
 
-          <div class="req-grid">
-            <div class="req-item">
-              <span class="k">From</span>
-              <span class="v">{{ r.fromArea }}</span>
-            </div>
-
-            <div class="req-item" *ngIf="r.backToArea">
-              <span class="k">To Area</span>
-              <span class="v">{{ r.backToArea }}</span>
-            </div>
-
-            <div class="req-item">
-              <span class="k">Request By</span>
-              <span class="v">{{ r.requestBy }}</span>
-            </div>
-
-            <div class="req-item">
-              <span class="k">Request At</span>
-              <span class="v">{{ r.requestAt }}</span>
-            </div>
+          <div class="queue-empty" *ngIf="!requestsView.length">
+            No requests
           </div>
-
-          <div class="req-note" *ngIf="r.remark">
-            <i class="fas fa-bolt me-1"></i>{{ r.remark }}
-          </div>
-
-          <div class="req-bottom">
-            <span
-              class="status-pill"
-              [class.wait]="r.status === 'Waiting'"
-              [class.proc]="r.status === 'Processing'"
-              [class.done]="r.status === 'Completed'"
-            >
-              {{ r.status }}
-            </span>
-
-            <button
-              class="btn-process"
-              (click)="confirmReceive(r)"
-              [disabled]="r.status !== 'Waiting'"
-            >
-              <i class="fas fa-inbox me-1"></i>
-              Receive
-            </button>
-          </div>
-        </div>
-
-        <div class="queue-empty" *ngIf="!requestsView.length">
-          No requests
-        </div>
+        </ng-container>
       </div>
     </div>
   </div>

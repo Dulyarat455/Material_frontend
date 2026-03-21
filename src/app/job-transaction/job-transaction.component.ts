@@ -17,7 +17,7 @@ type JobRow = {
   requestBy: string;
   remark?: string;
   state?: string;
-  priority?: string;
+  priority?: 'Normal' | 'Urgent';
 };
 
 @Component({
@@ -33,10 +33,12 @@ export class JobTransactionComponent {
   issueJobs: JobRow[] = [];
   returnJobs: JobRow[] = [];
 
-  isLoading = false;
+  isLoadingIssue = false;
+  isLoadingReturn = false;
 
   ngOnInit() {
     this.fetchIssueAll();
+    this.fetchReturnAll();
 
     setInterval(() => {
       this.issueJobs = [...this.issueJobs];
@@ -44,57 +46,83 @@ export class JobTransactionComponent {
     }, 60000);
   }
 
+  get isLoading(): boolean {
+    return this.isLoadingIssue || this.isLoadingReturn;
+  }
+
   fetchIssueAll() {
-    this.isLoading = true;
+    this.isLoadingIssue = true;
 
     this.http.get<any>(config.apiServer + '/api/issue/fetIssueAll').subscribe({
       next: (res) => {
         const rows = Array.isArray(res?.results) ? res.results : [];
-
-        const mapped: JobRow[] = rows.map((r: any) => {
-          const reqEmpNo = r?.requestUserEmpNo || '';
-          const reqName = r?.requestUserName || '';
-
-          const requestBy =
-            reqEmpNo && reqName
-              ? `${reqEmpNo} - ${reqName}`
-              : reqEmpNo || reqName || '-';
-
-          const rawType = String(r?.type || '').trim().toLowerCase();
-          const type: 'Issue' | 'Return' =
-            rawType === 'return' ? 'Return' : 'Issue';
-
-          return {
-            id: Number(r?.id || 0),
-            incomingId: r?.incomingId ?? null,
-            dateTimePD: this.formatDateTime(r?.requestTime),
-            jobNo: r?.jobNo || '-',
-            type,
-            materialNo: r?.materialNo || '-',
-            materialName: r?.materialName || '-',
-            materialSpec: r?.materialSpec || '-',
-            mcNo: r?.areaName || '-',
-            requestBy,
-            remark: r?.remark || '',
-            state: r?.state || '',
-            priority: r?.priority || ''
-          };
-        });
-
-        this.issueJobs = mapped.filter(x => x.type === 'Issue');
-        this.returnJobs = mapped.filter(x => x.type === 'Return');
-
-        this.isLoading = false;
+        this.issueJobs = rows.map((r: any) => this.mapJobRow(r, 'Issue'));
+        this.isLoadingIssue = false;
       },
       error: (err) => {
-        this.isLoading = false;
+        this.isLoadingIssue = false;
         Swal.fire(
           'Error',
-          err?.error?.message || err?.message || 'Load transaction fail',
+          err?.error?.message || err?.message || 'Load issue transaction fail',
           'error'
         );
       }
     });
+  }
+
+  fetchReturnAll() {
+    this.isLoadingReturn = true;
+
+    this.http.get<any>(config.apiServer + '/api/return/fetReturnAll').subscribe({
+      next: (res) => {
+        const rows = Array.isArray(res?.results) ? res.results : [];
+        this.returnJobs = rows.map((r: any) => this.mapJobRow(r, 'Return'));
+        this.isLoadingReturn = false;
+      },
+      error: (err) => {
+        this.isLoadingReturn = false;
+        Swal.fire(
+          'Error',
+          err?.error?.message || err?.message || 'Load return transaction fail',
+          'error'
+        );
+      }
+    });
+  }
+
+  private mapJobRow(r: any, fallbackType: 'Issue' | 'Return'): JobRow {
+    const reqEmpNo = r?.requestUserEmpNo || '';
+    const reqName = r?.requestUserName || '';
+
+    const requestBy =
+      reqEmpNo && reqName
+        ? `${reqEmpNo} - ${reqName}`
+        : reqEmpNo || reqName || '-';
+
+    const rawType = String(r?.type || fallbackType).trim().toLowerCase();
+    const type: 'Issue' | 'Return' =
+      rawType === 'return' ? 'Return' : 'Issue';
+
+    const priority: 'Normal' | 'Urgent' =
+      String(r?.priority || '').trim().toLowerCase() === 'urgent'
+        ? 'Urgent'
+        : 'Normal';
+
+    return {
+      id: Number(r?.id || 0),
+      incomingId: r?.incomingId ?? null,
+      dateTimePD: this.formatDateTime(r?.requestTime),
+      jobNo: r?.jobNo || '-',
+      type,
+      materialNo: r?.materialNo || '-',
+      materialName: r?.materialName || '-',
+      materialSpec: r?.materialSpec || '-',
+      mcNo: r?.areaName || '-',
+      requestBy,
+      remark: r?.remark || '',
+      state: r?.state || '',
+      priority
+    };
   }
 
   onClickStockOut(row: JobRow) {
@@ -103,11 +131,11 @@ export class JobTransactionComponent {
       title: 'Stock Out',
       html: `
         <div style="text-align:left; line-height:1.8;">
-          <div><b>Job No:</b> ${row.jobNo || '-'}</div>
-          <div><b>Material No:</b> ${row.materialNo || '-'}</div>
-          <div><b>Material Name:</b> ${row.materialName || '-'}</div>
-          <div><b>Material Spec:</b> ${row.materialSpec || '-'}</div>
-          <div><b>M/C No:</b> ${row.mcNo || '-'}</div>
+          <div><b>Job No:</b> ${this.escapeHtml(row.jobNo || '-')}</div>
+          <div><b>Material No:</b> ${this.escapeHtml(row.materialNo || '-')}</div>
+          <div><b>Material Name:</b> ${this.escapeHtml(row.materialName || '-')}</div>
+          <div><b>Material Spec:</b> ${this.escapeHtml(row.materialSpec || '-')}</div>
+          <div><b>M/C No:</b> ${this.escapeHtml(row.mcNo || '-')}</div>
         </div>
       `,
       confirmButtonText: 'Close',
@@ -118,14 +146,14 @@ export class JobTransactionComponent {
   onClickReturn(row: JobRow) {
     Swal.fire({
       icon: 'info',
-      title: 'Return',
+      title: 'Receive Return',
       html: `
         <div style="text-align:left; line-height:1.8;">
-          <div><b>Job No:</b> ${row.jobNo || '-'}</div>
-          <div><b>Material No:</b> ${row.materialNo || '-'}</div>
-          <div><b>Material Name:</b> ${row.materialName || '-'}</div>
-          <div><b>Material Spec:</b> ${row.materialSpec || '-'}</div>
-          <div><b>M/C No:</b> ${row.mcNo || '-'}</div>
+          <div><b>Job No:</b> ${this.escapeHtml(row.jobNo || '-')}</div>
+          <div><b>Material No:</b> ${this.escapeHtml(row.materialNo || '-')}</div>
+          <div><b>Material Name:</b> ${this.escapeHtml(row.materialName || '-')}</div>
+          <div><b>Material Spec:</b> ${this.escapeHtml(row.materialSpec || '-')}</div>
+          <div><b>M/C No:</b> ${this.escapeHtml(row.mcNo || '-')}</div>
         </div>
       `,
       confirmButtonText: 'Close',
@@ -142,8 +170,8 @@ export class JobTransactionComponent {
       title: 'Job Remark',
       html: `
         <div style="text-align:left; line-height:1.7;">
-          <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
-          <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
+          <div style="margin-bottom:8px;"><b>Job No:</b> ${this.escapeHtml(row.jobNo || '-')}</div>
+          <div style="margin-bottom:8px;"><b>Material No:</b> ${this.escapeHtml(row.materialNo || '-')}</div>
           <div style="
             padding:12px;
             border-radius:10px;
@@ -168,6 +196,31 @@ export class JobTransactionComponent {
     return row.id || row.jobNo;
   }
 
+  isOver10Min(row: JobRow): boolean {
+    if (!row.dateTimePD || row.dateTimePD === '-') return false;
+
+    const d = this.parseDateTime(row.dateTimePD);
+    if (!d) return false;
+
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = diffMs / (1000 * 60);
+
+    return diffMin >= 10;
+  }
+
+  parseDateTime(value: string): Date | null {
+    try {
+      const [datePart, timePart] = value.split(' ');
+      const [dd, mm, yyyy] = datePart.split('-').map(Number);
+      const [hh, min] = timePart.split(':').map(Number);
+
+      return new Date(yyyy, mm - 1, dd, hh, min);
+    } catch {
+      return null;
+    }
+  }
+
   formatDateTime(value: any): string {
     if (!value) return '-';
 
@@ -187,35 +240,4 @@ export class JobTransactionComponent {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
-
-
-  isOver10Min(row: JobRow): boolean {
-    if (!row.dateTimePD || row.dateTimePD === '-') return false;
-  
-    const d = this.parseDateTime(row.dateTimePD);
-    if (!d) return false;
-  
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-  
-    const diffMin = diffMs / (1000 * 60);
-  
-    return diffMin >= 10;
-  }
-
-
-  parseDateTime(value: string): Date | null {
-    try {
-      const [datePart, timePart] = value.split(' ');
-  
-      const [dd, mm, yyyy] = datePart.split('-').map(Number);
-      const [hh, min] = timePart.split(':').map(Number);
-  
-      return new Date(yyyy, mm - 1, dd, hh, min);
-    } catch {
-      return null;
-    }
-  }
-
-
 }

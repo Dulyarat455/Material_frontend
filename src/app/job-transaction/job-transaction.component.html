@@ -60,7 +60,7 @@
       <table class="table tx-table issue-table mb-0">
         <thead>
           <tr>
-            <th></th>
+            <th style="width:54px;"></th>
             <th>DateTime PD</th>
             <th>Job No</th>
             <th>Type</th>
@@ -74,21 +74,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="isLoading">
-            <td colspan="10" class="empty-cell">Loading...</td>
+          <tr *ngIf="isLoadingIssue">
+            <td colspan="11" class="empty-cell">Loading...</td>
           </tr>
 
-          <tr *ngFor="let row of issueJobs; trackBy: trackIssue" 
-              [class.row-urgent]="isOver10Min(row)"
+          <tr
+            *ngFor="let row of issueJobs; trackBy: trackIssue"
+            [class.row-urgent]="isOver10Min(row)"
           >
-            <td>
-              <span
-              *ngIf="row.priority === 'Urgent'"
-              class="urgent-badge ms-2"
-            >
-              <i class="fas fa-fire"></i>
-            </span>
+            <td class="text-center">
+              <span *ngIf="row.priority === 'Urgent'" class="urgent-badge" title="Urgent">
+                <i class="fas fa-fire"></i>
+              </span>
             </td>
+
             <td>{{ row.dateTimePD }}</td>
             <td><span class="job-no">{{ row.jobNo }}</span></td>
             <td><span class="type-pill type-issue">{{ row.type }}</span></td>
@@ -118,8 +117,8 @@
             </td>
           </tr>
 
-          <tr *ngIf="!isLoading && !issueJobs.length">
-            <td colspan="10" class="empty-cell">No issue jobs</td>
+          <tr *ngIf="!isLoadingIssue && !issueJobs.length">
+            <td colspan="11" class="empty-cell">No issue jobs</td>
           </tr>
         </tbody>
       </table>
@@ -148,6 +147,7 @@
       <table class="table tx-table return-table mb-0">
         <thead>
           <tr>
+            <th style="width:54px;"></th>
             <th>DateTime PD</th>
             <th>Job No</th>
             <th>Type</th>
@@ -161,11 +161,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="isLoading">
-            <td colspan="10" class="empty-cell">Loading...</td>
+          <tr *ngIf="isLoadingReturn">
+            <td colspan="11" class="empty-cell">Loading...</td>
           </tr>
 
-          <tr *ngFor="let row of returnJobs; trackBy: trackReturn">
+          <tr
+            *ngFor="let row of returnJobs; trackBy: trackReturn"
+            [class.row-urgent]="isOver10Min(row)"
+          >
+            <td class="text-center">
+              <span *ngIf="row.priority === 'Urgent'" class="urgent-badge" title="Urgent">
+                <i class="fas fa-fire"></i>
+              </span>
+            </td>
+
             <td>{{ row.dateTimePD }}</td>
             <td><span class="job-no">{{ row.jobNo }}</span></td>
             <td><span class="type-pill type-return">{{ row.type }}</span></td>
@@ -196,8 +205,8 @@
             </td>
           </tr>
 
-          <tr *ngIf="!isLoading && !returnJobs.length">
-            <td colspan="10" class="empty-cell">No return jobs</td>
+          <tr *ngIf="!isLoadingReturn && !returnJobs.length">
+            <td colspan="11" class="empty-cell">No return jobs</td>
           </tr>
         </tbody>
       </table>
