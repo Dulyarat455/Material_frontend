@@ -415,4 +415,41 @@ export class ReturnComponent {
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
+
+
+
+
+
+  showRemark(row: ReturnRequestRow) {
+    const remarkText = (row.remark || '').trim();
+    if (!remarkText) return;
+  
+    Swal.fire({
+      icon: 'info',
+      title: 'Return Remark',
+      html: `
+        <div style="text-align:left; line-height:1.7;">
+          <div style="margin-bottom:8px;">
+            <b>Job:</b> ${row.jobNo || '-'}
+          </div>
+          <div style="margin-bottom:8px;">
+            <b>Material:</b> ${row.materialNo}
+          </div>
+  
+          <div style="
+            padding:12px;
+            border-radius:10px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            color:#0f172a;
+            white-space:pre-wrap;
+          ">
+        ${remarkText}
+          </div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
 }

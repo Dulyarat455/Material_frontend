@@ -32,23 +32,22 @@ type MaterialItem = {
   // ใช้สำหรับ table mode
   jobNo?: string;
   coil?: number;
-  //part user 
+  //part user
   timestmp: string;
   stockNote?: string;
   userId: number;
   userName: string;
   userEmpNo: string;
 
-  incomingId?: number;   // ✅ เพิ่ม
-  storeId?: number;      // ✅ เพิ่ม
-
+  incomingId?: number;
+  storeId?: number;
 };
 
 type SlotRow = {
-  storeId?: number; // ✅ เพิ่ม
+  storeId?: number;
   storeCode: string;
-  zone: 'A' | 'B' | 'C' | 'D';
-  row: 'TOP' | 'BTM';
+  zone: 'A' | 'B' | 'C' | 'D' | 'PENDING';
+  row: 'TOP' | 'BTM' | 'PENDING';
   status: SlotStatus;
   usedQty?: number;
   materials: MaterialItem[];
@@ -71,9 +70,9 @@ type MoveRow = {
   sourceStoreCode: string;
   sourceInvNo: string;
 
-  incomingId: number;   // ✅ เพิ่ม
-  storeId: number;      // ✅ เพิ่ม
-  stockNote?: string;   // ✅ เพิ่ม
+  incomingId: number;
+  storeId: number;
+  stockNote?: string;
 };
 
 type StockScanField =
@@ -145,8 +144,6 @@ export class StorageComponent {
   viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
   panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' = 'TABLE';
 
-
-
   stockForm = {
     jobNo: '',
     yearMonth: '',
@@ -199,70 +196,8 @@ export class StorageComponent {
 
   userId: number | null = null;
 
-  // pending area ยังไม่มี API ตอนนี้ ปล่อย mock ไว้ก่อน
-  pendingItems: MaterialItem[] = [
-    {
-      jobNo: 'JOB-25001',
-      materialNo: 'MATS5',
-      description: 'Bolt M10',
-      qty: 2000,
-      uom: 'pcs',
-      invNo: 'INV-010',
-      receivedAt: '2025-12-25',
-      fifoRank: 1,
-      coil: 2,
-      itemNo: 'MATS5',
-      itemName: 'Bolt M10',
-      itemSpec: 'M10',
-  
-      timestmp: '10',
-      stockNote: '',
-      userId: 1,
-      userName: 'Mock User',
-      userEmpNo: 'EMP001'
-    },
-    {
-      jobNo: 'JOB-25002',
-      materialNo: 'MATS1',
-      description: 'SteelRod12mm',
-      qty: 600,
-      uom: 'pcs',
-      invNo: 'INV-011',
-      receivedAt: '2025-12-26',
-      fifoRank: 2,
-      urgent: true,
-      coil: 1,
-      itemNo: 'MATS1',
-      itemName: 'Steel Rod',
-      itemSpec: '12mm',
-  
-      timestmp: '11',
-      stockNote: '',
-      userId: 1,
-      userName: 'Mock User',
-      userEmpNo: 'EMP001'
-    },
-    {
-      jobNo: 'JOB-25003',
-      materialNo: 'MATS6',
-      description: 'Paint Can Blue',
-      qty: 50,
-      uom: 'pcs',
-      invNo: 'INV-012',
-      receivedAt: '2025-12-27',
-      fifoRank: 1,
-      coil: 0,
-      itemNo: 'MATS6',
-      itemName: 'Paint Can',
-      itemSpec: 'Blue',
-  
-      timestmp: '12',
-      stockNote: '',
-      userId: 1,
-      userName: 'Mock User',
-      userEmpNo: 'EMP001'
-    }
-  ];
+  // ใช้ข้อมูลจริงจาก API
+  pendingItems: MaterialItem[] = [];
 
   // ใช้ API แทน mock
   slots: SlotRow[] = [];
@@ -286,7 +221,6 @@ export class StorageComponent {
   }
 
   ngOnInit() {
-
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.fetchStoreMaster();
     this.fetchStorageMap();
@@ -424,7 +358,12 @@ export class StorageComponent {
 
   setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA') {
     this.panelMode = mode;
-    this.stockForm.storageArea = this.selectedSlot?.storeCode || '';
+
+    if (this.viewMode === 'PENDING') {
+      this.stockForm.storageArea = 'Pending';
+    } else {
+      this.stockForm.storageArea = this.selectedSlot?.storeCode || '';
+    }
 
     if (mode !== 'MOVE_AREA') {
       this.moveRows = [];
@@ -435,6 +374,12 @@ export class StorageComponent {
         itemName: '',
         itemSpec: ''
       };
+    } else {
+      if (this.viewMode === 'PENDING') {
+        this.moveDestinationArea = 'Pending';
+      } else {
+        this.moveDestinationArea = this.selectedSlot?.storeCode || '';
+      }
     }
 
     if (mode === 'STOCK_IN' || mode === 'STOCK_OUT') {
@@ -606,7 +551,7 @@ export class StorageComponent {
       'st-partial': s.status === 'PARTIAL',
       'st-empty': s.status === 'EMPTY',
       'st-rejected': s.status === 'REJECTED',
-      'is-selected': this.selectedSlot?.storeCode === s.storeCode,
+      'is-selected': this.selectedSlot?.storeCode === s.storeCode && this.viewMode === 'SLOT',
       'is-move-highlight': this.isMoveHighlighted(s.storeCode)
     };
   }
@@ -616,31 +561,28 @@ export class StorageComponent {
       this.moveRows.some(r => r.sourceStoreCode === slotId);
   }
 
-
-
-
   onMoveMaterialInput() {
     const key = (this.moveSearchItemNo || '').trim().toLowerCase();
-  
+
     if (!key) {
       this.materialSuggestions = [];
       this.showMaterialSuggestions = false;
       return;
     }
-  
-    const allMaterialNos = this.slots
-      .flatMap(slot => (slot.materials || []).map(m => (m.materialNo || m.itemNo || '').trim()))
-      .filter(Boolean);
-  
+
+    const allMaterialNos = [
+      ...this.slots.flatMap(slot => (slot.materials || []).map(m => (m.materialNo || m.itemNo || '').trim())),
+      ...this.pendingItems.map(m => (m.materialNo || m.itemNo || '').trim())
+    ].filter(Boolean);
+
     const uniqueMaterialNos = Array.from(new Set(allMaterialNos));
-  
+
     this.materialSuggestions = uniqueMaterialNos
       .filter(x => x.toLowerCase().includes(key))
       .slice(0, 8);
-  
+
     this.showMaterialSuggestions = this.materialSuggestions.length > 0;
   }
-
 
   selectMaterialSuggestion(materialNo: string) {
     this.moveSearchItemNo = materialNo;
@@ -655,59 +597,68 @@ export class StorageComponent {
     }, 150);
   }
 
-
   onClickSlot(s: SlotRow) {
     this.viewMode = 'SLOT';
     this.selectedSlot = s;
     this.stockForm.storageArea = s.storeCode;
-  
+
     switch (this.panelMode) {
       case 'MOVE_AREA':
         this.moveDestinationArea = s.storeCode;
         return;
-  
+
       case 'STOCK_IN':
       case 'STOCK_OUT':
         setTimeout(() => this.focusScanFirst(), 0);
         return;
-  
+
       case 'TABLE':
       default:
         return;
     }
   }
 
-
-
-
   onClickPendingArea() {
     this.viewMode = 'PENDING';
     this.selectedSlot = null;
+    this.stockForm.storageArea = 'Pending';
 
-    if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
-      this.stockForm.storageArea = '';
+    if (this.panelMode === 'MOVE_AREA') {
+      this.moveDestinationArea = 'Pending';
+      return;
+    }
+
+    if (this.panelMode === 'STOCK_IN' || this.panelMode === 'STOCK_OUT') {
       setTimeout(() => this.focusScanFirst(), 0);
     }
   }
 
-
   onChangeMoveDestinationArea() {
     const area = (this.moveDestinationArea || '').trim();
-  
+
     if (!area) {
       this.selectedSlot = null;
+      if (this.viewMode === 'SLOT') {
+        this.viewMode = 'NONE';
+      }
       return;
     }
-  
+
+    if (area === 'Pending') {
+      this.viewMode = 'PENDING';
+      this.selectedSlot = null;
+      this.stockForm.storageArea = 'Pending';
+      return;
+    }
+
     const slot = this.slots.find(s => s.storeCode === area);
-  
+
     if (slot) {
       this.selectedSlot = slot;
       this.viewMode = 'SLOT';
+      this.stockForm.storageArea = slot.storeCode;
     }
   }
-
-
 
   openMaterialDetailSwal(item: MaterialItem) {
     Swal.fire({
@@ -729,7 +680,7 @@ export class StorageComponent {
   // ใช้ในโหมด Move Area
   searchMoveItem() {
     const key = (this.moveSearchItemNo || '').trim().toLowerCase();
-    
+
     this.showMaterialSuggestions = false;
     this.materialSuggestions = [];
     this.moveRows = [];
@@ -739,7 +690,7 @@ export class StorageComponent {
       itemName: '',
       itemSpec: ''
     };
-  
+
     if (!key) {
       Swal.fire({
         icon: 'warning',
@@ -748,13 +699,13 @@ export class StorageComponent {
       });
       return;
     }
-  
+
     const rows: MoveRow[] = [];
-  
+
     this.slots.forEach(slot => {
       (slot.materials || []).forEach((m, index) => {
         const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-  
+
         if (materialNo === key) {
           rows.push({
             uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
@@ -765,14 +716,14 @@ export class StorageComponent {
             qty: Number(m.qty || 0),
             remark: m.remark || '',
             toArea: '',
-  
+
             itemNo: m.materialNo || m.itemNo || '',
             itemName: m.itemName || m.description || '',
             itemSpec: m.itemSpec || '',
-  
+
             sourceStoreCode: slot.storeCode,
             sourceInvNo: m.invNo || '',
-  
+
             incomingId: Number(m.incomingId || 0),
             storeId: Number(slot.storeId || m.storeId || 0),
             stockNote: m.stockNote || ''
@@ -780,9 +731,37 @@ export class StorageComponent {
         }
       });
     });
-  
+
+    this.pendingItems.forEach((m, index) => {
+      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+
+      if (materialNo === key) {
+        rows.push({
+          uid: `Pending_${m.incomingId || index}_${m.invNo}`,
+          checked: false,
+          area: 'Pending',
+          receivedDate: m.receivedAt || '',
+          invoice: m.invNo || '',
+          qty: Number(m.qty || 0),
+          remark: m.remark || '',
+          toArea: '',
+
+          itemNo: m.materialNo || m.itemNo || '',
+          itemName: m.itemName || m.description || '',
+          itemSpec: m.itemSpec || '',
+
+          sourceStoreCode: 'Pending',
+          sourceInvNo: m.invNo || '',
+
+          incomingId: Number(m.incomingId || 0),
+          storeId: Number(m.storeId || 0),
+          stockNote: m.stockNote || ''
+        });
+      }
+    });
+
     this.moveRows = rows;
-  
+
     if (rows.length) {
       this.moveForm = {
         itemNo: rows[0].itemNo,
@@ -791,7 +770,7 @@ export class StorageComponent {
       };
       return;
     }
-  
+
     Swal.fire({
       icon: 'info',
       title: 'No item found',
@@ -799,16 +778,12 @@ export class StorageComponent {
     });
   }
 
-
-
-
   // ใช้ในโหมด Move Area
-
   confirmMoveArea() {
     if (this.isMovingArea) return;
-  
+
     const selected = this.moveRows.filter(r => r.checked);
-  
+
     if (!selected.length) {
       Swal.fire({
         icon: 'warning',
@@ -817,7 +792,7 @@ export class StorageComponent {
       });
       return;
     }
-  
+
     if (!this.moveDestinationArea || this.moveDestinationArea.trim() === '') {
       Swal.fire({
         icon: 'warning',
@@ -826,7 +801,7 @@ export class StorageComponent {
       });
       return;
     }
-  
+
     const sameAreaRows = selected.filter(r => r.sourceStoreCode === this.moveDestinationArea);
     if (sameAreaRows.length) {
       Swal.fire({
@@ -836,7 +811,7 @@ export class StorageComponent {
       });
       return;
     }
-  
+
     const html = `
       <div style="text-align:left; max-height:360px; overflow:auto;">
         <div style="margin-bottom:12px;">
@@ -853,7 +828,7 @@ export class StorageComponent {
         `).join('')}
       </div>
     `;
-  
+
     Swal.fire({
       icon: 'question',
       title: 'Confirm Move Area',
@@ -865,9 +840,9 @@ export class StorageComponent {
       confirmButtonColor: '#2563eb'
     }).then((result) => {
       if (!result.isConfirmed) return;
-  
+
       this.isMovingArea = true;
-  
+
       const requests = selected.map(row => {
         const body = {
           incomingId: row.incomingId,
@@ -876,14 +851,14 @@ export class StorageComponent {
           storeCodeDestination: this.moveDestinationArea,
           stockNote: row.stockNote || row.remark || ''
         };
-  
+
         return this.http.post(config.apiServer + '/api/mc/moveArea', body).toPromise();
       });
-  
+
       Promise.all(requests)
         .then(() => {
           this.isMovingArea = false;
-  
+
           Swal.fire({
             icon: 'success',
             title: 'Move completed',
@@ -902,7 +877,7 @@ export class StorageComponent {
         })
         .catch((err) => {
           this.isMovingArea = false;
-  
+
           Swal.fire({
             icon: 'error',
             title: 'Move Area Fail',
@@ -911,7 +886,6 @@ export class StorageComponent {
         });
     });
   }
-
 
   // pending area ยังเป็น mock อยู่ ใช้ย้ายของจาก pending เข้า slot ชั่วคราว
   // assignPendingToSlot(p: MaterialItem, slot: SlotRow) {
@@ -948,11 +922,6 @@ export class StorageComponent {
   //   });
   // }
 
-
-
-
-
-
   // pending area ยังเป็น mock อยู่
   openQuickStoreSwal(p: MaterialItem) {
   //   const empty = this.slots.find(s => s.status === 'EMPTY');
@@ -984,16 +953,6 @@ export class StorageComponent {
   //   });
   }
 
-
-
-
-
-
-
-
-
-
-
   // โหลด dropdown storage area
   fetchStoreMaster() {
     this.http.get(config.apiServer + '/api/storeMaster/list').subscribe({
@@ -1013,28 +972,26 @@ export class StorageComponent {
     });
   }
 
-
-
-
   // โหลด layout + material จาก API จริง
   fetchStorageMap() {
     this.http.get(config.apiServer + '/api/mc/fetchIncomingAll').subscribe({
       next: (res: any) => {
         const rows = res?.results || [];
-  
-        this.slots = rows.map((r: any) => ({
-          storeId: Number(r.storeId || r.id || 0), // ✅ เพิ่ม
-          storeCode: r.storeCode || r.name || '',
-          zone: (r.zone || '').toUpperCase() as 'A' | 'B' | 'C' | 'D',
-          row: (r.row || '').toUpperCase() as 'TOP' | 'BTM',
-          status: this.normalizeSlotStatus(r.status),
-          usedQty: Number(r.usedQty || 0),
-          materials: (r.materials || []).map((m: any) => ({
-            incomingId: Number(m.incomingId || m.id || 0), // ✅ เพิ่ม
-            storeId: Number(r.storeId || r.id || 0),       // ✅ เพิ่ม
-  
+
+        const normalSlots: SlotRow[] = [];
+        const pendingMaterials: MaterialItem[] = [];
+
+        rows.forEach((r: any) => {
+          const zone = String(r.zone || '').toUpperCase();
+          const row = String(r.row || '').toUpperCase();
+
+          const materials = (r.materials || []).map((m: any) => ({
+            incomingId: Number(m.incomingId || m.id || 0),
+            storeId: Number(r.storeId || r.id || 0),
+
             jobNo: m.jobNo || '',
             materialNo: m.materialNo || m.matCode || '',
+            description: m.description || '',
             qty: Number(m.qtyKgsPcs || m.qty || 0),
             uom: m.unit || m.uom || '',
             invNo: m.invoiceOne || m.invNo || '',
@@ -1046,20 +1003,43 @@ export class StorageComponent {
             itemSpec: m.itemSpec || '',
             remark: m.remark || '',
             stockNote: m.stockNote || '',
-  
+
             timestmp: m.timeStmp || '',
             userId: Number(m.userId || 0),
             userName: m.userName || '',
             userEmpNo: m.userEmpNo || ''
-          }))
-        }));
-  
-        if (this.selectedSlot?.storeCode) {
+          }));
+
+          if (r.storeCode === 'Pending' || zone === 'PENDING' || row === 'PENDING') {
+            pendingMaterials.push(...materials);
+          } else {
+            normalSlots.push({
+              storeId: Number(r.storeId || r.id || 0),
+              storeCode: r.storeCode || r.name || '',
+              zone: zone as 'A' | 'B' | 'C' | 'D',
+              row: row as 'TOP' | 'BTM',
+              status: this.normalizeSlotStatus(r.status),
+              usedQty: Number(r.usedQty || 0),
+              materials
+            });
+          }
+        });
+
+        this.slots = normalSlots;
+        this.pendingItems = pendingMaterials;
+
+        if (this.viewMode === 'PENDING') {
+          this.stockForm.storageArea = 'Pending';
+          this.selectedSlot = null;
+        } else if (this.selectedSlot?.storeCode) {
           const freshSelected = this.slots.find(s => s.storeCode === this.selectedSlot?.storeCode);
           this.selectedSlot = freshSelected || null;
-  
-          if (!freshSelected && this.viewMode === 'SLOT') {
+
+          if (freshSelected) {
+            this.stockForm.storageArea = freshSelected.storeCode;
+          } else if (this.viewMode === 'SLOT') {
             this.viewMode = 'NONE';
+            this.stockForm.storageArea = '';
           }
         }
       },
@@ -1084,28 +1064,39 @@ export class StorageComponent {
 
   onChangeStorageArea() {
     const area = (this.stockForm.storageArea || '').trim();
-  
+
     if (!area) {
       this.selectedSlot = null;
-  
-      if (this.viewMode === 'SLOT') {
+
+      if (this.viewMode === 'SLOT' || this.viewMode === 'PENDING') {
         this.viewMode = 'NONE';
       }
       return;
     }
-  
+
+    if (area === 'Pending') {
+      this.viewMode = 'PENDING';
+      this.selectedSlot = null;
+
+      if (this.panelMode === 'MOVE_AREA') {
+        this.moveDestinationArea = 'Pending';
+      }
+      return;
+    }
+
     const slot = this.slots.find(s => s.storeCode === area);
-  
+
     if (slot) {
       this.selectedSlot = slot;
       this.viewMode = 'SLOT';
+
+      if (this.panelMode === 'MOVE_AREA') {
+        this.moveDestinationArea = slot.storeCode;
+      }
     } else {
       this.selectedSlot = null;
     }
   }
-
-
-
 
   // ******** stockIn ************
   submitStockIn() {

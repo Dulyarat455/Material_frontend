@@ -173,10 +173,6 @@
               </div>
             </div>
 
-            <div class="req-note" *ngIf="r.remark">
-              <i class="fas fa-bolt me-1"></i>{{ r.remark }}
-            </div>
-
             <div class="req-bottom">
               <span
                 class="status-pill"
@@ -187,14 +183,17 @@
                 {{ r.status }}
               </span>
 
+            <!-- 🔥 Remark Icon -->
               <button
-                class="btn-process"
-                (click)="confirmReceive(r)"
-                [disabled]="r.status !== 'Waiting'"
-              >
-                <i class="fas fa-inbox me-1"></i>
-                Receive
-              </button>
+                  *ngIf="r.remark?.trim()"
+                  type="button"
+                  class="remark-icon-btn"
+                  (click)="showRemark(r)"
+                  title="View remark"
+                >
+                  <i class="fas fa-comment-dots"></i>
+            </button>
+
             </div>
           </div>
 

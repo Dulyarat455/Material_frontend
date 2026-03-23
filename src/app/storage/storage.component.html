@@ -19,194 +19,192 @@
         <div class="card-body">
           <div class="floorplan">
             <!-- LEFT SIDE FIXED STACK -->
-          <div class="fp-left-stack">
-            <div
-              class="fp-pending fp-pending-compact"
-              (click)="onClickPendingArea()"
-              role="button"
-              tabindex="0"
-            >
-              <div class="fp-title">
-                <span class="dot warn"></span>
-                <b>PENDING AREA</b>
-                <span class="pill ms-2">{{ pendingItems.length }} ITEMS</span>
-              </div>
-
-              <div class="pending-hint muted">
-                Click to view pending list
-              </div>
-            </div>
-
-            <div class="fp-left">
-              <!-- BLOCK 1 -->
-              <div class="fp-block b1">
-                <div class="fp-block-head">
-                  <span class="mini-pill">BTM</span>
-                  <span class="mini-pill">TOP</span>
+            <div class="fp-left-stack">
+              <div
+                class="fp-pending fp-pending-compact"
+                [class.is-selected]="viewMode === 'PENDING'"
+                (click)="onClickPendingArea()"
+                role="button"
+                tabindex="0"
+              >
+                <div class="fp-title">
+                  <span class="dot warn"></span>
+                  <b>PENDING AREA</b>
+                  <span class="pill ms-2">{{ pendingItems.length }} ITEMS</span>
                 </div>
 
-                <div class="fp-two-col">
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('A','BTM') | slice:0:3; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
-                  </div>
-
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('B','TOP') | slice:0:3; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
-                  </div>
+                <div class="pending-hint muted">
+                  Click to view pending list
                 </div>
               </div>
 
-              <!-- BLOCK 2 -->
-              <div class="fp-block b2">
-                <div class="fp-block-head">
-                  <span class="mini-pill">TOP</span>
-                  <span class="mini-pill">BTM</span>
-                </div>
-
-                <div class="fp-two-col">
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('C','TOP') | slice:0:3; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
+              <div class="fp-left">
+                <!-- BLOCK 1 -->
+                <div class="fp-block b1">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">BTM</span>
+                    <span class="mini-pill">TOP</span>
                   </div>
 
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('C','BTM') | slice:0:3; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      @if (s.storeCode === "2201") {
-                        <div class="slot-id">{{ "Reject" }}</div>
-                      }
-                      @else {
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('A','BTM') | slice:0:3; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
                         <div class="slot-id">{{ s.storeCode }}</div>
-                      }
-                      
-                    </button>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('B','TOP') | slice:0:3; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- BLOCK 3 -->
-              <div class="fp-block b3">
-                <div class="fp-block-head">
-                  <span class="mini-pill">BTM</span>
-                  <span class="mini-pill">TOP</span>
-                </div>
-
-                <div class="fp-two-col">
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('A','BTM') | slice:3:6; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
+                <!-- BLOCK 2 -->
+                <div class="fp-block b2">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">TOP</span>
+                    <span class="mini-pill">BTM</span>
                   </div>
 
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('B','TOP') | slice:3:6; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('C','TOP') | slice:0:3; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('C','BTM') | slice:0:3; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        @if (s.storeCode === "2201") {
+                          <div class="slot-id">{{ "Reject" }}</div>
+                        }
+                        @else {
+                          <div class="slot-id">{{ s.storeCode }}</div>
+                        }
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- BLOCK 4 -->
-              <div class="fp-block b4">
-                <div class="fp-block-head">
-                  <span class="mini-pill">TOP</span>
-                  <span class="mini-pill">BTM</span>
-                </div>
-
-                <div class="fp-two-col">
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('C','TOP') | slice:3:6; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
+                <!-- BLOCK 3 -->
+                <div class="fp-block b3">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">BTM</span>
+                    <span class="mini-pill">TOP</span>
                   </div>
 
-                  <div class="fp-col">
-                    <button
-                      *ngFor="let s of slotsBy('C','BTM') | slice:3:6; trackBy: trackSlot"
-                      type="button"
-                      [ngClass]="slotClass(s)"
-                      (click)="onClickSlot(s)"
-                    >
-                      <div class="slot-id">{{ s.storeCode }}</div>
-                    </button>
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('A','BTM') | slice:3:6; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('B','TOP') | slice:3:6; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BLOCK 4 -->
+                <div class="fp-block b4">
+                  <div class="fp-block-head">
+                    <span class="mini-pill">TOP</span>
+                    <span class="mini-pill">BTM</span>
+                  </div>
+
+                  <div class="fp-two-col">
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('C','TOP') | slice:3:6; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      </button>
+                    </div>
+
+                    <div class="fp-col">
+                      <button
+                        *ngFor="let s of slotsBy('C','BTM') | slice:3:6; trackBy: trackSlot"
+                        type="button"
+                        [ngClass]="slotClass(s)"
+                        (click)="onClickSlot(s)"
+                      >
+                        <div class="slot-id">{{ s.storeCode }}</div>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- RIGHT COLUMN -->
-          <div class="fp-right">
-            <div class="fp-right-head">
-              <span class="mini-pill">BTM</span>
-              <span class="mini-pill">TOP</span>
-            </div>
-
-            <div class="fp-two-col fp-right-two-col">
-              <div class="fp-col">
-                <button
-                  *ngFor="let s of slotsBy('D','BTM'); trackBy: trackSlot"
-                  type="button"
-                  [ngClass]="slotClass(s)"
-                  (click)="onClickSlot(s)"
-                >
-                  <div class="slot-id">{{ s.storeCode }}</div>
-                </button>
+            <!-- RIGHT COLUMN -->
+            <div class="fp-right">
+              <div class="fp-right-head">
+                <span class="mini-pill">BTM</span>
+                <span class="mini-pill">TOP</span>
               </div>
 
-              <div class="fp-col">
-                <button
-                  *ngFor="let s of slotsBy('D','TOP'); trackBy: trackSlot"
-                  type="button"
-                  [ngClass]="slotClass(s)"
-                  (click)="onClickSlot(s)"
-                >
-                  <div class="slot-id">{{ s.storeCode }}</div>
-                </button>
+              <div class="fp-two-col fp-right-two-col">
+                <div class="fp-col">
+                  <button
+                    *ngFor="let s of slotsBy('D','BTM'); trackBy: trackSlot"
+                    type="button"
+                    [ngClass]="slotClass(s)"
+                    (click)="onClickSlot(s)"
+                  >
+                    <div class="slot-id">{{ s.storeCode }}</div>
+                  </button>
+                </div>
+
+                <div class="fp-col">
+                  <button
+                    *ngFor="let s of slotsBy('D','TOP'); trackBy: trackSlot"
+                    type="button"
+                    [ngClass]="slotClass(s)"
+                    (click)="onClickSlot(s)"
+                  >
+                    <div class="slot-id">{{ s.storeCode }}</div>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-
-            
 
             <div class="fp-table">
               <div class="panel-topbar">
@@ -218,27 +216,27 @@
                         PENDING • {{ pendingItems.length }} items
                       </span>
                     </ng-container>
-            
+
                     <ng-template #slotTitle>
                       <ng-container *ngIf="selectedSlot; else noneTitle">
                         Slot <b>{{ selectedSlot.storeCode }}</b> materials
                         <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
                       </ng-container>
-            
+
                       <ng-template #noneTitle>
                         Materials
                         <span class="badge badge-secondary ms-2">Select Pending/Slot</span>
                       </ng-template>
                     </ng-template>
                   </ng-container>
-            
+
                   <ng-template #formTitle>
                     <span *ngIf="panelMode === 'STOCK_IN'">Stock In</span>
                     <span *ngIf="panelMode === 'STOCK_OUT'">Stock Out</span>
                     <span *ngIf="panelMode === 'MOVE_AREA'">Move Area</span>
                   </ng-template>
                 </div>
-            
+
                 <div class="panel-actions">
                   <button
                     class="mode-btn"
@@ -246,21 +244,21 @@
                     (click)="setPanelMode('STOCK_IN')">
                     Stock In
                   </button>
-            
+
                   <button
                     class="mode-btn"
                     [class.active]="panelMode === 'STOCK_OUT'"
                     (click)="setPanelMode('STOCK_OUT')">
                     Stock Out
                   </button>
-            
+
                   <button
                     class="mode-btn"
                     [class.active]="panelMode === 'MOVE_AREA'"
                     (click)="setPanelMode('MOVE_AREA')">
                     Move Area
                   </button>
-            
+
                   <button
                     class="mode-btn ghost"
                     [class.active]="panelMode === 'TABLE'"
@@ -269,7 +267,7 @@
                   </button>
                 </div>
               </div>
-            
+
               <!-- TABLE MODE -->
               <ng-container *ngIf="panelMode === 'TABLE'">
                 <div class="table-wrap">
@@ -287,17 +285,19 @@
                         <th class="text-center">Stock Out</th>
                       </tr>
                     </thead>
-            
+
                     <tbody>
                       <ng-container *ngIf="viewMode === 'PENDING'">
                         <tr *ngFor="let p of pendingItems">
-                          <td><b>{{ p.materialNo }}</b></td>
-                          <td class="muted">{{ p.description }}</td>
-                          <td class="muted">{{ p.invNo }}</td>
-                          <td class="muted">{{ p.receivedAt }}</td>
-                          <td class="text-end"><b>{{ p.qty | number }}</b> {{ p.uom }}</td>
-                          <td class="text-center">
-                            <span class="badge badge-light">#{{ p.fifoRank }}</span>
+                          <td><b>{{ p.jobNo }}</b></td>
+                          <td class="muted">{{ p.materialNo }}</td>
+                          <td class="muted">{{ p.itemName || p.description }}</td>
+                          <td class="muted">{{ p.itemSpec }}</td>
+                          <td class="text-center">{{ p.coil | number }}</td>
+                          <td class="text-center">{{ p.qty | number }}</td>
+                          <td class="muted">{{ p.uom }}</td>
+                          <td class="muted">
+                            <button (click)="openMaterialDetailSwal(p)"> Detail </button>
                           </td>
                           <td class="text-center">
                             <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(p)">
@@ -305,12 +305,12 @@
                             </button>
                           </td>
                         </tr>
-            
+
                         <tr *ngIf="!pendingItems.length">
                           <td colspan="9" class="text-center muted py-3">No pending items</td>
                         </tr>
                       </ng-container>
-            
+
                       <ng-container *ngIf="viewMode !== 'PENDING'">
                         <tr *ngFor="let m of (selectedSlot?.materials || [])">
                           <td><b>{{ m.jobNo }}</b></td>
@@ -320,12 +320,10 @@
                           <td class="text-center">{{ m.coil | number }}</td>
                           <td class="text-center">{{ m.qty }}</td>
                           <td class="muted">{{ m.uom }}</td>
-
-                         <td class="muted"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
-                         <td class="text-center"><button >out </button></td>
+                          <td class="muted"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
+                          <td class="text-center"><button>out</button></td>
                         </tr>
 
-            
                         <tr *ngIf="!(selectedSlot?.materials?.length)">
                           <td colspan="9" class="text-center muted py-3">No data</td>
                         </tr>
@@ -335,321 +333,310 @@
                 </div>
               </ng-container>
 
+              <!-- STOCK IN / STOCK OUT FORM -->
+              <ng-container *ngIf="panelMode === 'STOCK_IN' || panelMode === 'STOCK_OUT'">
+                <div class="stock-panel">
 
+                  <div class="stock-row">
+                    <label>Job No.</label>
+                    <input
+                      #scanJobNo
+                      type="text"
+                      [(ngModel)]="stockForm.jobNo"
+                      (keydown.enter)="onStockScanEnter('jobNo', $event)"
+                    />
+                  </div>
 
+                  <div class="stock-row stock-row-hidden">
+                    <label>yearMonth</label>
+                    <input
+                      #scanYearMonth
+                      type="text"
+                      [(ngModel)]="stockForm.yearMonth"
+                      (keydown.enter)="onStockScanEnter('yearMonth', $event)"
+                    />
+                  </div>
 
+                  <div class="stock-row stock-row-hidden">
+                    <label>recivedDate</label>
+                    <input
+                      #scanRecivedDate
+                      type="text"
+                      [(ngModel)]="stockForm.recivedDate"
+                      (keydown.enter)="onStockScanEnter('recivedDate', $event)"
+                    />
+                  </div>
 
-              
-            
-            <!-- STOCK IN / STOCK OUT FORM -->
-          <ng-container *ngIf="panelMode === 'STOCK_IN' || panelMode === 'STOCK_OUT'">
-            <div class="stock-panel">
+                  <div class="stock-row stock-row-hidden">
+                    <label>inspector</label>
+                    <input
+                      #scanInspector
+                      type="text"
+                      [(ngModel)]="stockForm.inspector"
+                      (keydown.enter)="onStockScanEnter('inspector', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>Job No.</label>
-                <input
-                  #scanJobNo
-                  type="text"
-                  [(ngModel)]="stockForm.jobNo"
-                  (keydown.enter)="onStockScanEnter('jobNo', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>UnloadBy</label>
+                    <input
+                      #scanUnloadBy
+                      type="text"
+                      [(ngModel)]="stockForm.unloadBy"
+                      (keydown.enter)="onStockScanEnter('unloadBy', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>yearMonth</label>
-                <input
-                  #scanYearMonth
-                  type="text"
-                  [(ngModel)]="stockForm.yearMonth"
-                  (keydown.enter)="onStockScanEnter('yearMonth', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>invoiceOne</label>
+                    <input
+                      #scanInvoiceOne
+                      type="text"
+                      [(ngModel)]="stockForm.invoiceOne"
+                      (keydown.enter)="onStockScanEnter('invoiceOne', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>recivedDate</label>
-                <input
-                  #scanRecivedDate
-                  type="text"
-                  [(ngModel)]="stockForm.recivedDate"
-                  (keydown.enter)="onStockScanEnter('recivedDate', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>taxInvNo</label>
+                    <input
+                      #scanTaxInvNo
+                      type="text"
+                      [(ngModel)]="stockForm.taxInvNo"
+                      (keydown.enter)="onStockScanEnter('taxInvNo', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>inspector</label>
-                <input
-                  #scanInspector
-                  type="text"
-                  [(ngModel)]="stockForm.inspector"
-                  (keydown.enter)="onStockScanEnter('inspector', $event)"
-                />
-              </div>
-              <div class="stock-row stock-row-hidden">
-                <label>UnloadBy</label>
-                <input
-                  #scanUnloadBy
-                  type="text"
-                  [(ngModel)]="stockForm.unloadBy"
-                  (keydown.enter)="onStockScanEnter('unloadBy', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>materialNo</label>
+                    <input
+                      #scanItemNo
+                      type="text"
+                      [(ngModel)]="stockForm.itemNo"
+                      (keydown.enter)="onStockScanEnter('itemNo', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>invoiceOne</label>
-                <input
-                  #scanInvoiceOne
-                  type="text"
-                  [(ngModel)]="stockForm.invoiceOne"
-                  (keydown.enter)="onStockScanEnter('invoiceOne', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>unitPrice</label>
+                    <input
+                      #scanUnitPrice
+                      type="text"
+                      [(ngModel)]="stockForm.unitPrice"
+                      (keydown.enter)="onStockScanEnter('unitPrice', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>taxInvNo</label>
-                <input
-                  #scanTaxInvNo
-                  type="text"
-                  [(ngModel)]="stockForm.taxInvNo"
-                  (keydown.enter)="onStockScanEnter('taxInvNo', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>qtyOfPalletPack</label>
+                    <input
+                      #scanQtyOfPalletPack
+                      type="text"
+                      [(ngModel)]="stockForm.qtyOfPalletPack"
+                      (keydown.enter)="onStockScanEnter('qtyOfPalletPack', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>materialNo</label>
-                <input
-                  #scanItemNo
-                  type="text"
-                  [(ngModel)]="stockForm.itemNo"
-                  (keydown.enter)="onStockScanEnter('itemNo', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>coil</label>
+                    <input
+                      #scanCoil
+                      type="text"
+                      [(ngModel)]="stockForm.coil"
+                      (keydown.enter)="onStockScanEnter('coil', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>unitPrice</label>
-                <input
-                  #scanUnitPrice
-                  type="text"
-                  [(ngModel)]="stockForm.unitPrice"
-                  (keydown.enter)="onStockScanEnter('unitPrice', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>qtyKgsPcs</label>
+                    <input
+                      #scanQtyKgsPcs
+                      type="text"
+                      [(ngModel)]="stockForm.qtyKgsPcs"
+                      (keydown.enter)="onStockScanEnter('qtyKgsPcs', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>qtyOfPalletPack</label>
-                <input
-                  #scanQtyOfPalletPack
-                  type="text"
-                  [(ngModel)]="stockForm.qtyOfPalletPack"
-                  (keydown.enter)="onStockScanEnter('qtyOfPalletPack', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>unit</label>
+                    <input
+                      #scanUnit
+                      type="text"
+                      [(ngModel)]="stockForm.unit"
+                      (keydown.enter)="onStockScanEnter('unit', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>coil</label>
-                <input
-                  #scanCoil
-                  type="text"
-                  [(ngModel)]="stockForm.coil"
-                  (keydown.enter)="onStockScanEnter('coil', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>kgsCoil</label>
+                    <input
+                      #scanKgsCoil
+                      type="text"
+                      [(ngModel)]="stockForm.kgsCoil"
+                      (keydown.enter)="onStockScanEnter('kgsCoil', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>qtyKgsPcs</label>
-                <input
-                  #scanQtyKgsPcs
-                  type="text"
-                  [(ngModel)]="stockForm.qtyKgsPcs"
-                  (keydown.enter)="onStockScanEnter('qtyKgsPcs', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>odCoil</label>
+                    <input
+                      #scanOdCoil
+                      type="text"
+                      [(ngModel)]="stockForm.odCoil"
+                      (keydown.enter)="onStockScanEnter('odCoil', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>unit</label>
-                <input
-                  #scanUnit
-                  type="text"
-                  [(ngModel)]="stockForm.unit"
-                  (keydown.enter)="onStockScanEnter('unit', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>remark</label>
+                    <input
+                      #scanRemark
+                      type="text"
+                      [(ngModel)]="stockForm.remark"
+                      (keydown.enter)="onStockScanEnter('remark', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>kgsCoil</label>
-                <input
-                  #scanKgsCoil
-                  type="text"
-                  [(ngModel)]="stockForm.kgsCoil"
-                  (keydown.enter)="onStockScanEnter('kgsCoil', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>millSheet</label>
+                    <input
+                      #scanMillSheet
+                      type="text"
+                      [(ngModel)]="stockForm.millSheet"
+                      (keydown.enter)="onStockScanEnter('millSheet', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>odCoil</label>
-                <input
-                  #scanOdCoil
-                  type="text"
-                  [(ngModel)]="stockForm.odCoil"
-                  (keydown.enter)="onStockScanEnter('odCoil', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>Item Name.</label>
+                    <input
+                      #scanItemName
+                      type="text"
+                      [(ngModel)]="stockForm.itemName"
+                      (keydown.enter)="onStockScanEnter('itemName', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>remark</label>
-                <input
-                  #scanRemark
-                  type="text"
-                  [(ngModel)]="stockForm.remark"
-                  (keydown.enter)="onStockScanEnter('remark', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>Spec/Dwg</label>
+                    <input
+                      #scanSpecDwg
+                      type="text"
+                      [(ngModel)]="stockForm.specDwg"
+                      (keydown.enter)="onStockScanEnter('specDwg', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>millSheet</label>
-                <input
-                  #scanMillSheet
-                  type="text"
-                  [(ngModel)]="stockForm.millSheet"
-                  (keydown.enter)="onStockScanEnter('millSheet', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>Lot No.</label>
+                    <input
+                      #scanLotNo
+                      type="text"
+                      [(ngModel)]="stockForm.lotNo"
+                      (keydown.enter)="onStockScanEnter('lotNo', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>Item Name.</label>
-                <input
-                  #scanItemName
-                  type="text"
-                  [(ngModel)]="stockForm.itemName"
-                  (keydown.enter)="onStockScanEnter('itemName', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>packing</label>
+                    <input
+                      #scanQuantity
+                      type="text"
+                      [(ngModel)]="stockForm.quantity"
+                      (keydown.enter)="onStockScanEnter('quantity', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>Spec/Dwg</label>
-                <input
-                  #scanSpecDwg
-                  type="text"
-                  [(ngModel)]="stockForm.specDwg"
-                  (keydown.enter)="onStockScanEnter('specDwg', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>rosh</label>
+                    <input
+                      #scanRosh
+                      type="text"
+                      [(ngModel)]="stockForm.rosh"
+                      (keydown.enter)="onStockScanEnter('rosh', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row">
-                <label>Lot No.</label>
-                <input
-                  #scanLotNo
-                  type="text"
-                  [(ngModel)]="stockForm.lotNo"
-                  (keydown.enter)="onStockScanEnter('lotNo', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>result</label>
+                    <input
+                      #scanResult
+                      type="text"
+                      [(ngModel)]="stockForm.result"
+                      (keydown.enter)="onStockScanEnter('result', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>packing</label>
-                <input
-                  #scanQuantity
-                  type="text"
-                  [(ngModel)]="stockForm.quantity"
-                  (keydown.enter)="onStockScanEnter('quantity', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>supplier</label>
+                    <input
+                      #scanSupplier
+                      type="text"
+                      [(ngModel)]="stockForm.supplier"
+                      (keydown.enter)="onStockScanEnter('supplier', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>rosh</label>
-                <input
-                  #scanRosh
-                  type="text"
-                  [(ngModel)]="stockForm.rosh"
-                  (keydown.enter)="onStockScanEnter('rosh', $event)"
-                />
-              </div>
+                  <div class="stock-row stock-row-hidden">
+                    <label>amount</label>
+                    <input
+                      #scanAmount
+                      type="text"
+                      [(ngModel)]="stockForm.amount"
+                      (keydown.enter)="onStockScanEnter('amount', $event)"
+                    />
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>result</label>
-                <input
-                  #scanResult
-                  type="text"
-                  [(ngModel)]="stockForm.result"
-                  (keydown.enter)="onStockScanEnter('result', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>Storage Area</label>
 
-              <div class="stock-row stock-row-hidden">
-                <label>supplier</label>
-                <input
-                  #scanSupplier
-                  type="text"
-                  [(ngModel)]="stockForm.supplier"
-                  (keydown.enter)="onStockScanEnter('supplier', $event)"
-                />
-              </div>
+                    <div class="storage-area-box">
+                      <select
+                        class="storage-area-select"
+                        [(ngModel)]="stockForm.storageArea"
+                        name="storageArea"
+                        (change)="onChangeStorageArea()"
+                      >
+                        <option value="">Select area</option>
+                        <option
+                          *ngFor="let a of storeMasters"
+                          [value]="a.name"
+                        >
+                          {{ a.name }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
 
-              <div class="stock-row stock-row-hidden">
-                <label>amount</label>
-                <input
-                  #scanAmount
-                  type="text"
-                  [(ngModel)]="stockForm.amount"
-                  (keydown.enter)="onStockScanEnter('amount', $event)"
-                />
-              </div>
+                  <div class="stock-row">
+                    <label>Stock Note</label>
+                    <textarea rows="3" [(ngModel)]="stockForm.stockNote"></textarea>
+                  </div>
 
-              <div class="stock-row">
-                <label>Storage Area</label>
-              
-                <div class="storage-area-box">
-                  <select
-                    class="storage-area-select"
-                    [(ngModel)]="stockForm.storageArea"
-                    name="storageArea"
-                    (change)="onChangeStorageArea()"
-                  >
-                    <option value="">Select area</option>
-                    <option
-                      *ngFor="let a of storeMasters"
-                      [value]="a.name"
+                  <div class="stock-footer">
+                    <button class="btn-soft" type="button" (click)="resetStockForm()">Clear</button>
+                    <button
+                      class="btn-main"
+                      type="button"
+                      (click)="confirmStockAction()"
+                      [disabled]="isSavingStock"
                     >
-                      {{ a.name }}
-                    </option>
-                  </select>
-              
+                      <span *ngIf="panelMode === 'STOCK_IN'">
+                        {{ isSavingStock ? 'Saving...' : 'Confirm Stock In' }}
+                      </span>
+                      <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
+                    </button>
+                  </div>
+
                 </div>
-              </div>
+              </ng-container>
 
-              <div class="stock-row">
-                <label>Stock Note</label>
-                <textarea rows="3" [(ngModel)]="stockForm.stockNote"></textarea>
-              </div>
-
-              <div class="stock-footer">
-                <button class="btn-soft" type="button" (click)="resetStockForm()">Clear</button>
-                <button
-                class="btn-main"
-                type="button"
-                (click)="confirmStockAction()"
-                [disabled]="isSavingStock"
-              >
-                <span *ngIf="panelMode === 'STOCK_IN'">
-                  {{ isSavingStock ? 'Saving...' : 'Confirm Stock In' }}
-                </span>
-                <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
-              </button>
-              </div>
-
-            </div>
-          </ng-container>
-
-
-
-
-
-            
               <!-- MOVE AREA MODE -->
               <ng-container *ngIf="panelMode === 'MOVE_AREA'">
                 <div class="move-panel">
                   <div class="move-search-row">
                     <label>Material No</label>
-                  
+
                     <div class="move-search-group">
                       <div class="move-search-autocomplete">
                         <input
@@ -662,7 +649,7 @@
                           (keyup.enter)="searchMoveItem(); showMaterialSuggestions = false"
                           autocomplete="off"
                         />
-                  
+
                         <div class="move-suggest-box" *ngIf="showMaterialSuggestions">
                           <button
                             type="button"
@@ -674,7 +661,7 @@
                           </button>
                         </div>
                       </div>
-                  
+
                       <button
                         type="button"
                         class="btn-main move-search-btn"
@@ -684,24 +671,24 @@
                       </button>
                     </div>
                   </div>
-            
+
                   <div class="move-info-grid">
                     <div class="move-info-item">
                       <label>Material No</label>
                       <div class="info-box">{{ moveForm.itemNo || '-' }}</div>
                     </div>
-            
+
                     <div class="move-info-item">
                       <label>Material Name</label>
                       <div class="info-box">{{ moveForm.itemName || '-' }}</div>
                     </div>
-            
+
                     <div class="move-info-item">
                       <label>Material Spec</label>
                       <div class="info-box">{{ moveForm.itemSpec || '-' }}</div>
                     </div>
                   </div>
-            
+
                   <div class="table-wrap move-table-wrap">
                     <table class="table table-sm mb-0 wms-table">
                       <thead>
@@ -727,7 +714,7 @@
                           <td class="text-center">{{ row.qty | number }}</td>
                           <td>{{ row.stockNote || '-' }}</td>
                         </tr>
-                      
+
                         <tr *ngIf="!moveRows.length">
                           <td colspan="7" class="text-center muted py-3">No item found</td>
                         </tr>
@@ -737,27 +724,27 @@
 
                   <div class="move-destination-row" *ngIf="moveRows.length">
                     <label>Destination Area</label>
-                    <select 
-                    [(ngModel)]="moveDestinationArea" 
-                    class="move-select"
-                    (change)="onChangeMoveDestinationArea()"
+                    <select
+                      [(ngModel)]="moveDestinationArea"
+                      class="move-select"
+                      (change)="onChangeMoveDestinationArea()"
                     >
                       <option value="">Select destination area</option>
                       <option
-                        *ngFor="let s of slots; trackBy: trackSlot"
-                        [value]="s.storeCode"
-                        [disabled]="s.status === 'REJECTED'">
-                        {{ s.storeCode }}
+                        *ngFor="let a of storeMasters"
+                        [value]="a.name"
+                      >
+                        {{ a.name }}
                       </option>
                     </select>
                   </div>
-            
+
                   <div class="stock-footer">
                     <button
-                    class="btn-soft"
-                    (click)="moveSearchItemNo=''; moveRows=[]; moveForm={ itemNo:'', itemName:'', itemSpec:'' }">
-                    Clear
-                  </button>
+                      class="btn-soft"
+                      (click)="moveSearchItemNo=''; moveRows=[]; moveDestinationArea=''; moveForm={ itemNo:'', itemName:'', itemSpec:'' }">
+                      Clear
+                    </button>
                     <button class="btn-main" (click)="confirmMoveArea()" [disabled]="isMovingArea">
                       {{ isMovingArea ? 'Moving...' : 'Confirm Move Area' }}
                     </button>
@@ -766,15 +753,7 @@
               </ng-container>
             </div>
 
-
-
-
           </div>
-
-
-
-
-
         </div>
       </div>
     </div>

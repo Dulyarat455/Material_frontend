@@ -448,3 +448,49 @@
     border-color: rgba(239,68,68,.20);
     color: #b91c1c;
   }
+
+
+
+
+ /* ===================
+ Ramark Icon Button
+ =================== */
+
+  .remark-icon-btn{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    border:1px solid rgba(2,6,23,.1);
+    background:#fff;
+  
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  
+    font-size:20px;
+    color:#f4a734;
+  
+    transition: all .2s ease;
+  }
+  
+  .remark-icon-btn:hover{
+    background:#eff6ff;
+    
+    transform: translateY(-1px);
+  }
+
+
+
+
+
+
+
+  .queue-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  
+    max-height: 600px;   /* ประมาณ 2 cards */
+    overflow-y: auto;
+    padding-right: 4px;
+  }
