@@ -138,15 +138,26 @@
             <div class="req-top">
               <div class="req-main">
                 <div class="req-material">{{ r.materialNo }}</div>
-                <div class="req-qty">{{ r.jobNo || 'RETURN' }}</div>
+                <div class="req-job-pill">JOB#{{ r.jobNo }}</div>
+                <span
+                  class="status-pill"
+                  [class.wait]="r.status === 'Waiting'"
+                  [class.proc]="r.status === 'Processing'"
+                  [class.done]="r.status === 'Completed'"
+                >
+                  {{ r.status }}
+               </span>
               </div>
 
-              <div class="return-pill" [class.urgent]="r.priority === 'Urgent'">
-                {{ r.priority }}
-              </div>
+              @if (r.priority === 'Urgent') {
+                <div class="return-pill" [class.urgent]="r.priority === 'Urgent'">
+                  {{ r.priority }}
+                </div>
+              }
             </div>
+          
 
-            <div class="req-grid">
+            <div class="req-grid compact-row">
               <div class="req-item">
                 <span class="k">Material Name</span>
                 <span class="v">{{ r.materialName }}</span>
@@ -171,30 +182,18 @@
                 <span class="k">Request At</span>
                 <span class="v">{{ r.requestAt }}</span>
               </div>
-            </div>
 
-            <div class="req-bottom">
-              <span
-                class="status-pill"
-                [class.wait]="r.status === 'Waiting'"
-                [class.proc]="r.status === 'Processing'"
-                [class.done]="r.status === 'Completed'"
+                <button
+                *ngIf="r.remark?.trim()"
+                type="button"
+                class="remark-icon-btn"
+                (click)="showRemark(r)"
+                title="View remark"
               >
-                {{ r.status }}
-              </span>
-
-            <!-- 🔥 Remark Icon -->
-              <button
-                  *ngIf="r.remark?.trim()"
-                  type="button"
-                  class="remark-icon-btn"
-                  (click)="showRemark(r)"
-                  title="View remark"
-                >
-                  <i class="fas fa-comment-dots"></i>
-            </button>
-
+                <i class="fas fa-comment-dots"></i>
+              </button>
             </div>
+
           </div>
 
           <div class="queue-empty" *ngIf="!requestsView.length">

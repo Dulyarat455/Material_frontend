@@ -57,6 +57,9 @@ export class IssueComponent {
   selectedMachine = '';
 
   userId: number | null = null;
+  groupId: number | null = null;
+  sectionId: number | null = null;
+
   isSubmitting = false;
   isLoadingQueue = false;
   isLoadingMachine = false;
@@ -87,6 +90,9 @@ export class IssueComponent {
 
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
+    this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
+    this.sectionId = Number(localStorage.getItem('materialStore_sectionId')) || null;
+
     this.fetchMaterials();
     this.fetchIssueQueueByUserId();
   }
@@ -230,6 +236,7 @@ export class IssueComponent {
 
     const body = {
       areaId,
+      groupId: this.groupId,
       requestByUserId: this.userId,
       materialId: this.selectedMaterialId,
       remark: this.remark || null,

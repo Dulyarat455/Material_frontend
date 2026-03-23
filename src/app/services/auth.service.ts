@@ -42,6 +42,11 @@ export class AuthService {
     localStorage.setItem('materialStore_name', userData.name);
     localStorage.setItem('materialStore_userId', userData.id);
     localStorage.setItem('materialStore_empNo', userData.empNo);
+    localStorage.setItem('materialStore_groupId', userData.groupId);
+    localStorage.setItem('materialStore_groupName', userData.groupName);
+    localStorage.setItem('materialStore_sectionId', userData.sectionId);
+    localStorage.setItem('materialStore_sectionName', userData.sectionName);
+
     this.authStatus.next(true);
     this.refreshComponents.next(true);
   }
@@ -51,6 +56,11 @@ export class AuthService {
     localStorage.removeItem('materialStore_name');
     localStorage.removeItem('materialStore_userId');
     localStorage.removeItem('materialStore_empNo');
+    localStorage.removeItem('materialStore_groupId');
+    localStorage.removeItem('materialStore_groupName');
+    localStorage.removeItem('materialStore_sectionId');
+    localStorage.removeItem('materialStore_sectionName');
+
     this.authStatus.next(false);
     window.location.href = '/MaterialPress';
     // this.refreshComponents.next(true); // แจ้ง components ให้ refresh

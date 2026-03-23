@@ -211,30 +211,20 @@
 }
 
 /* request list */
-/* ==========================
-this for lock row to scroll
-==========================  */
-
 .queue-list{
   display: flex;
   flex-direction: column;
-  gap: 10px;
-
-  /* lock ให้เห็นประมาณ 2 cards */
+  gap: 8px;
   max-height: 600px;
   overflow-y: auto;
   padding-right: 4px;
 }
 
-
-
-
-
 .req-card{
   border:1px solid rgba(2,6,23,.08);
   border-radius:14px;
   background:#fff;
-  padding:12px;
+  padding:10px 12px;
   box-shadow: 0 4px 12px rgba(15,23,42,.03);
 }
 
@@ -250,12 +240,15 @@ this for lock row to scroll
   align-items:center;
   gap:8px;
   flex-wrap:wrap;
+  min-width:0;
 }
 
 .req-material{
   font-weight:900;
   font-size:16px;
   color:#0f172a;
+  line-height:1.2;
+  word-break:break-word;
 }
 
 .req-fifo{
@@ -268,6 +261,26 @@ this for lock row to scroll
   border:1px solid rgba(245,158,11,.20);
 }
 
+.req-top-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  flex-shrink:0;
+}
+
+.job-pill{
+  font-size:11px;
+  font-weight:900;
+  padding:5px 10px;
+  border-radius:999px;
+  color:#b45309;
+  background: rgba(245,158,11,.10);
+  border:1px solid rgba(245,158,11,.24);
+  white-space:nowrap;
+}
+
 .priority-pill{
   font-size:12px;
   font-weight:900;
@@ -276,6 +289,7 @@ this for lock row to scroll
   border:1px solid rgba(2,6,23,.10);
   background:#f8fafc;
   color:#475569;
+  white-space:nowrap;
 }
 
 .priority-pill.urgent{
@@ -284,11 +298,17 @@ this for lock row to scroll
   color:#b91c1c;
 }
 
+/* จุดหลักที่ทำให้ card เตี้ยลง */
 .req-grid{
   margin-top:10px;
   display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:8px 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap:8px 14px;
+  align-items:start;
+}
+
+.req-grid.compact-row .req-item{
+  min-width:0;
 }
 
 .req-item{
@@ -303,16 +323,19 @@ this for lock row to scroll
   color:#94a3b8;
   text-transform:uppercase;
   letter-spacing:.03em;
+  line-height:1.1;
 }
 
 .req-item .v{
   font-size:13px;
   font-weight:800;
   color:#334155;
+  line-height:1.25;
+  word-break:break-word;
 }
 
 .req-bottom{
-  margin-top:12px;
+  margin-top:10px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -374,6 +397,106 @@ this for lock row to scroll
   background:#fff;
 }
 
+/* =========================
+   MATERIAL DROPDOWN
+   ========================= */
+.material-search {
+  position: relative;
+}
+
+.dropdown-material {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 999;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.dropdown-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdown-item:hover {
+  background: #eff6ff;
+}
+
+.d-code {
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.d-name {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* =========================
+   DISABLED LOOK
+   ========================= */
+select:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* =========================
+   INPUT IMPROVE
+   ========================= */
+.issue-form input,
+.issue-form select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.issue-form input:focus,
+.issue-form select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+}
+
+/* remark button */
+.btn-remark{
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(37,99,235,.16);
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1d4ed8;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .15s ease;
+}
+
+.btn-remark:hover{
+  background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: rgba(37,99,235,.28);
+  transform: translateY(-1px);
+}
+
+.btn-remark:active{
+  transform: translateY(0);
+}
+
+@media (max-width: 1200px){
+  .req-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 992px){
   .issue-grid{
     grid-template-columns: 1fr;
@@ -392,113 +515,26 @@ this for lock row to scroll
     align-items:flex-start;
   }
 
+  .req-top{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .req-top-right{
+    justify-content:flex-start;
+  }
+
   .req-grid{
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-
-
-
-
-
-
-
-/* =========================
-   MATERIAL DROPDOWN
-   ========================= */
-   .material-search {
-    position: relative;
-  }
-  
-  .dropdown-material {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    max-height: 240px;
-    overflow-y: auto;
-    z-index: 999;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  }
-  
-  .dropdown-item {
-    padding: 10px 14px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  
-  .dropdown-item:hover {
-    background: #eff6ff;
-  }
-  
-  .d-code {
-    font-weight: 700;
-    color: #1e3a8a;
-  }
-  
-  .d-name {
-    font-size: 12px;
-    color: #64748b;
-  }
-  
-  /* =========================
-     DISABLED LOOK
-     ========================= */
-  select:disabled {
-    background: #f1f5f9;
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-  
-  /* =========================
-     INPUT IMPROVE
-     ========================= */
-  .issue-form input,
-  .issue-form select {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-  }
-  
-  .issue-form input:focus,
-  .issue-form select:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+@media (max-width: 640px){
+  .req-grid{
+    grid-template-columns: 1fr;
   }
 
-
-  /* =============
-  Remark button
-  ============= */
-
-
-  .btn-remark{
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: 1px solid rgba(37,99,235,.16);
-    background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-    color: #1d4ed8;
-    display: grid;
-    place-items: center;
-    font-size: 15px;
-    font-weight: 900;
-    cursor: pointer;
-    transition: .15s ease;
+  .req-card{
+    padding:10px;
   }
-  
-  .btn-remark:hover{
-    background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
-    border-color: rgba(37,99,235,.28);
-    transform: translateY(-1px);
-  }
-  
-  .btn-remark:active{
-    transform: translateY(0);
-  }
+}

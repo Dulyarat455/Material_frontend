@@ -73,7 +73,7 @@ export class JobTransactionComponent {
   fetchReturnAll() {
     this.isLoadingReturn = true;
 
-    this.http.get<any>(config.apiServer + '/api/return/fetReturnAll').subscribe({
+    this.http.get<any>(config.apiServer + '/api/return/fetchReturnAll').subscribe({
       next: (res) => {
         const rows = Array.isArray(res?.results) ? res.results : [];
         this.returnJobs = rows.map((r: any) => this.mapJobRow(r, 'Return'));

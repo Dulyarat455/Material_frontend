@@ -217,14 +217,17 @@
 .queue-list{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
+  max-height:600px;
+  overflow-y:auto;
+  padding-right:4px;
 }
 
 .req-card{
   border:1px solid rgba(2,6,23,.08);
   border-radius:14px;
   background:#fff;
-  padding:12px;
+  padding:10px 12px;
   box-shadow: 0 4px 12px rgba(15,23,42,.03);
 }
 
@@ -240,15 +243,18 @@
   align-items:center;
   gap:8px;
   flex-wrap:wrap;
+  min-width:0;
 }
 
 .req-material{
   font-weight:900;
   font-size:16px;
   color:#0f172a;
+  line-height:1.2;
+  word-break:break-word;
 }
 
-.req-qty{
+.req-job-pill{
   font-size:11px;
   font-weight:900;
   padding:4px 8px;
@@ -256,6 +262,7 @@
   color:#9a3412;
   background: rgba(245,158,11,.10);
   border:1px solid rgba(245,158,11,.16);
+  white-space:nowrap;
 }
 
 .return-pill{
@@ -266,13 +273,26 @@
   border:1px solid rgba(245,158,11,.18);
   background: linear-gradient(180deg, #fff3e8 0%, #ffe7d2 100%);
   color:#c2410c;
+  white-space:nowrap;
 }
 
+.return-pill.urgent{
+  background: rgba(239,68,68,.08);
+  border-color: rgba(239,68,68,.20);
+  color: #b91c1c;
+}
+
+/* จุดหลักที่ทำให้ card เตี้ยลง */
 .req-grid{
   margin-top:10px;
   display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:8px 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap:8px 14px;
+  align-items:start;
+}
+
+.req-grid.compact-row .req-item{
+  min-width:0;
 }
 
 .req-item{
@@ -287,26 +307,19 @@
   color:#94a3b8;
   text-transform:uppercase;
   letter-spacing:.03em;
+  line-height:1.1;
 }
 
 .req-item .v{
   font-size:13px;
   font-weight:800;
   color:#334155;
-}
-
-.req-note{
-  margin-top:10px;
-  padding:8px 10px;
-  border-radius:10px;
-  background: rgba(245,158,11,.08);
-  color:#92400e;
-  font-size:12px;
-  font-weight:800;
+  line-height:1.25;
+  word-break:break-word;
 }
 
 .req-bottom{
-  margin-top:12px;
+  margin-top:10px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -368,6 +381,77 @@
   background:#fff;
 }
 
+/* material dropdown */
+.material-search{
+  position:relative;
+}
+
+.dropdown-material{
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  max-height:240px;
+  overflow-y:auto;
+  z-index:999;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.dropdown-item{
+  padding:10px 14px;
+  cursor:pointer;
+  border-bottom:1px solid #f1f5f9;
+}
+
+.dropdown-item:hover{
+  background:#fff7ed;
+}
+
+.d-code{
+  font-weight:700;
+  color:#c2410c;
+}
+
+.d-name{
+  font-size:12px;
+  color:#64748b;
+}
+
+select:disabled{
+  background:#f1f5f9;
+  cursor:not-allowed;
+  opacity:.7;
+}
+
+/* remark */
+.remark-icon-btn{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  border:1px solid rgba(2,6,23,.1);
+  background:#fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  color:#f4a734;
+  transition: all .2s ease;
+}
+
+.remark-icon-btn:hover{
+  background:#eff6ff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1200px){
+  .req-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 992px){
   .return-grid{
     grid-template-columns: 1fr;
@@ -386,111 +470,22 @@
     align-items:flex-start;
   }
 
+  .req-top{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
   .req-grid{
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-
-
-
-
-
-/* =========================
-   MATERIAL DROPDOWN
-   ========================= */
-   .material-search {
-    position: relative;
-  }
-  
-  .dropdown-material {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    max-height: 240px;
-    overflow-y: auto;
-    z-index: 999;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  }
-  
-  .dropdown-item {
-    padding: 10px 14px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  
-  .dropdown-item:hover {
-    background: #fff7ed;
-  }
-  
-  .d-code {
-    font-weight: 700;
-    color: #c2410c;
-  }
-  
-  .d-name {
-    font-size: 12px;
-    color: #64748b;
-  }
-  
-  select:disabled {
-    background: #f1f5f9;
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-  
-  .return-pill.urgent{
-    background: rgba(239,68,68,.08);
-    border-color: rgba(239,68,68,.20);
-    color: #b91c1c;
+@media (max-width: 640px){
+  .req-grid{
+    grid-template-columns: 1fr;
   }
 
-
-
-
- /* ===================
- Ramark Icon Button
- =================== */
-
-  .remark-icon-btn{
-    width:42px;
-    height:42px;
-    border-radius:10px;
-    border:1px solid rgba(2,6,23,.1);
-    background:#fff;
-  
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-  
-    font-size:20px;
-    color:#f4a734;
-  
-    transition: all .2s ease;
+  .req-card{
+    padding:10px;
   }
-  
-  .remark-icon-btn:hover{
-    background:#eff6ff;
-    
-    transform: translateY(-1px);
-  }
-
-
-
-
-
-
-
-  .queue-list{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  
-    max-height: 600px;   /* ประมาณ 2 cards */
-    overflow-y: auto;
-    padding-right: 4px;
-  }
+}

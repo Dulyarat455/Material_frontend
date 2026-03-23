@@ -59,6 +59,9 @@ export class ReturnComponent {
   selectedMachine = '';
 
   userId: number | null = null;
+  groupId: number | null = null;
+  sectionId: number | null = null;
+
   isSubmitting = false;
   isLoadingQueue = false;
   isLoadingMachine = false;
@@ -89,6 +92,8 @@ export class ReturnComponent {
 
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
+    this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
+    this.sectionId = Number(localStorage.getItem('materialStore_sectionId')) || null;
     this.fetchMaterials();
     this.fetchReturnQueueByUserId();
   }
@@ -232,6 +237,7 @@ export class ReturnComponent {
 
     const body = {
       areaId,
+      groupId: this.groupId,
       requestByUserId: this.userId,
       materialId: this.selectedMaterialId,
       remark: this.remark || null,
