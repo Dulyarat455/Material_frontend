@@ -146,8 +146,8 @@
                 <span
                 class="status-pill"
                 [class.wait]="r.status === 'Waiting'"
-                [class.proc]="r.status === 'Complete'"
-                [class.done]="r.status === 'Denial'"
+                [class.complete]="r.status === 'Complete'"
+                [class.denial]="r.status === 'Denial'"
                 >
                   {{ r.status }}
                 </span>

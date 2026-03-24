@@ -11,14 +11,15 @@ type ReturnRequestRow = {
   materialNo: string;
   materialName: string;
   materialSpec: string;
-  qty: number; // backend ตอนนี้ยังไม่มี qty -> จะ map เป็น 0 ไปก่อน
+  qty: number;
   fromArea: string;
   backToArea: string;
   priority: 'Normal' | 'Urgent';
   requestBy: string;
   requestAt: string;
-  status: 'Waiting' | 'Processing' | 'Completed';
+  status: 'Waiting' | 'Complete' | 'Denial';
   remark?: string;
+  groupId?: number | null;
 };
 
 type MaterialRow = {
@@ -43,15 +44,12 @@ type AreaRow = {
 export class ReturnComponent {
   constructor(private http: HttpClient) {}
 
-  // =========================
-  // FORM
-  // =========================
   materialNo = '';
   materialName = '';
   materialSpec = '';
-  qty: number | null = null; // UI only for now
+  qty: number | null = null;
   fromArea = '';
-  backToArea = ''; // UI only for now
+  backToArea = '';
   remark = '';
   priority: 'Normal' | 'Urgent' = 'Normal';
 
@@ -66,41 +64,35 @@ export class ReturnComponent {
   isLoadingQueue = false;
   isLoadingMachine = false;
 
-  // =========================
-  // MATERIAL SEARCH
-  // =========================
   materials: MaterialRow[] = [];
   materialDropdown: MaterialRow[] = [];
   showMaterialDropdown = false;
   selectedMaterialId: number | null = null;
 
-  // =========================
-  // LINE -> MACHINE
-  // =========================
   areas: AreaRow[] = [];
   machinesView: string[] = [];
   lines = ['A', 'B', 'C'];
 
-  // =========================
-  // QUEUE
-  // =========================
   requestsAll: ReturnRequestRow[] = [];
   requestsView: ReturnRequestRow[] = [];
 
   q = '';
-  statusFilter: 'all' | ReturnRequestRow['status'] = 'all';
+  statusFilter: ReturnRequestRow['status'] = 'Waiting';
 
   ngOnInit() {
-    this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
-    this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
-    this.sectionId = Number(localStorage.getItem('materialStore_sectionId')) || null;
+    this.userId = this.toNumber(localStorage.getItem('materialStore_userId'));
+    this.groupId = this.toNumber(localStorage.getItem('materialStore_groupId'));
+    this.sectionId = this.toNumber(localStorage.getItem('materialStore_sectionId'));
+
     this.fetchMaterials();
-    this.fetchReturnQueueByUserId();
+    this.fetchReturnQueueFollowFilter();
   }
 
-  // =========================
-  // MATERIAL
-  // =========================
+  private toNumber(value: any): number | null {
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
   fetchMaterials() {
     this.http.get<any>(config.apiServer + '/api/material/list').subscribe({
       next: (res) => {
@@ -154,9 +146,6 @@ export class ReturnComponent {
     }, 150);
   }
 
-  // =========================
-  // LINE -> MACHINE
-  // =========================
   onLineChange() {
     this.selectedMachine = '';
     this.fromArea = '';
@@ -194,9 +183,6 @@ export class ReturnComponent {
     this.fromArea = this.selectedMachine || '';
   }
 
-  // =========================
-  // CREATE RETURN
-  // =========================
   submitReturnRequest(): void {
     if (this.isSubmitting) return;
 
@@ -261,7 +247,7 @@ export class ReturnComponent {
         });
 
         this.resetForm();
-        this.fetchReturnQueueByUserId();
+        this.fetchReturnQueueFollowFilter();
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -274,31 +260,46 @@ export class ReturnComponent {
     });
   }
 
-  // =========================
-  // FETCH QUEUE
-  // =========================
-  fetchReturnQueueByUserId() {
-    if (!this.userId) {
-      this.requestsAll = [];
-      this.applyFilters();
-      return;
-    }
+  onStatusFilterChange() {
+    this.fetchReturnQueueFollowFilter();
+  }
 
+  fetchReturnQueueFollowFilter() {
     this.isLoadingQueue = true;
 
-    this.http.post<any>(config.apiServer + '/api/return/fetchReturnByUserId', {
-      userId: this.userId
+    let stateJob = 'wait';
+
+    if (this.statusFilter === 'Waiting') {
+      stateJob = 'wait';
+    } else if (this.statusFilter === 'Complete') {
+      stateJob = 'complete';
+    } else if (this.statusFilter === 'Denial') {
+      stateJob = 'denial';
+    } 
+
+    this.http.post<any>(config.apiServer + '/api/reurn/fetchReturnFollowStateJob', {
+      stateJob
     }).subscribe({
       next: (res) => {
         const rows = Array.isArray(res?.results) ? res.results : [];
 
-        this.requestsAll = rows.map((r: any) => {
-          const rawState = String(r?.state || '').toLowerCase();
+        let filteredRows = rows;
+
+        if (this.groupId != null) {
+          const hasGroupField = rows.some((r: any) => r?.groupId != null);
+
+          if (hasGroupField) {
+            filteredRows = rows.filter((r: any) => Number(r?.groupId) === Number(this.groupId));
+          }
+        }
+
+        this.requestsAll = filteredRows.map((r: any) => {
+          const rawState = String(r?.state || '').trim().toLowerCase();
 
           let status: ReturnRequestRow['status'] = 'Waiting';
           if (rawState === 'wait') status = 'Waiting';
-          else if (rawState === 'processing') status = 'Processing';
-          else if (rawState === 'done' || rawState === 'completed') status = 'Completed';
+          else if (rawState === 'complete') status = 'Complete';
+          else if (rawState === 'denial') status = 'Denial';
 
           const requestByText =
             r?.requestUserEmpNo && r?.requestUserName
@@ -311,14 +312,15 @@ export class ReturnComponent {
             materialNo: r?.materialNo || '-',
             materialName: r?.materialName || '-',
             materialSpec: r?.materialSpec || '-',
-            qty: Number(r?.qty || 0), // backend ยังไม่มี qty
+            qty: Number(r?.qty || 0),
             fromArea: r?.areaName || '-',
             backToArea: '',
             priority: String(r?.priority || '').trim().toLowerCase() === 'urgent' ? 'Urgent' : 'Normal',
             requestBy: requestByText,
             requestAt: this.formatDateTime(r?.requestTime),
             status,
-            remark: r?.remark || ''
+            remark: r?.remark || '',
+            groupId: r?.groupId ?? null
           };
         });
 
@@ -336,12 +338,8 @@ export class ReturnComponent {
     });
   }
 
-  // =========================
-  // FILTER
-  // =========================
   applyFilters() {
     const q = (this.q || '').trim().toLowerCase();
-    const s = this.statusFilter;
 
     this.requestsView = (this.requestsAll || []).filter((x) => {
       if (q) {
@@ -356,20 +354,16 @@ export class ReturnComponent {
         if (!hit) return false;
       }
 
-      if (s !== 'all' && x.status !== s) return false;
       return true;
     });
   }
 
   resetFilters() {
     this.q = '';
-    this.statusFilter = 'all';
-    this.applyFilters();
+    this.statusFilter = 'Waiting';
+    this.fetchReturnQueueFollowFilter();
   }
 
-  // =========================
-  // ACTION
-  // =========================
   async confirmReceive(row: ReturnRequestRow) {
     const r = await Swal.fire({
       title: 'Receive return?',
@@ -388,13 +382,10 @@ export class ReturnComponent {
 
     if (!r.isConfirmed) return;
 
-    row.status = 'Processing';
+    row.status = 'Waiting';
     this.applyFilters();
   }
 
-  // =========================
-  // HELPERS
-  // =========================
   resetForm() {
     this.materialNo = '';
     this.materialName = '';
@@ -422,14 +413,10 @@ export class ReturnComponent {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
 
-
-
-
-
   showRemark(row: ReturnRequestRow) {
     const remarkText = (row.remark || '').trim();
     if (!remarkText) return;
-  
+
     Swal.fire({
       icon: 'info',
       title: 'Return Remark',
@@ -441,7 +428,6 @@ export class ReturnComponent {
           <div style="margin-bottom:8px;">
             <b>Material:</b> ${row.materialNo}
           </div>
-  
           <div style="
             padding:12px;
             border-radius:10px;
@@ -450,7 +436,7 @@ export class ReturnComponent {
             color:#0f172a;
             white-space:pre-wrap;
           ">
-        ${remarkText}
+            ${remarkText}
           </div>
         </div>
       `,
