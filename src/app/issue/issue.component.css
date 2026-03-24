@@ -363,9 +363,9 @@
 }
 
 .status-pill.done{
-  background: rgba(16,185,129,.10);
-  border-color: rgba(16,185,129,.18);
-  color:#047857;
+  background: rgba(119, 27, 224, 0.1);
+  border-color: rgba(243, 21, 21, 0.18);
+  color:#d8186b;
 }
 
 .btn-process{

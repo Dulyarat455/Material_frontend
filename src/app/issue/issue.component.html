@@ -124,11 +124,11 @@
           placeholder="Search material / machine / user / job..."
         />
 
-        <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
-          <option value="all">All</option>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+     
           <option value="Waiting">Waiting</option>
-          <option value="Processing">Processing</option>
-          <option value="Completed">Completed</option>
+          <option value="Complete">Complete</option>
+          <option value="Denial">Denial</option>
         </select>
 
         <button class="btn-soft" (click)="resetFilters()">Reset</button>
@@ -146,8 +146,8 @@
                 <span
                 class="status-pill"
                 [class.wait]="r.status === 'Waiting'"
-                [class.proc]="r.status === 'Processing'"
-                [class.done]="r.status === 'Completed'"
+                [class.proc]="r.status === 'Complete'"
+                [class.done]="r.status === 'Denial'"
                 >
                   {{ r.status }}
                 </span>

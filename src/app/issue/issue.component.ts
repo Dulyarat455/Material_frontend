@@ -16,7 +16,7 @@ type IssueRequestRow = {
   priority: 'Normal' | 'Urgent';
   requestBy: string;
   requestAt: string;
-  status: 'Waiting' | 'Processing' | 'Completed';
+  status: 'Waiting' | 'Complete' | 'Denial';
   fifoHint?: string;
   remark?: string;
 };
@@ -43,9 +43,6 @@ type AreaRow = {
 export class IssueComponent {
   constructor(private http: HttpClient) {}
 
-  // =========================
-  // FORM
-  // =========================
   materialNo = '';
   materialName = '';
   materialSpec = '';
@@ -64,29 +61,20 @@ export class IssueComponent {
   isLoadingQueue = false;
   isLoadingMachine = false;
 
-  // =========================
-  // MATERIAL SEARCH
-  // =========================
   materials: MaterialRow[] = [];
   materialDropdown: MaterialRow[] = [];
   showMaterialDropdown = false;
   selectedMaterialId: number | null = null;
 
-  // =========================
-  // LINE -> MACHINE
-  // =========================
   areas: AreaRow[] = [];
   machinesView: string[] = [];
   lines = ['A', 'B', 'C'];
 
-  // =========================
-  // QUEUE
-  // =========================
   requestsAll: IssueRequestRow[] = [];
   requestsView: IssueRequestRow[] = [];
 
   q = '';
-  statusFilter: 'all' | IssueRequestRow['status'] = 'all';
+  statusFilter: 'all' | IssueRequestRow['status'] = 'Waiting';
 
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
@@ -94,12 +82,9 @@ export class IssueComponent {
     this.sectionId = Number(localStorage.getItem('materialStore_sectionId')) || null;
 
     this.fetchMaterials();
-    this.fetchIssueQueueByUserId();
+    this.fetchIssueQueueFollowFilter();
   }
 
-  // =========================
-  // MATERIAL
-  // =========================
   fetchMaterials() {
     this.http.get<any>(config.apiServer + '/api/material/list').subscribe({
       next: (res) => {
@@ -151,9 +136,6 @@ export class IssueComponent {
     }, 150);
   }
 
-  // =========================
-  // LINE -> MACHINE
-  // =========================
   onLineChange() {
     this.selectedMachine = '';
     this.destination = '';
@@ -191,14 +173,10 @@ export class IssueComponent {
     this.destination = this.selectedMachine || '';
   }
 
-  // =========================
-  // CREATE ISSUE
-  // =========================
   submitIssueRequest(): void {
     if (this.isSubmitting) return;
 
     const materialNo = (this.materialNo || '').trim().toUpperCase();
-    
 
     if (!materialNo) {
       Swal.fire('Error', 'กรุณากรอก Material No', 'error');
@@ -219,7 +197,6 @@ export class IssueComponent {
       Swal.fire('Error', 'กรุณาเลือก Machine', 'error');
       return;
     }
-
 
     if (!this.userId) {
       Swal.fire('Error', 'User not found', 'error');
@@ -260,7 +237,7 @@ export class IssueComponent {
         });
 
         this.resetForm();
-        this.fetchIssueQueueByUserId();
+        this.fetchIssueQueueFollowFilter();
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -273,31 +250,48 @@ export class IssueComponent {
     });
   }
 
-  // =========================
-  // FETCH QUEUE
-  // =========================
-  fetchIssueQueueByUserId() {
-    if (!this.userId) {
+  onStatusFilterChange() {
+    this.fetchIssueQueueFollowFilter();
+  }
+
+  fetchIssueQueueFollowFilter() {
+    if (!this.groupId) {
       this.requestsAll = [];
-      this.applyFilters();
+      this.requestsView = [];
       return;
     }
 
     this.isLoadingQueue = true;
 
-    this.http.post<any>(config.apiServer + '/api/issue/fetchIssueByUserId', {
-      userId: this.userId
+    let stateJob = 'wait';
+
+    if (this.statusFilter === 'Waiting') {
+      stateJob = 'wait';
+    } else if (this.statusFilter === 'Complete') {
+      stateJob = 'complete';
+    } else if (this.statusFilter === 'Denial') {
+      stateJob = 'denial';
+    } else {
+      stateJob = 'wait';
+    }
+
+    this.http.post<any>(config.apiServer + '/api/issue/fetchIssueFollowStateJob', {
+      stateJob
     }).subscribe({
       next: (res) => {
         const rows = Array.isArray(res?.results) ? res.results : [];
 
-        this.requestsAll = rows.map((r: any) => {
-          const rawState = String(r?.state || '').toLowerCase();
+        const filteredByGroup = rows.filter((r: any) => {
+          return Number(r?.groupId || 0) === Number(this.groupId || 0);
+        });
+
+        this.requestsAll = filteredByGroup.map((r: any) => {
+          const rawState = String(r?.state || '').trim().toLowerCase();
 
           let status: IssueRequestRow['status'] = 'Waiting';
           if (rawState === 'wait') status = 'Waiting';
-          else if (rawState === 'processing') status = 'Processing';
-          else if (rawState === 'done' || rawState === 'completed') status = 'Completed';
+          else if (rawState === 'complete') status = 'Complete';
+          else if (rawState === 'denial') status = 'Denial';
 
           const requestByText =
             r?.requestUserEmpNo && r?.requestUserName
@@ -312,7 +306,7 @@ export class IssueComponent {
             materialSpec: r?.materialSpec || '-',
             qty: Number(r?.qty || 0),
             destination: r?.areaName || '-',
-            priority: r?.priority === 'Urgent' ? 'Urgent' : 'Normal',
+            priority: String(r?.priority || '').trim().toLowerCase() === 'urgent' ? 'Urgent' : 'Normal',
             requestBy: requestByText,
             requestAt: this.formatDateTime(r?.requestTime),
             status,
@@ -335,12 +329,8 @@ export class IssueComponent {
     });
   }
 
-  // =========================
-  // FILTER
-  // =========================
   applyFilters() {
     const q = (this.q || '').trim().toLowerCase();
-    const s = this.statusFilter;
 
     this.requestsView = (this.requestsAll || []).filter(x => {
       if (q) {
@@ -349,48 +339,22 @@ export class IssueComponent {
           x.materialName.toLowerCase().includes(q) ||
           x.destination.toLowerCase().includes(q) ||
           x.requestBy.toLowerCase().includes(q) ||
-          x.fifoHint?.toLowerCase().includes(q);
+          x.fifoHint?.toLowerCase().includes(q) ||
+          x.jobNo.toLowerCase().includes(q);
 
         if (!hit) return false;
       }
 
-      if (s !== 'all' && x.status !== s) return false;
       return true;
     });
   }
 
   resetFilters() {
     this.q = '';
-    this.statusFilter = 'all';
-    this.applyFilters();
+    this.statusFilter = 'Waiting';
+    this.fetchIssueQueueFollowFilter();
   }
 
-  async confirmProcess(row: IssueRequestRow) {
-    const r = await Swal.fire({
-      title: 'Process request?',
-      html: `
-        <div style="text-align:left">
-          <div><b>Job:</b> ${row.jobNo || '-'}</div>
-          <div><b>Material:</b> ${row.materialNo}</div>
-          <div><b>Material Name:</b> ${row.materialName}</div>
-          <div><b>Qty:</b> ${row.qty}</div>
-          <div><b>To:</b> ${row.destination}</div>
-        </div>
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Process'
-    });
-
-    if (!r.isConfirmed) return;
-
-    row.status = 'Processing';
-    this.applyFilters();
-  }
-
-  // =========================
-  // HELPERS
-  // =========================
   resetForm() {
     this.materialNo = '';
     this.materialName = '';
@@ -398,26 +362,33 @@ export class IssueComponent {
     this.destination = '';
     this.priority = 'Normal';
     this.remark = '';
+    this.selectedLine = '';
+    this.selectedMachine = '';
     this.selectedMaterialId = null;
     this.showMaterialDropdown = false;
+    this.materialDropdown = [];
+    this.areas = [];
+    this.machinesView = [];
   }
 
   formatDateTime(value: any): string {
     if (!value) return '-';
+
     const d = new Date(value);
     if (isNaN(d.getTime())) return String(value);
 
     const pad = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
+    
+    // return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
-
-
 
   showRemark(row: IssueRequestRow) {
     const remarkText = (row.remark || '').trim();
-  
+
     if (!remarkText) return;
-  
+
     Swal.fire({
       icon: 'info',
       title: 'Request Remark',
@@ -440,7 +411,4 @@ export class IssueComponent {
       confirmButtonColor: '#2563eb'
     });
   }
-
-
-  
 }
