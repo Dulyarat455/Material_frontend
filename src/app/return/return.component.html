@@ -107,6 +107,19 @@
         <div>
           <div class="card-title">Return Queue</div>
           <div class="card-subtitle">Returned from production area</div>
+
+          <div class="card-subtitle" *ngIf="groupName">
+            <span
+              class="group-badge"
+              [ngClass]="{
+                'group-lamination': groupName === 'Lamination',
+                'group-general': groupName === 'General',
+                'group-stator': groupName === 'Stator'
+              }"
+            >
+              {{ groupName }}
+            </span>
+          </div>
         </div>
         <div class="queue-count">
           {{ requestsView.length }} items

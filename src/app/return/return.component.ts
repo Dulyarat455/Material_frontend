@@ -59,6 +59,7 @@ export class ReturnComponent {
   userId: number | null = null;
   groupId: number | null = null;
   sectionId: number | null = null;
+  groupName: string = '';
 
   isSubmitting = false;
   isLoadingQueue = false;
@@ -83,6 +84,7 @@ export class ReturnComponent {
     this.userId = this.toNumber(localStorage.getItem('materialStore_userId'));
     this.groupId = this.toNumber(localStorage.getItem('materialStore_groupId'));
     this.sectionId = this.toNumber(localStorage.getItem('materialStore_sectionId'));
+    this.groupName = localStorage.getItem('materialStore_groupName')!;
 
     this.fetchMaterials();
     this.fetchReturnQueueFollowFilter();

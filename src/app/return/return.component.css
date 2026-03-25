@@ -489,3 +489,64 @@ select:disabled{
     padding:10px;
   }
 }
+
+
+
+
+
+/* =====================
+Group Name 
+===================== */
+
+.group-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .2px;
+  border: 1px solid transparent;
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+/* default */
+.group-badge::before{
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+/* Lamination */
+.group-lamination{
+  color: #0b4dbb;
+  background: linear-gradient(180deg, #79f0a8 0%, #56dd92 100%);
+}
+.group-lamination::before{
+  background: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22,163,74,.15);
+}
+
+/* General */
+.group-general{
+  color: #0b4dbb;
+  background: linear-gradient(180deg, #d8f27a 0%, #bfe35b 100%);
+}
+.group-general::before{
+  background: #84cc16;
+  box-shadow: 0 0 0 3px rgba(132,204,22,.15);
+}
+
+/* Stator */
+.group-stator{
+  color: #0b4dbb;
+  background: linear-gradient(180deg, #a8ebff 0%, #8ddcf5 100%);
+}
+.group-stator::before{
+  background: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6,182,212,.15);
+}

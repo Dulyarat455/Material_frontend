@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import Swal from 'sweetalert2';
 import config from '../../config';
@@ -75,6 +75,46 @@ type MoveRow = {
   stockNote?: string;
 };
 
+type TransactionNavJob = {
+  id: number;
+  incomingId?: number | null;
+  dateTimePD?: string;
+  jobNo?: string;
+  type?: 'Issue' | 'Return';
+  materialNo?: string;
+  materialName?: string;
+  materialSpec?: string;
+  mcNo?: string;
+  requestBy?: string;
+  remark?: string;
+  state?: string;
+  priority?: 'Normal' | 'Urgent';
+};
+
+
+type StockOutRow = {
+  uid: string;
+  checked: boolean;
+  area: string;
+  receivedDate: string;
+  jobNo: string;
+  invoice: string;
+  qty: number;
+  remark?: string;
+
+  itemNo: string;
+  itemName: string;
+  itemSpec: string;
+
+  incomingId: number;
+  storeId: number;
+  sourceStoreCode: string;
+  stockNote?: string;
+};
+
+
+
+
 type StockScanField =
   | 'jobNo'
   | 'yearMonth'
@@ -112,7 +152,8 @@ type StockScanField =
 export class StorageComponent {
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   @ViewChild('scanJobNo') scanJobNo?: ElementRef<HTMLInputElement>;
@@ -196,6 +237,32 @@ export class StorageComponent {
 
   userId: number | null = null;
 
+
+
+  
+  stockOutRequestJobNo = '';
+  stockOutSearchItemNo = '';
+  stockOutRows: StockOutRow[] = [];
+  stockOutForm = {
+    itemNo: '',
+    itemName: '',
+    itemSpec: ''
+  };
+
+  selectedTransactionJob: {
+    jobNo: string;
+    materialNo: string;
+    materialName: string;
+    materialSpec: string;
+    incomingId?: number | null;
+  } | null = null;
+
+
+
+
+
+
+
   // ใช้ข้อมูลจริงจาก API
   pendingItems: MaterialItem[] = [];
 
@@ -224,6 +291,130 @@ export class StorageComponent {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.fetchStoreMaster();
     this.fetchStorageMap();
+
+    this.applyTransactionState();
+  }
+
+
+
+  private applyTransactionState() {
+    const navState = (history.state || {}) as {
+      fromTransaction?: boolean;
+      mode?: 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'TABLE';
+      returnMode?: boolean;
+      job?: TransactionNavJob;
+    };
+  
+    if (!navState?.fromTransaction || !navState?.job) return;
+  
+    const job = navState.job;
+  
+    this.panelMode = navState.mode || 'STOCK_OUT';
+  
+    // ✅ เก็บ job ที่ส่งมาจาก transaction
+    this.selectedTransactionJob = {
+      jobNo: job.jobNo || '',
+      materialNo: job.materialNo || '',
+      materialName: job.materialName || '',
+      materialSpec: job.materialSpec || '',
+      incomingId: job.incomingId ?? null
+    };
+  
+    // ✅ set ค่าให้ panel stock out แบบใหม่
+    this.stockOutRequestJobNo = job.jobNo || '';
+    this.stockOutSearchItemNo = job.materialNo || '';
+    this.stockOutForm = {
+      itemNo: job.materialNo || '',
+      itemName: job.materialName || '',
+      itemSpec: job.materialSpec || ''
+    };
+  
+    // ✅ clear list เดิมก่อน
+    this.stockOutRows = [];
+  
+    Swal.fire({
+      icon: 'info',
+      title: 'Open Stock Out',
+      text: `โหลดข้อมูล Job ${job.jobNo || '-'} เรียบร้อยแล้ว`,
+      timer: 1200,
+      showConfirmButton: false
+    });
+  
+    // ✅ รอให้ fetchStorageMap โหลดข้อมูล slots มาก่อนค่อย search
+    setTimeout(() => this.searchStockOutItem(), 250);
+  }
+
+
+  searchStockOutItem() {
+    const key = (this.stockOutSearchItemNo || '').trim().toLowerCase();
+  
+    this.stockOutRows = [];
+    this.stockOutForm = {
+      itemNo: '',
+      itemName: '',
+      itemSpec: ''
+    };
+  
+    if (!key) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Material No',
+        text: 'กรุณากรอก Material No'
+      });
+      return;
+    }
+  
+    const rows: StockOutRow[] = [];
+  
+    this.slots.forEach((slot) => {
+      (slot.materials || []).forEach((m, index) => {
+        const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+  
+        if (materialNo === key) {
+          rows.push({
+            uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
+            checked: false,
+            area: slot.storeCode,
+            receivedDate: m.receivedAt || '',
+            jobNo: m.jobNo || '',
+            invoice: m.invNo || '',
+            qty: Number(m.qty || 0),
+            remark: m.remark || '',
+  
+            itemNo: m.materialNo || m.itemNo || '',
+            itemName: m.itemName || m.description || '',
+            itemSpec: m.itemSpec || '',
+  
+            incomingId: Number(m.incomingId || 0),
+            storeId: Number(slot.storeId || m.storeId || 0),
+            sourceStoreCode: slot.storeCode,
+            stockNote: m.stockNote || ''
+          });
+        }
+      });
+    });
+  
+    this.stockOutRows = rows;
+  
+    if (rows.length) {
+      this.stockOutForm = {
+        itemNo: this.selectedTransactionJob?.materialNo || rows[0].itemNo,
+        itemName: this.selectedTransactionJob?.materialName || rows[0].itemName,
+        itemSpec: this.selectedTransactionJob?.materialSpec || rows[0].itemSpec
+      };
+      return;
+    }
+  
+    Swal.fire({
+      icon: 'info',
+      title: 'No item found',
+      text: `ไม่พบ Material No : ${this.stockOutSearchItemNo}`
+    });
+  }
+
+
+  isAllStockOutChecked(): boolean {
+    return this.stockOutRows.length > 0 && this.stockOutRows.every(row => row.checked);
   }
 
   slotsBy(zone: SlotRow['zone'], row: SlotRow['row']) {
@@ -244,14 +435,14 @@ export class StorageComponent {
   }
 
   focusScanFirst() {
-    if (this.panelMode !== 'STOCK_IN' && this.panelMode !== 'STOCK_OUT') return;
+    if (this.panelMode !== 'STOCK_IN') return;
     this.focusEl(this.scanJobNo);
   }
 
   onStockScanEnter(field: StockScanField, ev: any) {
     if (ev?.key === 'Enter') ev.preventDefault();
 
-    if (this.panelMode !== 'STOCK_IN' && this.panelMode !== 'STOCK_OUT') return;
+    if (this.panelMode !== 'STOCK_IN') return;
 
     switch (field) {
       case 'jobNo':
@@ -358,13 +549,13 @@ export class StorageComponent {
 
   setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA') {
     this.panelMode = mode;
-
+  
     if (this.viewMode === 'PENDING') {
       this.stockForm.storageArea = 'Pending';
     } else {
       this.stockForm.storageArea = this.selectedSlot?.storeCode || '';
     }
-
+  
     if (mode !== 'MOVE_AREA') {
       this.moveRows = [];
       this.moveSearchItemNo = '';
@@ -381,8 +572,21 @@ export class StorageComponent {
         this.moveDestinationArea = this.selectedSlot?.storeCode || '';
       }
     }
-
-    if (mode === 'STOCK_IN' || mode === 'STOCK_OUT') {
+  
+    // ✅ reset stock out state เมื่อไม่ได้อยู่โหมดนี้
+    if (mode !== 'STOCK_OUT') {
+      this.stockOutRequestJobNo = '';
+      this.stockOutSearchItemNo = '';
+      this.stockOutRows = [];
+      this.stockOutForm = {
+        itemNo: '',
+        itemName: '',
+        itemSpec: ''
+      };
+      this.selectedTransactionJob = null;
+    }
+  
+    if (mode === 'STOCK_IN') {
       setTimeout(() => this.focusScanFirst(), 0);
     }
   }
@@ -397,6 +601,8 @@ export class StorageComponent {
   }
 
   confirmStockAction() {
+    if (this.panelMode !== 'STOCK_IN') return;
+
     const requiredFields = [
       { key: 'jobNo', label: 'Job No.' },
       { key: 'itemNo', label: 'Material No' },
@@ -1162,4 +1368,74 @@ export class StorageComponent {
       }
     });
   }
+
+
+
+
+  toggleAllStockOutRows(ev: Event) {
+    const checked = (ev.target as HTMLInputElement)?.checked === true;
+    this.stockOutRows = this.stockOutRows.map(r => ({ ...r, checked }));
+  }
+  
+  confirmStockOut() {
+    const selected = this.stockOutRows.filter(r => r.checked);
+  
+    if (!this.stockOutRequestJobNo.trim()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Job No',
+        text: 'ไม่พบ Request Job No'
+      });
+      return;
+    }
+  
+    if (!selected.length) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No selection',
+        text: 'กรุณาเลือกรายการที่ต้องการ Stock Out'
+      });
+      return;
+    }
+  
+    const payload = {
+      requestJobNo: this.stockOutRequestJobNo,
+      materialNo: this.stockOutForm.itemNo,
+      materialName: this.stockOutForm.itemName,
+      materialSpec: this.stockOutForm.itemSpec,
+      rows: selected.map(r => ({
+        incomingId: r.incomingId,
+        storeId: r.storeId,
+        area: r.area,
+        qty: r.qty,
+        invoice: r.invoice,
+        stockNote: r.stockNote || r.remark || ''
+      }))
+    };
+  
+    console.log('CONFIRM STOCK OUT = ', payload);
+  
+    Swal.fire({
+      icon: 'success',
+      title: 'Check complete',
+      text: 'ข้อมูล Stock Out พร้อมใช้งานแล้ว ดู payload ใน console ได้เลย'
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

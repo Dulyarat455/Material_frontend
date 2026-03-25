@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+
+
 import Swal from 'sweetalert2';
 import config from '../../config';
 
@@ -28,7 +31,10 @@ type JobRow = {
   styleUrl: './job-transaction.component.css'
 })
 export class JobTransactionComponent {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   issueJobs: JobRow[] = [];
   returnJobs: JobRow[] = [];
@@ -126,38 +132,29 @@ export class JobTransactionComponent {
   }
 
   onClickStockOut(row: JobRow) {
-    Swal.fire({
-      icon: 'info',
-      title: 'Stock Out',
-      html: `
-        <div style="text-align:left; line-height:1.8;">
-          <div><b>Job No:</b> ${this.escapeHtml(row.jobNo || '-')}</div>
-          <div><b>Material No:</b> ${this.escapeHtml(row.materialNo || '-')}</div>
-          <div><b>Material Name:</b> ${this.escapeHtml(row.materialName || '-')}</div>
-          <div><b>Material Spec:</b> ${this.escapeHtml(row.materialSpec || '-')}</div>
-          <div><b>M/C No:</b> ${this.escapeHtml(row.mcNo || '-')}</div>
-        </div>
-      `,
-      confirmButtonText: 'Close',
-      confirmButtonColor: '#2563eb'
+    this.router.navigate(['/storage'], {
+      state: {
+        fromTransaction: true,
+        mode: 'STOCK_OUT',
+        job: {
+          jobNo: row.jobNo,
+          materialNo: row.materialNo,
+          materialName: row.materialName,
+          materialSpec: row.materialSpec,
+          incomingId: row.incomingId ?? null
+        }
+      }
     });
   }
 
   onClickReturn(row: JobRow) {
-    Swal.fire({
-      icon: 'info',
-      title: 'Receive Return',
-      html: `
-        <div style="text-align:left; line-height:1.8;">
-          <div><b>Job No:</b> ${this.escapeHtml(row.jobNo || '-')}</div>
-          <div><b>Material No:</b> ${this.escapeHtml(row.materialNo || '-')}</div>
-          <div><b>Material Name:</b> ${this.escapeHtml(row.materialName || '-')}</div>
-          <div><b>Material Spec:</b> ${this.escapeHtml(row.materialSpec || '-')}</div>
-          <div><b>M/C No:</b> ${this.escapeHtml(row.mcNo || '-')}</div>
-        </div>
-      `,
-      confirmButtonText: 'Close',
-      confirmButtonColor: '#16a34a'
+    this.router.navigate(['/storage'], {
+      state: {
+        fromTransaction: true,
+        mode: 'STOCK_OUT',
+        returnMode: true,
+        job: row
+      }
     });
   }
 

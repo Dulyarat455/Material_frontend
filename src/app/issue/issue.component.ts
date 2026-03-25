@@ -56,6 +56,7 @@ export class IssueComponent {
   userId: number | null = null;
   groupId: number | null = null;
   sectionId: number | null = null;
+  groupName: string = '';
 
   isSubmitting = false;
   isLoadingQueue = false;
@@ -79,6 +80,7 @@ export class IssueComponent {
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
+    this.groupName = localStorage.getItem('materialStore_groupName')!;
     this.sectionId = Number(localStorage.getItem('materialStore_sectionId')) || null;
 
     this.fetchMaterials();

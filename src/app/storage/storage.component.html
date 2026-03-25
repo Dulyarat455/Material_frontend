@@ -334,7 +334,7 @@
               </ng-container>
 
               <!-- STOCK IN / STOCK OUT FORM -->
-              <ng-container *ngIf="panelMode === 'STOCK_IN' || panelMode === 'STOCK_OUT'">
+              <ng-container *ngIf="panelMode === 'STOCK_IN' ">
                 <div class="stock-panel">
 
                   <div class="stock-row">
@@ -624,12 +624,119 @@
                       <span *ngIf="panelMode === 'STOCK_IN'">
                         {{ isSavingStock ? 'Saving...' : 'Confirm Stock In' }}
                       </span>
-                      <span *ngIf="panelMode === 'STOCK_OUT'">Confirm Stock Out</span>
+                    
                     </button>
                   </div>
 
                 </div>
               </ng-container>
+
+
+
+                <!-- STOCK OUT MODE -->
+
+              <ng-container *ngIf="panelMode === 'STOCK_OUT'">
+                <div class="move-panel">
+                  <div class="move-search-row">
+                    <label>Request Job No</label>
+                    <div class="move-search-group">
+                      <input
+                        type="text"
+                        [(ngModel)]="stockOutRequestJobNo"
+                        placeholder="Request job no."
+                        readonly
+                      />
+                    </div>
+                  </div>
+              
+                  <div class="move-search-row">
+                    <label>Material No</label>
+                    <div class="move-search-group">
+                      <input
+                        type="text"
+                        [(ngModel)]="stockOutSearchItemNo"
+                        placeholder="Search item no."
+                        (keyup.enter)="searchStockOutItem()"
+                      />
+                      <button type="button" class="btn-search" (click)="searchStockOutItem()">
+                        Search
+                      </button>
+                    </div>
+                  </div>
+              
+                  <div class="move-form-grid">
+                    <div class="move-form-row">
+                      <label>Material No</label>
+                      <div class="value-box">{{ stockOutForm.itemNo || '-' }}</div>
+                    </div>
+              
+                    <div class="move-form-row">
+                      <label>Material Name</label>
+                      <div class="value-box">{{ stockOutForm.itemName || '-' }}</div>
+                    </div>
+              
+                    <div class="move-form-row">
+                      <label>Material Spec</label>
+                      <div class="value-box">{{ stockOutForm.itemSpec || '-' }}</div>
+                    </div>
+                  </div>
+              
+                  <div class="table-wrap mt-3">
+                    <table class="table table-sm table-hover mb-0 wms-table">
+                      <thead>
+                        <tr>
+                          <th class="text-center">
+                            <input
+                            type="checkbox"
+                            [checked]="isAllStockOutChecked()"
+                            (change)="toggleAllStockOutRows($event)"
+                          />
+                          </th>
+                          <th>Area</th>
+                          <th>Received Date</th>
+                          <th>Job No</th>
+                          <th>Invoice1</th>
+                          <th class="text-end">Qty</th>
+                          <th>Remark</th>
+                        </tr>
+                      </thead>
+              
+                      <tbody>
+                        <tr *ngFor="let row of stockOutRows">
+                          <td class="text-center">
+                            <input type="checkbox" [(ngModel)]="row.checked" />
+                          </td>
+                          <td>{{ row.area }}</td>
+                          <td>{{ row.receivedDate || '-' }}</td>
+                          <td>{{ row.jobNo || '-' }}</td>
+                          <td>{{ row.invoice || '-' }}</td>
+                          <td class="text-end">{{ row.qty | number }}</td>
+                          <td>{{ row.remark || '-' }}</td>
+                        </tr>
+              
+                        <tr *ngIf="!stockOutRows.length">
+                          <td colspan="7" class="text-center muted py-3">No item found</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+              
+                  <div class="panel-footer mt-3">
+                    <button class="btn btn-primary" (click)="confirmStockOut()">
+                      Confirm Stock Out
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+
+
+
+
+
+
+
+
 
               <!-- MOVE AREA MODE -->
               <ng-container *ngIf="panelMode === 'MOVE_AREA'">
