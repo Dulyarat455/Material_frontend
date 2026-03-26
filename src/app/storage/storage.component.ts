@@ -66,6 +66,8 @@ type MoveRow = {
   itemNo: string;
   itemName: string;
   itemSpec: string;
+  coil?: number;
+  unit?: string;
 
   sourceStoreCode: string;
   sourceInvNo: string;
@@ -105,6 +107,8 @@ type StockOutRow = {
   itemNo: string;
   itemName: string;
   itemSpec: string;
+  coil?: number;
+  unit?: string;
 
   incomingId: number;
   storeId: number;
@@ -386,6 +390,8 @@ export class StorageComponent {
             itemNo: m.materialNo || m.itemNo || '',
             itemName: m.itemName || m.description || '',
             itemSpec: m.itemSpec || '',
+            coil: m.coil != null ? Number(m.coil) : undefined,
+            unit: m.uom || '',
   
             incomingId: Number(m.incomingId || 0),
             storeId: Number(slot.storeId || m.storeId || 0),
@@ -957,6 +963,8 @@ export class StorageComponent {
             itemNo: m.materialNo || m.itemNo || '',
             itemName: m.itemName || m.description || '',
             itemSpec: m.itemSpec || '',
+            coil: m.coil != null ? Number(m.coil) : undefined,
+            unit: m.uom || '',
 
             sourceStoreCode: slot.storeCode,
             sourceInvNo: m.invNo || '',
@@ -986,6 +994,8 @@ export class StorageComponent {
           itemNo: m.materialNo || m.itemNo || '',
           itemName: m.itemName || m.description || '',
           itemSpec: m.itemSpec || '',
+          coil: m.coil != null ? Number(m.coil) : undefined,
+          unit: m.uom || '',
 
           sourceStoreCode: 'Pending',
           sourceInvNo: m.invNo || '',

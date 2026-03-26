@@ -832,3 +832,13 @@
     padding: 6px 12px;
     border-radius: 8px;
   }
+
+/* 
+  ===================
+  font size pannel-StockOut
+  =================== */
+
+  .stockout-form-grid .move-form-row label {
+    font-size: 12px;
+    font-weight: 600;
+  }

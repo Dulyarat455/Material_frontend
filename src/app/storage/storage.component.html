@@ -664,7 +664,7 @@
                     </div>
                   </div>
               
-                  <div class="move-form-grid">
+                  <div class="move-form-grid stockout-form-grid">
                     <div class="move-form-row">
                       <label>Material No</label>
                       <div class="value-box">{{ stockOutForm.itemNo || '-' }}</div>
@@ -690,7 +690,9 @@
                           <th>Received Date</th>
                           <th>Job No</th>
                           <th>Invoice1</th>
+                          <th class="text-center">Coil</th>
                           <th class="text-end">Qty</th>
+                          <th>Unit</th>
                           <th>Remark</th>
                         </tr>
                       </thead>
@@ -709,12 +711,14 @@
                           <td>{{ row.receivedDate || '-' }}</td>
                           <td>{{ row.jobNo || '-' }}</td>
                           <td>{{ row.invoice || '-' }}</td>
+                          <td class="text-center">{{ row.coil ?? '-' }}</td>
                           <td class="text-end">{{ row.qty | number }}</td>
+                          <td>{{ row.unit || '-' }}</td>
                           <td>{{ row.remark || '-' }}</td>
                         </tr>
               
                         <tr *ngIf="!stockOutRows.length">
-                          <td colspan="7" class="text-center muted py-3">No item found</td>
+                          <td colspan="9" class="text-center muted py-3">No item found</td>
                         </tr>
                       </tbody>
                     </table>
@@ -808,7 +812,9 @@
                           <th>Received Date</th>
                           <th>Job No</th>
                           <th>Invoice1</th>
+                          <th class="text-center">Coil</th>
                           <th class="text-center">Qty</th>
+                          <th>Unit</th>
                           <th>Remark</th>
                         </tr>
                       </thead>
@@ -821,12 +827,14 @@
                           <td>{{ row.receivedDate }}</td>
                           <td>{{ row.itemNo }}</td>
                           <td>{{ row.invoice }}</td>
+                          <td class="text-center">{{ row.coil ?? '-' }}</td>
                           <td class="text-center">{{ row.qty | number }}</td>
+                          <td>{{ row.unit || '-' }}</td>
                           <td>{{ row.stockNote || '-' }}</td>
                         </tr>
 
                         <tr *ngIf="!moveRows.length">
-                          <td colspan="7" class="text-center muted py-3">No item found</td>
+                          <td colspan="9" class="text-center muted py-3">No item found</td>
                         </tr>
                       </tbody>
                     </table>
