@@ -685,13 +685,7 @@
                     <table class="table table-sm table-hover mb-0 wms-table">
                       <thead>
                         <tr>
-                          <th class="text-center">
-                            <input
-                            type="checkbox"
-                            [checked]="isAllStockOutChecked()"
-                            (change)="toggleAllStockOutRows($event)"
-                          />
-                          </th>
+                          <th class="text-center">✓</th>
                           <th>Area</th>
                           <th>Received Date</th>
                           <th>Job No</th>
@@ -704,7 +698,12 @@
                       <tbody>
                         <tr *ngFor="let row of stockOutRows">
                           <td class="text-center">
-                            <input type="checkbox" [(ngModel)]="row.checked" />
+                            <input
+                            type="checkbox"
+                            [checked]="row.checked"
+                            [disabled]="isStockOutRowDisabled(row)"
+                            (change)="onSelectSingleStockOut(row, $event)"
+                          />
                           </td>
                           <td>{{ row.area }}</td>
                           <td>{{ row.receivedDate || '-' }}</td>
@@ -722,9 +721,13 @@
                   </div>
               
                   <div class="panel-footer mt-3">
-                    <button class="btn btn-primary" (click)="confirmStockOut()">
-                      Confirm Stock Out
-                    </button>
+                    <button
+                    class="btn btn-primary"
+                    (click)="confirmStockOut()"
+                    [disabled]="isSavingStock"
+                  >
+                    {{ isSavingStock ? 'Saving...' : 'Confirm Stock Out' }}
+                  </button>
                   </div>
                 </div>
               </ng-container>

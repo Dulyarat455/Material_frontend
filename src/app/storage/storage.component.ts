@@ -250,6 +250,7 @@ export class StorageComponent {
   };
 
   selectedTransactionJob: {
+    id: number;
     jobNo: string;
     materialNo: string;
     materialName: string;
@@ -313,6 +314,7 @@ export class StorageComponent {
   
     // ✅ เก็บ job ที่ส่งมาจาก transaction
     this.selectedTransactionJob = {
+      id: Number(job.id || null),
       jobNo: job.jobNo || '',
       materialNo: job.materialNo || '',
       materialName: job.materialName || '',
@@ -416,6 +418,29 @@ export class StorageComponent {
   isAllStockOutChecked(): boolean {
     return this.stockOutRows.length > 0 && this.stockOutRows.every(row => row.checked);
   }
+
+
+  get selectedStockOutRow(): StockOutRow | null {
+    return this.stockOutRows.find(r => r.checked) || null;
+  }
+  
+  isStockOutRowDisabled(row: StockOutRow): boolean {
+    const selected = this.selectedStockOutRow;
+    return !!selected && selected.uid !== row.uid;
+  }
+  
+  onSelectSingleStockOut(row: StockOutRow, ev: Event) {
+    const checked = (ev.target as HTMLInputElement)?.checked === true;
+  
+    this.stockOutRows = this.stockOutRows.map(r => {
+      if (r.uid === row.uid) {
+        return { ...r, checked };
+      }
+      return { ...r, checked: false };
+    });
+  }
+
+
 
   slotsBy(zone: SlotRow['zone'], row: SlotRow['row']) {
     return this.slots.filter(s => s.zone === zone && s.row === row);
@@ -599,6 +624,12 @@ export class StorageComponent {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
+
+
+  private normalizeScanValue(v: any): string {
+    return (v || '').toString().trim().toUpperCase();
+  }
+
 
   confirmStockAction() {
     if (this.panelMode !== 'STOCK_IN') return;
@@ -1372,13 +1403,334 @@ export class StorageComponent {
 
 
 
-  toggleAllStockOutRows(ev: Event) {
-    const checked = (ev.target as HTMLInputElement)?.checked === true;
-    this.stockOutRows = this.stockOutRows.map(r => ({ ...r, checked }));
-  }
+  // toggleAllStockOutRows(ev: Event) {
+  //   const checked = (ev.target as HTMLInputElement)?.checked === true;
+  //   this.stockOutRows = this.stockOutRows.map(r => ({ ...r, checked }));
+  // }
   
+
+
+
+
+  
+  private submitStockOutByProduction(picked: StockOutRow) {
+    const body = {
+      jobId: this.selectedTransactionJob!.id,
+      incomingId: picked.incomingId,
+      userId: this.userId,
+      inchargeTime: new Date().toISOString()
+    };
+  
+    this.isSavingStock = true;
+  
+    this.http.post(config.apiServer + '/api/mc/stockOutByProduction', body).subscribe({
+      next: (res: any) => {
+        this.isSavingStock = false;
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Stock Out Success',
+          text: res?.message || 'ทำรายการ Stock Out สำเร็จ'
+        }).then(() => {
+          this.stockOutRows = [];
+          this.fetchStorageMap();
+          this.searchStockOutItem();
+        });
+      },
+      error: (err) => {
+        this.isSavingStock = false;
+  
+        Swal.fire({
+          icon: 'error',
+          title: 'Stock Out Fail',
+          text: err?.error?.message || err?.message || 'ทำรายการ Stock Out ไม่สำเร็จ'
+        });
+      }
+    });
+  }
+
+
+
+  private openIncomingJobScanModal(picked: StockOutRow) {
+    const expectedJobNo = this.normalizeScanValue(picked.jobNo);
+  
+    Swal.fire({
+      icon: 'question',
+      title: 'Scan Incoming Tag',
+      width: 760,
+      html: `
+        <style>
+          .swal2-popup .stock-panel {
+            padding: 8px 6px 0;
+            max-height: 65vh;
+            overflow-y: auto;
+          }
+  
+          .swal2-popup .stock-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+          }
+  
+          .swal2-popup .stock-row label {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0;
+          }
+  
+          .swal2-popup .stock-row input {
+            width: 100%;
+            min-width: 0;
+            height: 38px;
+            border: 1px solid #d0d7e2;
+            border-radius: 8px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            outline: none;
+          }
+  
+          .swal2-popup .stock-row input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+          }
+        </style>
+  
+        <div class="stock-panel">
+          <div style="text-align:left; margin-bottom:12px;">
+            กรุณาสแกนใบ <b>Material Incoming</b><br>
+            ระบบจะตรวจสอบเฉพาะ <b>Job No.</b> ว่าตรงกับรายการที่เลือกหรือไม่
+          </div>
+  
+          <div style="text-align:left; margin-bottom:12px;">
+            <b>Selected Incoming Job No:</b> ${this.escapeHtml(picked.jobNo || '-')}
+          </div>
+  
+          <div class="stock-row">
+            <label>Job No.</label>
+            <input
+              id="swal-scan-jobno"
+              type="text"
+              autocomplete="off"
+              placeholder="Scan Job No."
+            />
+          </div>
+  
+          <div class="stock-row">
+            <label>yearMonth</label>
+            <input id="swal-scan-yearMonth" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>recivedDate</label>
+            <input id="swal-scan-recivedDate" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>inspector</label>
+            <input id="swal-scan-inspector" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>UnloadBy</label>
+            <input id="swal-scan-unloadBy" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>invoiceOne</label>
+            <input id="swal-scan-invoiceOne" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>taxInvNo</label>
+            <input id="swal-scan-taxInvNo" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>materialNo</label>
+            <input id="swal-scan-itemNo" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>unitPrice</label>
+            <input id="swal-scan-unitPrice" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>qtyOfPalletPack</label>
+            <input id="swal-scan-qtyOfPalletPack" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>coil</label>
+            <input id="swal-scan-coil" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>qtyKgsPcs</label>
+            <input id="swal-scan-qtyKgsPcs" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>unit</label>
+            <input id="swal-scan-unit" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>kgsCoil</label>
+            <input id="swal-scan-kgsCoil" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>odCoil</label>
+            <input id="swal-scan-odCoil" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>remark</label>
+            <input id="swal-scan-remark" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>millSheet</label>
+            <input id="swal-scan-millSheet" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>Item Name.</label>
+            <input id="swal-scan-itemName" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>Spec/Dwg</label>
+            <input id="swal-scan-specDwg" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>Lot No.</label>
+            <input id="swal-scan-lotNo" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>packing</label>
+            <input id="swal-scan-quantity" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>rosh</label>
+            <input id="swal-scan-rosh" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>result</label>
+            <input id="swal-scan-result" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>supplier</label>
+            <input id="swal-scan-supplier" type="text" />
+          </div>
+  
+          <div class="stock-row">
+            <label>amount</label>
+            <input id="swal-scan-amount" type="text" />
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Verify',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2563eb',
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        if (!popup) return;
+  
+        const jobNoInput = popup.querySelector('#swal-scan-jobno') as HTMLInputElement | null;
+        if (!jobNoInput) return;
+  
+        setTimeout(() => {
+          jobNoInput.focus();
+          jobNoInput.select();
+        }, 0);
+  
+        jobNoInput.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') {
+            ev.preventDefault();
+            Swal.clickConfirm();
+          }
+        });
+      },
+      preConfirm: () => {
+        const popup = Swal.getPopup();
+        if (!popup) return false;
+  
+        const scannedJobNo = this.normalizeScanValue(
+          (popup.querySelector('#swal-scan-jobno') as HTMLInputElement | null)?.value || ''
+        );
+  
+        if (!scannedJobNo) {
+          Swal.showValidationMessage('กรุณาสแกน Job No. จากใบ Material Incoming');
+          return false;
+        }
+  
+        if (scannedJobNo !== expectedJobNo) {
+          Swal.showValidationMessage(
+            `Job No. ไม่ตรงกัน (scan: ${scannedJobNo} / expected: ${expectedJobNo})`
+          );
+          return false;
+        }
+  
+        return {
+          jobNo: scannedJobNo,
+          yearMonth: (popup.querySelector('#swal-scan-yearMonth') as HTMLInputElement | null)?.value || '',
+          recivedDate: (popup.querySelector('#swal-scan-recivedDate') as HTMLInputElement | null)?.value || '',
+          inspector: (popup.querySelector('#swal-scan-inspector') as HTMLInputElement | null)?.value || '',
+          unloadBy: (popup.querySelector('#swal-scan-unloadBy') as HTMLInputElement | null)?.value || '',
+          invoiceOne: (popup.querySelector('#swal-scan-invoiceOne') as HTMLInputElement | null)?.value || '',
+          taxInvNo: (popup.querySelector('#swal-scan-taxInvNo') as HTMLInputElement | null)?.value || '',
+          itemNo: (popup.querySelector('#swal-scan-itemNo') as HTMLInputElement | null)?.value || '',
+          unitPrice: (popup.querySelector('#swal-scan-unitPrice') as HTMLInputElement | null)?.value || '',
+          qtyOfPalletPack: (popup.querySelector('#swal-scan-qtyOfPalletPack') as HTMLInputElement | null)?.value || '',
+          coil: (popup.querySelector('#swal-scan-coil') as HTMLInputElement | null)?.value || '',
+          qtyKgsPcs: (popup.querySelector('#swal-scan-qtyKgsPcs') as HTMLInputElement | null)?.value || '',
+          unit: (popup.querySelector('#swal-scan-unit') as HTMLInputElement | null)?.value || '',
+          kgsCoil: (popup.querySelector('#swal-scan-kgsCoil') as HTMLInputElement | null)?.value || '',
+          odCoil: (popup.querySelector('#swal-scan-odCoil') as HTMLInputElement | null)?.value || '',
+          remark: (popup.querySelector('#swal-scan-remark') as HTMLInputElement | null)?.value || '',
+          millSheet: (popup.querySelector('#swal-scan-millSheet') as HTMLInputElement | null)?.value || '',
+          itemName: (popup.querySelector('#swal-scan-itemName') as HTMLInputElement | null)?.value || '',
+          specDwg: (popup.querySelector('#swal-scan-specDwg') as HTMLInputElement | null)?.value || '',
+          lotNo: (popup.querySelector('#swal-scan-lotNo') as HTMLInputElement | null)?.value || '',
+          quantity: (popup.querySelector('#swal-scan-quantity') as HTMLInputElement | null)?.value || '',
+          rosh: (popup.querySelector('#swal-scan-rosh') as HTMLInputElement | null)?.value || '',
+          result: (popup.querySelector('#swal-scan-result') as HTMLInputElement | null)?.value || '',
+          supplier: (popup.querySelector('#swal-scan-supplier') as HTMLInputElement | null)?.value || '',
+          amount: (popup.querySelector('#swal-scan-amount') as HTMLInputElement | null)?.value || ''
+        };
+      }
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+  
+      // ตอนนี้ check แค่ jobNo
+      // ส่วนค่าที่ scan field อื่น ๆ result.value มีครบ เผื่อจะเอาไปใช้ต่อ
+      this.submitStockOutByProduction(picked);
+    });
+  }
+
+
   confirmStockOut() {
     const selected = this.stockOutRows.filter(r => r.checked);
+  
+    if (!this.selectedTransactionJob?.id) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Job',
+        text: 'ไม่พบ Job ที่ส่งมาจากหน้า Transaction'
+      });
+      return;
+    }
   
     if (!this.stockOutRequestJobNo.trim()) {
       Swal.fire({
@@ -1389,40 +1741,40 @@ export class StorageComponent {
       return;
     }
   
-    if (!selected.length) {
+    if (selected.length !== 1) {
       Swal.fire({
         icon: 'warning',
-        title: 'No selection',
-        text: 'กรุณาเลือกรายการที่ต้องการ Stock Out'
+        title: 'Select one item only',
+        text: 'กรุณาเลือก Material Incoming ได้เพียง 1 รายการ'
       });
       return;
     }
   
-    const payload = {
-      requestJobNo: this.stockOutRequestJobNo,
-      materialNo: this.stockOutForm.itemNo,
-      materialName: this.stockOutForm.itemName,
-      materialSpec: this.stockOutForm.itemSpec,
-      rows: selected.map(r => ({
-        incomingId: r.incomingId,
-        storeId: r.storeId,
-        area: r.area,
-        qty: r.qty,
-        invoice: r.invoice,
-        stockNote: r.stockNote || r.remark || ''
-      }))
-    };
-  
-    console.log('CONFIRM STOCK OUT = ', payload);
+    const picked = selected[0];
   
     Swal.fire({
-      icon: 'success',
-      title: 'Check complete',
-      text: 'ข้อมูล Stock Out พร้อมใช้งานแล้ว ดู payload ใน console ได้เลย'
+      icon: 'question',
+      title: 'Confirm Stock Out',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div><b>Request Job No:</b> ${this.escapeHtml(this.stockOutRequestJobNo)}</div>
+          <div><b>Incoming Job No:</b> ${this.escapeHtml(picked.jobNo || '-')}</div>
+          <div><b>Material No:</b> ${this.escapeHtml(this.stockOutForm.itemNo || '-')}</div>
+          <div><b>Area:</b> ${this.escapeHtml(picked.area || '-')}</div>
+          <div><b>Invoice:</b> ${this.escapeHtml(picked.invoice || '-')}</div>
+          <div><b>Qty:</b> ${picked.qty || 0}</div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Next',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2563eb'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+  
+      this.openIncomingJobScanModal(picked);
     });
   }
-
-
 
 
 

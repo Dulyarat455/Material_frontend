@@ -137,6 +137,7 @@ export class JobTransactionComponent {
         fromTransaction: true,
         mode: 'STOCK_OUT',
         job: {
+          id: row.id,
           jobNo: row.jobNo,
           materialNo: row.materialNo,
           materialName: row.materialName,
