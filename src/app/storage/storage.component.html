@@ -714,7 +714,23 @@
                           <td class="text-center">{{ row.coil ?? '-' }}</td>
                           <td class="text-end">{{ row.qty | number }}</td>
                           <td>{{ row.unit || '-' }}</td>
-                          <td>{{ row.remark || '-' }}</td>
+
+                          @if (row.stockNote) {
+                            <td class="text-center">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                (click)="openRemarkSwal(row.stockNote)"
+                                [disabled]="!(row.stockNote || '').trim()"
+                              >
+                                Remark
+                              </button>
+                            </td>
+                          }
+                          @if(!row.stockNote){
+                              <td class="text-center"> - </td>
+                          }
+                          
                         </tr>
               
                         <tr *ngIf="!stockOutRows.length">
@@ -825,12 +841,26 @@
                           </td>
                           <td><b>{{ row.area }}</b></td>
                           <td>{{ row.receivedDate }}</td>
-                          <td>{{ row.itemNo }}</td>
+                          <td>{{ row.jobNo }}</td>
                           <td>{{ row.invoice }}</td>
                           <td class="text-center">{{ row.coil ?? '-' }}</td>
                           <td class="text-center">{{ row.qty | number }}</td>
                           <td>{{ row.unit || '-' }}</td>
-                          <td>{{ row.stockNote || '-' }}</td>
+                          @if (row.stockNote) {
+                            <td class="text-center">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                (click)="openRemarkSwal(row.stockNote)"
+                                [disabled]="!(row.stockNote || '').trim()"
+                              >
+                                Remark
+                              </button>
+                            </td>
+                          }
+                          @if (!row.stockNote) {
+                            <td class="text-center"> - </td>
+                          }
                         </tr>
 
                         <tr *ngIf="!moveRows.length">

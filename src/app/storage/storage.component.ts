@@ -72,6 +72,7 @@ type MoveRow = {
   sourceStoreCode: string;
   sourceInvNo: string;
 
+  jobNo: string;
   incomingId: number;
   storeId: number;
   stockNote?: string;
@@ -913,6 +914,33 @@ export class StorageComponent {
           <div><b>Material Name:</b> ${item.itemName || item.description || '-'}</div>
           <div><b>D/O NO:</b> ${item.invNo || '-'}</div>
           <div><b>ReceivedDate:</b> ${item.receivedAt || '-'}</div>
+           <div><b>Remark:</b> ${item.stockNote || '-'}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
+
+
+  openRemarkSwal(remark?: string) {
+    const text = (remark || '').toString().trim();
+  
+    Swal.fire({
+      title: 'Remark',
+      icon: 'info',
+      html: `
+        <div style="
+          text-align:left;
+          line-height:1.8;
+          white-space:pre-wrap;
+          word-break:break-word;
+          max-height:320px;
+          overflow:auto;
+          padding:4px 2px;
+        ">
+          ${this.escapeHtml(text || '-')}
         </div>
       `,
       confirmButtonText: 'Close',
@@ -961,7 +989,7 @@ export class StorageComponent {
             toArea: '',
 
             itemNo: m.materialNo || m.itemNo || '',
-            itemName: m.itemName || m.description || '',
+            itemName: m.itemName  || '',
             itemSpec: m.itemSpec || '',
             coil: m.coil != null ? Number(m.coil) : undefined,
             unit: m.uom || '',
@@ -969,6 +997,7 @@ export class StorageComponent {
             sourceStoreCode: slot.storeCode,
             sourceInvNo: m.invNo || '',
 
+            jobNo: m.jobNo || '',
             incomingId: Number(m.incomingId || 0),
             storeId: Number(slot.storeId || m.storeId || 0),
             stockNote: m.stockNote || ''
@@ -1000,6 +1029,7 @@ export class StorageComponent {
           sourceStoreCode: 'Pending',
           sourceInvNo: m.invNo || '',
 
+          jobNo: m.jobNo || '',
           incomingId: Number(m.incomingId || 0),
           storeId: Number(m.storeId || 0),
           stockNote: m.stockNote || ''
@@ -1096,7 +1126,7 @@ export class StorageComponent {
           storeId: row.storeId,
           userId: this.userId,
           storeCodeDestination: this.moveDestinationArea,
-          stockNote: row.stockNote || row.remark || ''
+          stockNote: row.stockNote ||  ''
         };
 
         return this.http.post(config.apiServer + '/api/mc/moveArea', body).toPromise();
