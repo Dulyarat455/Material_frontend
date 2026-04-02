@@ -147,6 +147,39 @@ type StockScanField =
   | 'supplier'
   | 'amount';
 
+
+  type ReturnStockField =
+  | 'jobNoIncoming'
+  | 'yearMonth'
+  | 'recivedDate'
+  | 'inspector'
+  | 'unloadBy'
+  | 'invoiceOne'
+  | 'taxInvNo'
+  | 'materialNoScan'
+  | 'unitPrice'
+  | 'qtyOfPalletPack'
+  | 'scannerCoil'
+  | 'scannerQtyKgsPcs'
+  | 'unit'
+  | 'kgsCoil'
+  | 'odCoil'
+  | 'remark'
+  | 'millSheet'
+  | 'itemNameScan'
+  | 'specDwg'
+  | 'lotNo'
+  | 'quantity'
+  | 'rosh'
+  | 'result'
+  | 'supplier'
+  | 'amount'
+  | 'coil'
+  | 'qtyKgsPcs';
+
+
+
+
 @Component({
   selector: 'app-storage',
   standalone: true,
@@ -187,8 +220,39 @@ export class StorageComponent {
   @ViewChild('scanSupplier') scanSupplier?: ElementRef<HTMLInputElement>;
   @ViewChild('scanAmount') scanAmount?: ElementRef<HTMLInputElement>;
 
+
+
+  //returnStockIn
+@ViewChild('returnScanJobNo') returnScanJobNo?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanYearMonth') returnScanYearMonth?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanRecivedDate') returnScanRecivedDate?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanInspector') returnScanInspector?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanUnloadBy') returnScanUnloadBy?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanInvoiceOne') returnScanInvoiceOne?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanTaxInvNo') returnScanTaxInvNo?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanItemNo') returnScanItemNo?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanUnitPrice') returnScanUnitPrice?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanQtyOfPalletPack') returnScanQtyOfPalletPack?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanScannerCoil') returnScanScannerCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanScannerQtyKgsPcs') returnScanScannerQtyKgsPcs?: ElementRef<HTMLInputElement>;
+@ViewChild('returnActualCoil') returnActualCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('returnActualQtyKgsPcs') returnActualQtyKgsPcs?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanUnit') returnScanUnit?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanKgsCoil') returnScanKgsCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanOdCoil') returnScanOdCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanRemark') returnScanRemark?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanMillSheet') returnScanMillSheet?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanItemName') returnScanItemName?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanSpecDwg') returnScanSpecDwg?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanLotNo') returnScanLotNo?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanQuantity') returnScanQuantity?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanRosh') returnScanRosh?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanResult') returnScanResult?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanSupplier') returnScanSupplier?: ElementRef<HTMLInputElement>;
+@ViewChild('returnScanAmount') returnScanAmount?: ElementRef<HTMLInputElement>;
+
   viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
-  panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' = 'TABLE';
+  panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'RETURN_STOCK_IN' = 'TABLE';
 
   stockForm = {
     jobNo: '',
@@ -223,6 +287,51 @@ export class StorageComponent {
     stockNote: '',
     rawScan: ''
   };
+
+  
+  //returnStockIn
+  returnStockForm = {
+      requestJobNo: '',
+      itemNo: '',
+      itemName: '',
+      itemSpec: '',
+    
+      // scanner fields
+      jobNoIncoming: '',
+      yearMonth: '',
+      recivedDate: '',
+      inspector: '',
+      unloadBy: '',
+      invoiceOne: '',
+      taxInvNo: '',
+      materialNoScan: '',
+      unitPrice: '',
+      qtyOfPalletPack: '',
+      scannerCoil: '',
+      scannerQtyKgsPcs: '',
+      unit: '',
+      kgsCoil: '',
+      odCoil: '',
+      remark: '',
+      millSheet: '',
+      itemNameScan: '',
+      specDwg: '',
+      lotNo: '',
+      quantity: '',
+      rosh: '',
+      result: '',
+      supplier: '',
+      amount: '',
+    
+      // return actual values
+      coil: '',
+      qtyKgsPcs: '',
+    
+      storageArea: '',
+      stockNote: ''
+  };
+
+
 
   moveSearchItemNo = '';
   moveRows: MoveRow[] = [];
@@ -263,7 +372,8 @@ export class StorageComponent {
     incomingId?: number | null;
   } | null = null;
 
-
+  // isReturnFromTransaction = false;
+  // returnJobInfo: TransactionNavJob | null = null;
 
 
 
@@ -306,7 +416,7 @@ export class StorageComponent {
   private applyTransactionState() {
     const navState = (history.state || {}) as {
       fromTransaction?: boolean;
-      mode?: 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'TABLE';
+      mode?: 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'TABLE' | 'RETURN_STOCK_IN';
       returnMode?: boolean;
       job?: TransactionNavJob;
     };
@@ -314,10 +424,8 @@ export class StorageComponent {
     if (!navState?.fromTransaction || !navState?.job) return;
   
     const job = navState.job;
-  
     this.panelMode = navState.mode || 'STOCK_OUT';
   
-    // ✅ เก็บ job ที่ส่งมาจาก transaction
     this.selectedTransactionJob = {
       id: Number(job.id || null),
       jobNo: job.jobNo || '',
@@ -327,29 +435,86 @@ export class StorageComponent {
       incomingId: job.incomingId ?? null
     };
   
-    // ✅ set ค่าให้ panel stock out แบบใหม่
-    this.stockOutRequestJobNo = job.jobNo || '';
-    this.stockOutSearchItemNo = job.materialNo || '';
-    this.stockOutForm = {
-      itemNo: job.materialNo || '',
-      itemName: job.materialName || '',
-      itemSpec: job.materialSpec || ''
-    };
+    if (this.panelMode === 'RETURN_STOCK_IN') {
+      this.returnStockForm = {
+        requestJobNo: job.jobNo || '',
+        itemNo: job.materialNo || '',
+        itemName: job.materialName || '',
+        itemSpec: job.materialSpec || '',
+    
+        jobNoIncoming: '',
+        yearMonth: '',
+        recivedDate: '',
+        inspector: '',
+        unloadBy: '',
+        invoiceOne: '',
+        taxInvNo: '',
+        materialNoScan: '',
+        unitPrice: '',
+        qtyOfPalletPack: '',
+        scannerCoil: '',
+        scannerQtyKgsPcs: '',
+        unit: '',
+        kgsCoil: '',
+        odCoil: '',
+        remark: '',
+        millSheet: '',
+        itemNameScan: '',
+        specDwg: '',
+        lotNo: '',
+        quantity: '',
+        rosh: '',
+        result: '',
+        supplier: '',
+        amount: '',
+    
+        coil: '',
+        qtyKgsPcs: '',
+    
+        storageArea: '',
+        stockNote: job.remark || ''
+      };
   
-    // ✅ clear list เดิมก่อน
-    this.stockOutRows = [];
+      Swal.fire({
+        icon: 'info',
+        title: 'Open Return Stock In',
+        text: `โหลดข้อมูล Return Job ${job.jobNo || '-'} เรียบร้อยแล้ว`,
+        timer: 1200,
+        showConfirmButton: false
+      });
   
-    Swal.fire({
-      icon: 'info',
-      title: 'Open Stock Out',
-      text: `โหลดข้อมูล Job ${job.jobNo || '-'} เรียบร้อยแล้ว`,
-      timer: 1200,
-      showConfirmButton: false
-    });
+      setTimeout(() => {
+        this.focusEl(this.returnScanJobNo);
+      }, 0);
   
-    // ✅ รอให้ fetchStorageMap โหลดข้อมูล slots มาก่อนค่อย search
-    setTimeout(() => this.searchStockOutItem(), 250);
+      return;
+    }
+  
+    if (this.panelMode === 'STOCK_OUT') {
+      this.stockOutRequestJobNo = job.jobNo || '';
+      this.stockOutSearchItemNo = job.materialNo || '';
+      this.stockOutForm = {
+        itemNo: job.materialNo || '',
+        itemName: job.materialName || '',
+        itemSpec: job.materialSpec || ''
+      };
+  
+      this.stockOutRows = [];
+  
+      Swal.fire({
+        icon: 'info',
+        title: 'Open Stock Out',
+        text: `โหลดข้อมูล Job ${job.jobNo || '-'} เรียบร้อยแล้ว`,
+        timer: 1200,
+        showConfirmButton: false
+      });
+
+       // ✅ รอให้ fetchStorageMap โหลดข้อมูล slots มาก่อนค่อย search
+      setTimeout(() => this.searchStockOutItem(), 250);
+    }
   }
+
+  
 
 
   searchStockOutItem() {
@@ -579,15 +744,136 @@ export class StorageComponent {
     }
   }
 
-  setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA') {
+
+  onReturnStockEnter(field: ReturnStockField, ev: any) {
+    if (ev?.key === 'Enter') ev.preventDefault();
+    if (this.panelMode !== 'RETURN_STOCK_IN') return;
+  
+    switch (field) {
+      case 'jobNoIncoming':
+        if (!this.returnStockForm.jobNoIncoming) return;
+        return this.focusEl(this.returnScanYearMonth);
+  
+      case 'yearMonth':
+        if (!this.returnStockForm.yearMonth) return;
+        return this.focusEl(this.returnScanRecivedDate);
+  
+      case 'recivedDate':
+        if (!this.returnStockForm.recivedDate) return;
+        return this.focusEl(this.returnScanInspector);
+  
+      case 'inspector':
+        if (!this.returnStockForm.inspector) return;
+        return this.focusEl(this.returnScanUnloadBy);
+  
+      case 'unloadBy':
+        if (!this.returnStockForm.unloadBy) return;
+        return this.focusEl(this.returnScanInvoiceOne);
+  
+      case 'invoiceOne':
+        if (!this.returnStockForm.invoiceOne) return;
+        return this.focusEl(this.returnScanTaxInvNo);
+  
+      case 'taxInvNo':
+        if (!this.returnStockForm.taxInvNo) return;
+        return this.focusEl(this.returnScanItemNo);
+  
+      case 'materialNoScan':
+        if (!this.returnStockForm.materialNoScan) return;
+        return this.focusEl(this.returnScanUnitPrice);
+  
+      case 'unitPrice':
+        if (!this.returnStockForm.unitPrice) return;
+        return this.focusEl(this.returnScanQtyOfPalletPack);
+  
+      case 'qtyOfPalletPack':
+        if (!this.returnStockForm.qtyOfPalletPack) return;
+        return this.focusEl(this.returnScanScannerCoil);
+  
+      case 'scannerCoil':
+        if (!this.returnStockForm.scannerCoil) return;
+        return this.focusEl(this.returnScanScannerQtyKgsPcs);
+  
+      case 'scannerQtyKgsPcs':
+        if (!this.returnStockForm.scannerQtyKgsPcs) return;
+        return this.focusEl(this.returnScanUnit);
+  
+      case 'unit':
+        if (!this.returnStockForm.unit) return;
+        return this.focusEl(this.returnScanKgsCoil);
+  
+      case 'kgsCoil':
+        if (!this.returnStockForm.kgsCoil) return;
+        return this.focusEl(this.returnScanOdCoil);
+  
+      case 'odCoil':
+        if (!this.returnStockForm.odCoil) return;
+        return this.focusEl(this.returnScanRemark);
+  
+      case 'remark':
+        if (!this.returnStockForm.remark) return;
+        return this.focusEl(this.returnScanMillSheet);
+  
+      case 'millSheet':
+        if (!this.returnStockForm.millSheet) return;
+        return this.focusEl(this.returnScanItemName);
+  
+      case 'itemNameScan':
+        if (!this.returnStockForm.itemNameScan) return;
+        return this.focusEl(this.returnScanSpecDwg);
+  
+      case 'specDwg':
+        if (!this.returnStockForm.specDwg) return;
+        return this.focusEl(this.returnScanLotNo);
+  
+      case 'lotNo':
+        if (!this.returnStockForm.lotNo) return;
+        return this.focusEl(this.returnScanQuantity);
+  
+      case 'quantity':
+        if (!this.returnStockForm.quantity) return;
+        return this.focusEl(this.returnScanRosh);
+  
+      case 'rosh':
+        if (!this.returnStockForm.rosh) return;
+        return this.focusEl(this.returnScanResult);
+  
+      case 'result':
+        if (!this.returnStockForm.result) return;
+        return this.focusEl(this.returnScanSupplier);
+  
+      case 'supplier':
+        if (!this.returnStockForm.supplier) return;
+        return this.focusEl(this.returnScanAmount);
+  
+      case 'amount':
+        if (!this.returnStockForm.amount) return;
+        return this.focusEl(this.returnActualCoil);
+  
+      case 'coil':
+        if (!this.returnStockForm.coil) return;
+        return this.focusEl(this.returnActualQtyKgsPcs);
+  
+      case 'qtyKgsPcs':
+        if (!this.returnStockForm.qtyKgsPcs) return;
+        return;
+    }
+  }
+
+
+
+
+  setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'RETURN_STOCK_IN') {
     this.panelMode = mode;
   
+    // ใช้กับ stock in เดิมเท่านั้น
     if (this.viewMode === 'PENDING') {
       this.stockForm.storageArea = 'Pending';
     } else {
       this.stockForm.storageArea = this.selectedSlot?.storeCode || '';
     }
   
+    // reset move area state
     if (mode !== 'MOVE_AREA') {
       this.moveRows = [];
       this.moveSearchItemNo = '';
@@ -605,7 +891,7 @@ export class StorageComponent {
       }
     }
   
-    // ✅ reset stock out state เมื่อไม่ได้อยู่โหมดนี้
+    // reset stock out state เมื่อไม่ได้อยู่โหมดนี้
     if (mode !== 'STOCK_OUT') {
       this.stockOutRequestJobNo = '';
       this.stockOutSearchItemNo = '';
@@ -615,13 +901,68 @@ export class StorageComponent {
         itemName: '',
         itemSpec: ''
       };
+    }
+  
+    // reset return stock in state เมื่อไม่ได้อยู่โหมดนี้
+    if (mode !== 'RETURN_STOCK_IN') {
+      this.returnStockForm = {
+        requestJobNo: '',
+        itemNo: '',
+        itemName: '',
+        itemSpec: '',
+    
+        jobNoIncoming: '',
+        yearMonth: '',
+        recivedDate: '',
+        inspector: '',
+        unloadBy: '',
+        invoiceOne: '',
+        taxInvNo: '',
+        materialNoScan: '',
+        unitPrice: '',
+        qtyOfPalletPack: '',
+        scannerCoil: '',
+        scannerQtyKgsPcs: '',
+        unit: '',
+        kgsCoil: '',
+        odCoil: '',
+        remark: '',
+        millSheet: '',
+        itemNameScan: '',
+        specDwg: '',
+        lotNo: '',
+        quantity: '',
+        rosh: '',
+        result: '',
+        supplier: '',
+        amount: '',
+    
+        coil: '',
+        qtyKgsPcs: '',
+    
+        storageArea: '',
+        stockNote: ''
+      };
+    }
+  
+    // selectedTransactionJob ให้ล้างเมื่อไม่ใช่ flow transaction
+    if (mode !== 'STOCK_OUT' && mode !== 'RETURN_STOCK_IN') {
       this.selectedTransactionJob = null;
     }
   
     if (mode === 'STOCK_IN') {
       setTimeout(() => this.focusScanFirst(), 0);
     }
+  
+    if (mode === 'RETURN_STOCK_IN') {
+      setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+    }
   }
+
+
+
+
+
 
   private escapeHtml(value: string) {
     return value
@@ -1473,8 +1814,20 @@ export class StorageComponent {
           text: res?.message || 'ทำรายการ Stock Out สำเร็จ'
         }).then(() => {
           this.stockOutRows = [];
-          this.fetchStorageMap();
-          this.searchStockOutItem();
+          
+          this.selectedTransactionJob = null;
+          this.stockOutRequestJobNo = '';
+          this.stockOutSearchItemNo = '';
+          this.stockOutForm = {
+            itemNo: '',
+            itemName: '',
+            itemSpec: ''
+          };
+          this.panelMode = 'TABLE';
+          
+          // this.fetchStorageMap();
+          // this.searchStockOutItem();
+          this.router.navigate(['/jobTransaction']);
         });
       },
       error: (err) => {
@@ -1818,10 +2171,187 @@ export class StorageComponent {
 
 
 
+  private submitReturnStockIn() {
+    if (this.isSavingStock) return;
+  
+    const store = this.storeMasters.find(x => x.name === this.returnStockForm.storageArea);
+  
+    // if (!this.selectedTransactionJob?.incomingId || !this.selectedTransactionJob?.id) {
+    //   Swal.fire({
+    //     icon: 'error',
+    //     title: 'Transaction data not found',
+    //     text: 'ไม่พบ incomingId หรือ jobId ของรายการ Return'
+    //   });
+    //   return;
+    // }
+  
+    if (!store?.id) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Storage Area',
+        text: 'กรุณาเลือก Storage Area'
+      });
+      return;
+    }
+  
+    const body = {
+      jobNoIncoming: this.returnStockForm.jobNoIncoming,
+      jobId: this.selectedTransactionJob?.id,
+      storeId: store.id,
+      userId: this.userId,
+      inchargeTime: new Date().toISOString(),
+      stockNote: this.returnStockForm.stockNote || '',
+      coil: this.returnStockForm.coil,
+      qty: this.returnStockForm.qtyKgsPcs
+    };
+  
+    this.isSavingStock = true;
+  
+    this.http.post(config.apiServer + '/api/mc/stockInByProduction', body).subscribe({
+      next: (res: any) => {
+        this.isSavingStock = false;
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Return Stock In Success',
+          text: res?.message || 'รับคืน Material สำเร็จ'
+        }).then(() => {
+          this.resetReturnStockForm();
+          this.fetchStorageMap();
+          this.panelMode = 'TABLE';
+        });
+      },
+      error: (err) => {
+        this.isSavingStock = false;
+  
+        Swal.fire({
+          icon: 'error',
+          title: 'Return Stock In Fail',
+          text: err?.error?.message || err?.message || 'รับคืน Material ไม่สำเร็จ'
+        });
+      }
+    });
+  }
+
+
+  confirmReturnStockAction() {
+    if (this.panelMode !== 'RETURN_STOCK_IN') return;
+  
+    const requiredFields = [
+      { key: 'requestJobNo', label: 'Request Job No.' },
+      { key: 'jobNoIncoming', label: 'Job No. Incoming' },
+      { key: 'coil', label: 'Coil' },
+      { key: 'qtyKgsPcs', label: 'Qty Kgs/Pcs' },
+      { key: 'storageArea', label: 'Storage Area' }
+    ];
+  
+    const missing = requiredFields
+      .filter(f => !(this.returnStockForm as any)[f.key]?.toString().trim())
+      .map(f => f.label);
+  
+    if (missing.length) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ข้อมูลยังไม่ครบ',
+        html: `
+          <div style="text-align:left">
+            กรุณาตรวจสอบข้อมูลต่อไปนี้:<br><br>
+            <b>${missing.join('<br>')}</b>
+          </div>
+        `
+      });
+      return;
+    }
+  
+    const store = this.storeMasters.find(x => x.name === this.returnStockForm.storageArea);
+  
+    const orderedPayload = {
+      jobNoIncoming: this.returnStockForm.jobNoIncoming,
+      jobId: this.selectedTransactionJob?.id ?? null,
+      requestJobNo: this.returnStockForm.requestJobNo,
+      itemNo: this.returnStockForm.itemNo,
+      itemName: this.returnStockForm.itemName,
+      itemSpec: this.returnStockForm.itemSpec,
+      coil: this.returnStockForm.coil,
+      qty: this.returnStockForm.qtyKgsPcs,
+      storageArea: this.returnStockForm.storageArea,
+      storeId: store?.id ?? null,
+      stockNote: this.returnStockForm.stockNote
+    };
+  
+    Swal.fire({
+      title: 'Confirm Return Stock In Data',
+      html: `
+        <div style="text-align:left; max-height:420px; overflow:auto;">
+          <pre style="
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-size:13px;
+            line-height:1.45;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:10px;
+            padding:12px;
+            color:#0f172a;
+          ">${this.escapeHtml(JSON.stringify(orderedPayload, null, 2))}</pre>
+        </div>
+      `,
+      width: '720px',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#2563eb'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.submitReturnStockIn();
+    });
+  }
 
 
 
-
+  resetReturnStockForm() {
+    this.returnStockForm = {
+      requestJobNo: this.selectedTransactionJob?.jobNo || '',
+      itemNo: this.selectedTransactionJob?.materialNo || '',
+      itemName: this.selectedTransactionJob?.materialName || '',
+      itemSpec: this.selectedTransactionJob?.materialSpec || '',
+  
+      // scanner fields
+      jobNoIncoming: '',
+      yearMonth: '',
+      recivedDate: '',
+      inspector: '',
+      unloadBy: '',
+      invoiceOne: '',
+      taxInvNo: '',
+      materialNoScan: '',
+      unitPrice: '',
+      qtyOfPalletPack: '',
+      scannerCoil: '',
+      scannerQtyKgsPcs: '',
+      unit: '',
+      kgsCoil: '',
+      odCoil: '',
+      remark: '',
+      millSheet: '',
+      itemNameScan: '',
+      specDwg: '',
+      lotNo: '',
+      quantity: '',
+      rosh: '',
+      result: '',
+      supplier: '',
+      amount: '',
+  
+      // return actual values
+      coil: '',
+      qtyKgsPcs: '',
+  
+      storageArea: '',
+      stockNote: ''
+    };
+  
+    setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+  }
 
 
 

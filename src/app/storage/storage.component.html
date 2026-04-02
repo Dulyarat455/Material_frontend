@@ -234,6 +234,7 @@
                     <span *ngIf="panelMode === 'STOCK_IN'">Stock In</span>
                     <span *ngIf="panelMode === 'STOCK_OUT'">Stock Out</span>
                     <span *ngIf="panelMode === 'MOVE_AREA'">Move Area</span>
+                    <span *ngIf="panelMode === 'RETURN_STOCK_IN'">Return Stock In</span>
                   </ng-template>
                 </div>
 
@@ -899,6 +900,351 @@
                   </div>
                 </div>
               </ng-container>
+
+
+
+
+
+
+              <ng-container *ngIf="panelMode === 'RETURN_STOCK_IN'">
+                <div class="stock-panel return-stock-panel">
+                  <div class="stock-row">
+                    <label>Request Job No</label>
+                    <input type="text" [(ngModel)]="returnStockForm.requestJobNo" disabled />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Material No</label>
+                    <input type="text" [(ngModel)]="returnStockForm.itemNo" disabled />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Material Name</label>
+                    <input type="text" [(ngModel)]="returnStockForm.itemName" disabled />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Material Spec</label>
+                    <input type="text" [(ngModel)]="returnStockForm.itemSpec" disabled />
+                  </div>
+                  
+
+                  <!-- scanner fields -->
+
+                  <div class="stock-row">
+                    <label>Job No.</label>
+                    <input
+                      #returnScanJobNo
+                      type="text"
+                      [(ngModel)]="returnStockForm.jobNoIncoming"
+                      (keydown.enter)="onReturnStockEnter('jobNoIncoming', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>yearMonth</label>
+                    <input
+                      #returnScanYearMonth
+                      type="text"
+                      [(ngModel)]="returnStockForm.yearMonth"
+                      (keydown.enter)="onReturnStockEnter('yearMonth', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>recivedDate</label>
+                    <input
+                      #returnScanRecivedDate
+                      type="text"
+                      [(ngModel)]="returnStockForm.recivedDate"
+                      (keydown.enter)="onReturnStockEnter('recivedDate', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>inspector</label>
+                    <input
+                      #returnScanInspector
+                      type="text"
+                      [(ngModel)]="returnStockForm.inspector"
+                      (keydown.enter)="onReturnStockEnter('inspector', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>UnloadBy</label>
+                    <input
+                      #returnScanUnloadBy
+                      type="text"
+                      [(ngModel)]="returnStockForm.unloadBy"
+                      (keydown.enter)="onReturnStockEnter('unloadBy', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>invoiceOne</label>
+                    <input
+                      #returnScanInvoiceOne
+                      type="text"
+                      [(ngModel)]="returnStockForm.invoiceOne"
+                      (keydown.enter)="onReturnStockEnter('invoiceOne', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>taxInvNo</label>
+                    <input
+                      #returnScanTaxInvNo
+                      type="text"
+                      [(ngModel)]="returnStockForm.taxInvNo"
+                      (keydown.enter)="onReturnStockEnter('taxInvNo', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>materialNo</label>
+                    <input
+                      #returnScanItemNo
+                      type="text"
+                      [(ngModel)]="returnStockForm.materialNoScan"
+                      (keydown.enter)="onReturnStockEnter('materialNoScan', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>unitPrice</label>
+                    <input
+                      #returnScanUnitPrice
+                      type="text"
+                      [(ngModel)]="returnStockForm.unitPrice"
+                      (keydown.enter)="onReturnStockEnter('unitPrice', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>qtyOfPalletPack</label>
+                    <input
+                      #returnScanQtyOfPalletPack
+                      type="text"
+                      [(ngModel)]="returnStockForm.qtyOfPalletPack"
+                      (keydown.enter)="onReturnStockEnter('qtyOfPalletPack', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>coil</label>
+                    <input
+                      #returnScanScannerCoil
+                      type="text"
+                      [(ngModel)]="returnStockForm.scannerCoil"
+                      (keydown.enter)="onReturnStockEnter('scannerCoil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>qtyKgsPcs</label>
+                    <input
+                      #returnScanScannerQtyKgsPcs
+                      type="text"
+                      [(ngModel)]="returnStockForm.scannerQtyKgsPcs"
+                      (keydown.enter)="onReturnStockEnter('scannerQtyKgsPcs', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>unit</label>
+                    <input
+                      #returnScanUnit
+                      type="text"
+                      [(ngModel)]="returnStockForm.unit"
+                      (keydown.enter)="onReturnStockEnter('unit', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>kgsCoil</label>
+                    <input
+                      #returnScanKgsCoil
+                      type="text"
+                      [(ngModel)]="returnStockForm.kgsCoil"
+                      (keydown.enter)="onReturnStockEnter('kgsCoil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>odCoil</label>
+                    <input
+                      #returnScanOdCoil
+                      type="text"
+                      [(ngModel)]="returnStockForm.odCoil"
+                      (keydown.enter)="onReturnStockEnter('odCoil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>remark</label>
+                    <input
+                      #returnScanRemark
+                      type="text"
+                      [(ngModel)]="returnStockForm.remark"
+                      (keydown.enter)="onReturnStockEnter('remark', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>millSheet</label>
+                    <input
+                      #returnScanMillSheet
+                      type="text"
+                      [(ngModel)]="returnStockForm.millSheet"
+                      (keydown.enter)="onReturnStockEnter('millSheet', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Item Name.</label>
+                    <input
+                      #returnScanItemName
+                      type="text"
+                      [(ngModel)]="returnStockForm.itemNameScan"
+                      (keydown.enter)="onReturnStockEnter('itemNameScan', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Spec/Dwg</label>
+                    <input
+                      #returnScanSpecDwg
+                      type="text"
+                      [(ngModel)]="returnStockForm.specDwg"
+                      (keydown.enter)="onReturnStockEnter('specDwg', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Lot No.</label>
+                    <input
+                      #returnScanLotNo
+                      type="text"
+                      [(ngModel)]="returnStockForm.lotNo"
+                      (keydown.enter)="onReturnStockEnter('lotNo', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>packing</label>
+                    <input
+                      #returnScanQuantity
+                      type="text"
+                      [(ngModel)]="returnStockForm.quantity"
+                      (keydown.enter)="onReturnStockEnter('quantity', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>rosh</label>
+                    <input
+                      #returnScanRosh
+                      type="text"
+                      [(ngModel)]="returnStockForm.rosh"
+                      (keydown.enter)="onReturnStockEnter('rosh', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>result</label>
+                    <input
+                      #returnScanResult
+                      type="text"
+                      [(ngModel)]="returnStockForm.result"
+                      (keydown.enter)="onReturnStockEnter('result', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>supplier</label>
+                    <input
+                      #returnScanSupplier
+                      type="text"
+                      [(ngModel)]="returnStockForm.supplier"
+                      (keydown.enter)="onReturnStockEnter('supplier', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>amount</label>
+                    <input
+                      #returnScanAmount
+                      type="text"
+                      [(ngModel)]="returnStockForm.amount"
+                      (keydown.enter)="onReturnStockEnter('amount', $event)"
+                    />
+                  </div>
+
+                  <!-- return actual values -->
+              
+                  <div class="stock-row">
+                    <label>Return Coil</label>
+                    <input
+                      #returnActualCoil
+                      type="number"
+                      min="0"
+                      [(ngModel)]="returnStockForm.coil"
+                      (keydown.enter)="onReturnStockEnter('coil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Return QtyKgsPcs</label>
+                    <input
+                      #returnActualQtyKgsPcs
+                      type="number"
+                      min="0"
+                      [(ngModel)]="returnStockForm.qtyKgsPcs"
+                      (keydown.enter)="onReturnStockEnter('qtyKgsPcs', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Storage Area</label>
+                    <div class="storage-area-box">
+                      <select
+                        class="storage-area-select"
+                        [(ngModel)]="returnStockForm.storageArea"
+                        name="returnStorageArea"
+                      >
+                        <option value="">Select area</option>
+                        <option *ngFor="let a of storeMasters" [value]="a.name">
+                          {{ a.name }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Stock Note</label>
+                    <textarea rows="3" [(ngModel)]="returnStockForm.stockNote"></textarea>
+                  </div>
+              
+                  <div class="stock-footer">
+                    <button class="btn-soft" type="button" (click)="resetReturnStockForm()">
+                      Clear
+                    </button>
+              
+                    <button
+                      class="btn-main"
+                      type="button"
+                      (click)="confirmReturnStockAction()"
+                      [disabled]="isSavingStock"
+                    >
+                      {{ isSavingStock ? 'Saving...' : 'Confirm Return Stock In' }}
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+
+              
             </div>
 
           </div>

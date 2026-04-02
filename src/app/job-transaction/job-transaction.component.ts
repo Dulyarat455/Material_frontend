@@ -152,9 +152,22 @@ export class JobTransactionComponent {
     this.router.navigate(['/storage'], {
       state: {
         fromTransaction: true,
-        mode: 'STOCK_OUT',
+        mode: 'RETURN_STOCK_IN',
         returnMode: true,
-        job: row
+        job: {
+          id: row.id,
+          jobNo: row.jobNo,
+          materialNo: row.materialNo,
+          materialName: row.materialName,
+          materialSpec: row.materialSpec,
+          incomingId: row.incomingId ?? null,
+          type: row.type,
+          mcNo: row.mcNo,
+          requestBy: row.requestBy,
+          remark: row.remark,
+          state: row.state,
+          priority: row.priority
+        }
       }
     });
   }
