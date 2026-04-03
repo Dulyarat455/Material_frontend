@@ -1,0 +1,139 @@
+<div class="material-page">
+    <div class="page-shell">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-header-icon">
+            <i class="fa fa-cubes"></i>
+          </div>
+  
+          <div class="page-header-text">
+            <div class="page-title">Material Master</div>
+            <div class="page-subtitle">Manage material master data and sync from PBASS</div>
+          </div>
+        </div>
+  
+        <div class="page-header-right">
+          <div class="stat-chip">
+            <span class="stat-label">Total</span>
+            <span class="stat-value">{{ filteredMaterials.length }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="toolbar-card">
+        <div class="toolbar-left">
+          <button
+            class="btn btn-primary action-btn"
+            type="button"
+            (click)="onClickAddMaterial()"
+          >
+            <i class="fa fa-plus me-2"></i>
+            Add Material
+          </button>
+  
+          <button
+            class="btn btn-success action-btn"
+            type="button"
+            [disabled]="isSyncing"
+            (click)="syncMaterialFromPbass()"
+          >
+            <i class="fa fa-rotate me-2" [class.spin]="isSyncing"></i>
+            {{ isSyncing ? 'Syncing...' : 'Sync PBASS' }}
+          </button>
+  
+          <button
+            class="btn btn-outline-secondary action-btn"
+            type="button"
+            [disabled]="isLoading"
+            (click)="fetchMaterialList()"
+          >
+            <i class="fa fa-refresh me-2"></i>
+            Refresh
+          </button>
+        </div>
+  
+        <div class="toolbar-right">
+          <div class="search-box">
+            <i class="fa fa-search search-icon"></i>
+            <input
+              type="text"
+              class="form-control search-input"
+              placeholder="Search material no / name / spec"
+              [(ngModel)]="searchText"
+              (input)="onSearchChange()"
+            />
+          </div>
+        </div>
+      </div>
+  
+      <div class="table-card">
+        <div class="table-head">
+          <div class="table-title">Material List</div>
+          <div class="table-subtitle">
+            แสดงข้อมูล Material Master จากฐานข้อมูลปัจจุบัน
+          </div>
+        </div>
+  
+        <div class="table-wrap">
+          <table class="table table-hover align-middle mb-0 material-table">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Index</th>
+                <th style="width: 220px;">Material No</th>
+                <th>Material Name</th>
+                <th style="width: 220px;">Spec</th>
+                <th style="width: 180px;">Created At</th>
+              </tr>
+            </thead>
+  
+            <tbody *ngIf="!isLoading">
+              <tr *ngFor="let row of filteredMaterials; let i = index; trackBy: trackByMaterial">
+                <td>
+                  <span class="index-badge">{{ i + 1 }}</span>
+                </td>
+  
+                <td>
+                  <div class="material-no">{{ row.materialNo || '-' }}</div>
+                </td>
+  
+                <td>
+                  <div class="material-name">{{ row.materialName || '-' }}</div>
+                </td>
+  
+                <td>
+                  <div class="material-spec">{{ row.materialSpec || '-' }}</div>
+                </td>
+  
+                <td>
+                  <div class="time-text">{{ formatDateTime(row.timeStamp) }}</div>
+                </td>
+              </tr>
+  
+              <tr *ngIf="!filteredMaterials.length">
+                <td colspan="5" class="empty-cell">
+                  <div class="empty-state">
+                    <i class="fa fa-inbox empty-icon"></i>
+                    <div class="empty-title">No material data found</div>
+                    <div class="empty-subtitle">
+                      ไม่พบข้อมูลที่ตรงกับคำค้น หรือยังไม่มีข้อมูลในระบบ
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+  
+            <tbody *ngIf="isLoading">
+              <tr>
+                <td colspan="5" class="loading-cell">
+                  <div class="loading-state">
+                    <i class="fa fa-spinner fa-spin me-2"></i>
+                    Loading material data...
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -5,6 +5,7 @@ import { StorageComponent } from './storage/storage.component';
 import { IssueComponent } from './issue/issue.component';
 import { ReturnComponent } from './return/return.component';
 import { JobTransactionComponent } from './job-transaction/job-transaction.component';
+import { MaterialComponent } from './material/material.component';
 
 export const routes: Routes = [
 
@@ -41,6 +42,13 @@ export const routes: Routes = [
     component: ReturnComponent,
   },
 
+
+
+  
+  {
+    path: 'material',
+    component: MaterialComponent,
+  },
 
  
 

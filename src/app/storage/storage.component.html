@@ -246,12 +246,6 @@
                     Stock In
                   </button>
 
-                  <button
-                    class="mode-btn"
-                    [class.active]="panelMode === 'STOCK_OUT'"
-                    (click)="setPanelMode('STOCK_OUT')">
-                    Stock Out
-                  </button>
 
                   <button
                     class="mode-btn"
@@ -658,6 +652,7 @@
                         [(ngModel)]="stockOutSearchItemNo"
                         placeholder="Search item no."
                         (keyup.enter)="searchStockOutItem()"
+                        readonly
                       />
                       <button type="button" class="btn-search" (click)="searchStockOutItem()">
                         Search

@@ -81,15 +81,15 @@
             </p>
           </a>
           <ul class="nav nav-treeview bg-dark bg-opacity-50 rounded mx-2 mt-1">
-            @if(level !== '') {
+          
             <li class="nav-item">
               <a
-                routerLink="/input-production"
+                routerLink="/material"
                 class="nav-link"
                 routerLinkActive="active"
               >
                 <i class="fas fa-boxes nav-icon"></i>
-                <p class="ms-2">Input Production</p>
+                <p class="ms-2">Material</p>
               </a>
             </li>
             <li class="nav-item">
@@ -103,57 +103,8 @@
                 <p class="ms-2">Move part</p>
               </a>
             </li>
-            <li class="nav-item">
-              <a
-                routerLink="/close-wos"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-clipboard-check nav-icon"></i>
-                <p class="ms-2">Close WOS</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/shipment"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-truck nav-icon"></i>
-                <p class="ms-2">Shipment</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/hold-by-wos"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-store-slash nav-icon"></i>
-                <p class="ms-2">Hold/Reject</p>
-              </a>
-            </li>
-            }
-            <li class="nav-item">
-              <a
-                routerLink="/inventory-report"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-warehouse nav-icon"></i>
-                <p class="ms-2">Inventory Report</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/machine-output"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-chart-bar nav-icon"></i>
-                <p class="ms-2">Production Output</p>
-              </a>
-            </li>
+           
+           
           </ul>
         </li>
 

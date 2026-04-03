@@ -1903,133 +1903,33 @@ export class StorageComponent {
   
           <div class="stock-row">
             <label>Job No.</label>
-            <input
-              id="swal-scan-jobno"
-              type="text"
-              autocomplete="off"
-              placeholder="Scan Job No."
-            />
+            <input id="swal-scan-jobno" type="text" autocomplete="off" placeholder="Scan Job No." />
           </div>
   
-          <div class="stock-row">
-            <label>yearMonth</label>
-            <input id="swal-scan-yearMonth" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>recivedDate</label>
-            <input id="swal-scan-recivedDate" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>inspector</label>
-            <input id="swal-scan-inspector" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>UnloadBy</label>
-            <input id="swal-scan-unloadBy" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>invoiceOne</label>
-            <input id="swal-scan-invoiceOne" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>taxInvNo</label>
-            <input id="swal-scan-taxInvNo" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>materialNo</label>
-            <input id="swal-scan-itemNo" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>unitPrice</label>
-            <input id="swal-scan-unitPrice" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>qtyOfPalletPack</label>
-            <input id="swal-scan-qtyOfPalletPack" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>coil</label>
-            <input id="swal-scan-coil" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>qtyKgsPcs</label>
-            <input id="swal-scan-qtyKgsPcs" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>unit</label>
-            <input id="swal-scan-unit" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>kgsCoil</label>
-            <input id="swal-scan-kgsCoil" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>odCoil</label>
-            <input id="swal-scan-odCoil" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>remark</label>
-            <input id="swal-scan-remark" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>millSheet</label>
-            <input id="swal-scan-millSheet" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>Item Name.</label>
-            <input id="swal-scan-itemName" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>Spec/Dwg</label>
-            <input id="swal-scan-specDwg" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>Lot No.</label>
-            <input id="swal-scan-lotNo" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>packing</label>
-            <input id="swal-scan-quantity" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>rosh</label>
-            <input id="swal-scan-rosh" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>result</label>
-            <input id="swal-scan-result" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>supplier</label>
-            <input id="swal-scan-supplier" type="text" />
-          </div>
-  
-          <div class="stock-row">
-            <label>amount</label>
-            <input id="swal-scan-amount" type="text" />
-          </div>
+          <div class="stock-row"><label>yearMonth</label><input id="swal-scan-yearMonth" type="text" /></div>
+          <div class="stock-row"><label>recivedDate</label><input id="swal-scan-recivedDate" type="text" /></div>
+          <div class="stock-row"><label>inspector</label><input id="swal-scan-inspector" type="text" /></div>
+          <div class="stock-row"><label>UnloadBy</label><input id="swal-scan-unloadBy" type="text" /></div>
+          <div class="stock-row"><label>invoiceOne</label><input id="swal-scan-invoiceOne" type="text" /></div>
+          <div class="stock-row"><label>taxInvNo</label><input id="swal-scan-taxInvNo" type="text" /></div>
+          <div class="stock-row"><label>materialNo</label><input id="swal-scan-itemNo" type="text" /></div>
+          <div class="stock-row"><label>unitPrice</label><input id="swal-scan-unitPrice" type="text" /></div>
+          <div class="stock-row"><label>qtyOfPalletPack</label><input id="swal-scan-qtyOfPalletPack" type="text" /></div>
+          <div class="stock-row"><label>coil</label><input id="swal-scan-coil" type="text" /></div>
+          <div class="stock-row"><label>qtyKgsPcs</label><input id="swal-scan-qtyKgsPcs" type="text" /></div>
+          <div class="stock-row"><label>unit</label><input id="swal-scan-unit" type="text" /></div>
+          <div class="stock-row"><label>kgsCoil</label><input id="swal-scan-kgsCoil" type="text" /></div>
+          <div class="stock-row"><label>odCoil</label><input id="swal-scan-odCoil" type="text" /></div>
+          <div class="stock-row"><label>remark</label><input id="swal-scan-remark" type="text" /></div>
+          <div class="stock-row"><label>millSheet</label><input id="swal-scan-millSheet" type="text" /></div>
+          <div class="stock-row"><label>Item Name.</label><input id="swal-scan-itemName" type="text" /></div>
+          <div class="stock-row"><label>Spec/Dwg</label><input id="swal-scan-specDwg" type="text" /></div>
+          <div class="stock-row"><label>Lot No.</label><input id="swal-scan-lotNo" type="text" /></div>
+          <div class="stock-row"><label>packing</label><input id="swal-scan-quantity" type="text" /></div>
+          <div class="stock-row"><label>rosh</label><input id="swal-scan-rosh" type="text" /></div>
+          <div class="stock-row"><label>result</label><input id="swal-scan-result" type="text" /></div>
+          <div class="stock-row"><label>supplier</label><input id="swal-scan-supplier" type="text" /></div>
+          <div class="stock-row"><label>amount</label><input id="swal-scan-amount" type="text" /></div>
         </div>
       `,
       showCancelButton: true,
@@ -2041,19 +1941,44 @@ export class StorageComponent {
         if (!popup) return;
   
         const jobNoInput = popup.querySelector('#swal-scan-jobno') as HTMLInputElement | null;
-        if (!jobNoInput) return;
+        const amountInput = popup.querySelector('#swal-scan-amount') as HTMLInputElement | null;
+        const confirmBtn = Swal.getConfirmButton();
   
-        setTimeout(() => {
-          jobNoInput.focus();
-          jobNoInput.select();
-        }, 0);
+        if (confirmBtn) {
+          confirmBtn.disabled = true;
+        }
   
-        jobNoInput.addEventListener('keydown', (ev) => {
-          if (ev.key === 'Enter') {
-            ev.preventDefault();
-            Swal.clickConfirm();
-          }
-        });
+        const toggleVerifyButton = () => {
+          if (!confirmBtn || !amountInput) return;
+          confirmBtn.disabled = !(amountInput.value || '').trim();
+        };
+  
+        if (jobNoInput) {
+          setTimeout(() => {
+            jobNoInput.focus();
+            jobNoInput.select();
+          }, 0);
+  
+          jobNoInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+              ev.preventDefault();
+            }
+          });
+        }
+  
+        if (amountInput) {
+          amountInput.addEventListener('input', toggleVerifyButton);
+          amountInput.addEventListener('change', toggleVerifyButton);
+          amountInput.addEventListener('keyup', toggleVerifyButton);
+  
+          amountInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+              ev.preventDefault();
+            }
+          });
+  
+          toggleVerifyButton();
+        }
       },
       preConfirm: () => {
         const popup = Swal.getPopup();
@@ -2063,6 +1988,13 @@ export class StorageComponent {
           (popup.querySelector('#swal-scan-jobno') as HTMLInputElement | null)?.value || ''
         );
   
+        const amount = (popup.querySelector('#swal-scan-amount') as HTMLInputElement | null)?.value || '';
+  
+        if (!amount.trim()) {
+          Swal.showValidationMessage('ข้อมูลยังไม่ครบ!');
+          return false;
+        }
+  
         if (!scannedJobNo) {
           Swal.showValidationMessage('กรุณาสแกน Job No. จากใบ Material Incoming');
           return false;
@@ -2070,7 +2002,7 @@ export class StorageComponent {
   
         if (scannedJobNo !== expectedJobNo) {
           Swal.showValidationMessage(
-            `Job No. ไม่ตรงกัน (scan: ${scannedJobNo} / expected: ${expectedJobNo})`
+            `Job No. ของ Material ไม่ตรงกัน (scan: ${scannedJobNo} / expected: ${expectedJobNo})`
           );
           return false;
         }
@@ -2100,14 +2032,11 @@ export class StorageComponent {
           rosh: (popup.querySelector('#swal-scan-rosh') as HTMLInputElement | null)?.value || '',
           result: (popup.querySelector('#swal-scan-result') as HTMLInputElement | null)?.value || '',
           supplier: (popup.querySelector('#swal-scan-supplier') as HTMLInputElement | null)?.value || '',
-          amount: (popup.querySelector('#swal-scan-amount') as HTMLInputElement | null)?.value || ''
+          amount
         };
       }
     }).then((result) => {
       if (!result.isConfirmed) return;
-  
-      // ตอนนี้ check แค่ jobNo
-      // ส่วนค่าที่ scan field อื่น ๆ result.value มีครบ เผื่อจะเอาไปใช้ต่อ
       this.submitStockOutByProduction(picked);
     });
   }
@@ -2155,7 +2084,10 @@ export class StorageComponent {
           <div><b>Material No:</b> ${this.escapeHtml(this.stockOutForm.itemNo || '-')}</div>
           <div><b>Area:</b> ${this.escapeHtml(picked.area || '-')}</div>
           <div><b>Invoice:</b> ${this.escapeHtml(picked.invoice || '-')}</div>
+           <div><b>Coil:</b> ${picked.coil || 0}</div>
           <div><b>Qty:</b> ${picked.qty || 0}</div>
+          <div><b>Unit:</b> ${picked.unit || '-'}</div>
+
         </div>
       `,
       showCancelButton: true,
@@ -2263,6 +2195,32 @@ export class StorageComponent {
       return;
     }
   
+    const expectedMaterialNo = (this.returnStockForm.itemNo || '').toString().trim().toUpperCase();
+    const scannedMaterialNo = (this.returnStockForm.materialNoScan || '').toString().trim().toUpperCase();
+  
+    if (!scannedMaterialNo) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Material No',
+        text: 'กรุณาสแกน Material No จากใบ Material Incoming'
+      });
+      return;
+    }
+  
+    if (scannedMaterialNo !== expectedMaterialNo) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Material No ไม่ตรงกัน',
+        html: `
+          <div style="text-align:left; line-height:1.8;">
+            <div><b>Expected:</b> ${this.escapeHtml(expectedMaterialNo || '-')}</div>
+            <div><b>Scanned:</b> ${this.escapeHtml(scannedMaterialNo || '-')}</div>
+          </div>
+        `
+      });
+      return;
+    }
+  
     const store = this.storeMasters.find(x => x.name === this.returnStockForm.storageArea);
   
     const orderedPayload = {
@@ -2270,6 +2228,7 @@ export class StorageComponent {
       jobId: this.selectedTransactionJob?.id ?? null,
       requestJobNo: this.returnStockForm.requestJobNo,
       itemNo: this.returnStockForm.itemNo,
+      scannedMaterialNo: this.returnStockForm.materialNoScan,
       itemName: this.returnStockForm.itemName,
       itemSpec: this.returnStockForm.itemSpec,
       coil: this.returnStockForm.coil,
