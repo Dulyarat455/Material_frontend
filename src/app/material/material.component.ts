@@ -10,6 +10,7 @@ type MaterialRow = {
   materialNo: string;
   materialName: string;
   materialSpec: string;
+  accountCode?: string;
   timeStamp?: string;
   status?: string;
 };
@@ -48,6 +49,7 @@ export class MaterialComponent implements OnInit {
           materialNo: item.materialNo || '',
           materialName: item.materialName || '',
           materialSpec: item.materialSpec || '',
+          accountCode: item.accountCode || '',
           timeStamp: item.timeStamp || '',
           status: item.status || ''
         }));
@@ -80,7 +82,9 @@ export class MaterialComponent implements OnInit {
       return (
         (row.materialNo || '').toLowerCase().includes(key) ||
         (row.materialName || '').toLowerCase().includes(key) ||
-        (row.materialSpec || '').toLowerCase().includes(key)
+        (row.materialSpec || '').toLowerCase().includes(key) ||
+        (row.accountCode || '').toLowerCase().includes(key) 
+
       );
     });
   }
@@ -99,12 +103,15 @@ export class MaterialComponent implements OnInit {
 
   syncMaterialFromPbass() {
     if (this.isSyncing) return;
-
+  
     Swal.fire({
       title: 'Sync Material ?',
       html: `
         <div style="text-align:left">
-          ระบบจะดึงข้อมูล Material จาก PBASS แล้วเพิ่มเฉพาะรายการที่ยังไม่มีในฐานข้อมูล
+          ระบบจะดึงข้อมูล Material จาก PBASS
+          <br>• ถ้ายังไม่มีในฐานข้อมูล จะทำการเพิ่มข้อมูล
+          <br>• ถ้า Material No เดิม แต่ชื่อหรือ Spec เปลี่ยน จะทำการอัปเดตข้อมูล
+          <br>• ถ้าซ้ำครบทั้ง 3 ค่า จะข้ามรายการนั้น
         </div>
       `,
       icon: 'question',
@@ -114,14 +121,14 @@ export class MaterialComponent implements OnInit {
       confirmButtonColor: '#2563eb'
     }).then((result) => {
       if (!result.isConfirmed) return;
-
+  
       this.isSyncing = true;
-
+  
       Swal.fire({
         title: 'Syncing Material...',
         html: `
           <div style="font-size:14px;color:#475569">
-            กรุณารอสักครู่ ระบบกำลังดึงข้อมูลและตรวจสอบรายการซ้ำ
+            กรุณารอสักครู่ ระบบกำลังดึงข้อมูล ตรวจสอบข้อมูลซ้ำ และอัปเดตฐานข้อมูล
           </div>
         `,
         allowOutsideClick: false,
@@ -131,77 +138,119 @@ export class MaterialComponent implements OnInit {
           Swal.showLoading();
         }
       });
-
+  
       this.http.get<any>(`${config.apiServer}/api/material/getMaterialByPbass`).subscribe({
         next: (res) => {
           this.isSyncing = false;
-
+  
           const totalFromApi = Number(res?.totalFromApi || 0);
           const validRows = Number(res?.validRows || 0);
           const createdCount = Number(res?.createdCount || 0);
+          const updatedCount = Number(res?.updatedCount || 0);
           const duplicateCount = Number(res?.duplicateCount || 0);
           const duplicateInPayloadCount = Number(res?.duplicateInPayloadCount || 0);
           const totalCreateChunks = Number(res?.totalCreateChunks || 0);
           const chunkSize = Number(res?.chunkSize || 0);
-
+  
           const duplicateItems = Array.isArray(res?.duplicateItems) ? res.duplicateItems : [];
           const duplicatePreview = duplicateItems.slice(0, 10);
-
+  
+          const updateItems = Array.isArray(res?.updateItems) ? res.updateItems : [];
+          const updatePreview = updateItems.slice(0, 10);
+  
           Swal.fire({
             icon: 'success',
             title: 'Sync Completed',
-            width: 760,
+            width: 900,
             html: `
               <div style="text-align:left">
                 <div style="display:grid;grid-template-columns:180px 1fr;gap:8px 12px;margin-bottom:14px">
                   <div><b>Total From API</b></div><div>${totalFromApi}</div>
                   <div><b>Valid Rows</b></div><div>${validRows}</div>
                   <div><b>Created</b></div><div style="color:#16a34a;font-weight:700">${createdCount}</div>
+                  <div><b>Updated</b></div><div style="color:#d97706;font-weight:700">${updatedCount}</div>
                   <div><b>Duplicate In DB</b></div><div style="color:#dc2626;font-weight:700">${duplicateCount}</div>
                   <div><b>Duplicate In Payload</b></div><div>${duplicateInPayloadCount}</div>
                   <div><b>Total Chunks</b></div><div>${totalCreateChunks}</div>
                   <div><b>Chunk Size</b></div><div>${chunkSize}</div>
                 </div>
-
+  
+                ${
+                  updatePreview.length
+                    ? `
+                      <div style="margin-top:12px">
+                        <div style="font-weight:700;margin-bottom:6px">ตัวอย่าง Material ที่ถูกอัปเดต</div>
+                        <div style="max-height:220px;overflow:auto;border:1px solid #e2e8f0;border-radius:10px">
+                          <table style="width:100%;border-collapse:collapse;font-size:13px">
+                            <thead style="background:#fff7ed">
+                              <tr>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material No</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Old Name</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">New Name</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Old Spec</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">New Spec</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              ${updatePreview.map((x: any) => `
+                                <tr>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialNo || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.oldMaterialName || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.newMaterialName || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.oldMaterialSpec || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.newMaterialSpec || '-'}</td>
+                                </tr>
+                              `).join('')}
+                            </tbody>
+                          </table>
+                        </div>
+                        ${
+                          updateItems.length > 10
+                            ? `<div style="margin-top:6px;color:#64748b;font-size:12px">แสดง 10 รายการแรกจากทั้งหมด ${updateItems.length} รายการ</div>`
+                            : ''
+                        }
+                      </div>
+                    `
+                    : ''
+                }
+  
                 ${
                   duplicatePreview.length
                     ? `
-                    <div style="margin-top:12px">
-                      <div style="font-weight:700;margin-bottom:6px">ตัวอย่าง Material ที่ซ้ำในฐานข้อมูล</div>
-                      <div style="max-height:220px;overflow:auto;border:1px solid #e2e8f0;border-radius:10px">
-                        <table style="width:100%;border-collapse:collapse;font-size:13px">
-                          <thead style="background:#f8fafc">
-                            <tr>
-                              <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material No</th>
-                              <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material Name</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            ${duplicatePreview
-                              .map(
-                                (x: any) => `
-                                  <tr>
-                                    <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialNo || '-'}</td>
-                                    <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialName || '-'}</td>
-                                  </tr>
-                                `
-                              )
-                              .join('')}
-                          </tbody>
-                        </table>
+                      <div style="margin-top:12px">
+                        <div style="font-weight:700;margin-bottom:6px">ตัวอย่าง Material ที่ซ้ำในฐานข้อมูล</div>
+                        <div style="max-height:220px;overflow:auto;border:1px solid #e2e8f0;border-radius:10px">
+                          <table style="width:100%;border-collapse:collapse;font-size:13px">
+                            <thead style="background:#f8fafc">
+                              <tr>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material No</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material Name</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Spec</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              ${duplicatePreview.map((x: any) => `
+                                <tr>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialNo || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialName || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialSpec || '-'}</td>
+                                </tr>
+                              `).join('')}
+                            </tbody>
+                          </table>
+                        </div>
+                        ${
+                          duplicateItems.length > 10
+                            ? `<div style="margin-top:6px;color:#64748b;font-size:12px">แสดง 10 รายการแรกจากทั้งหมด ${duplicateItems.length} รายการ</div>`
+                            : ''
+                        }
                       </div>
-                      ${
-                        duplicateItems.length > 10
-                          ? `<div style="margin-top:6px;color:#64748b;font-size:12px">แสดง 10 รายการแรกจากทั้งหมด ${duplicateItems.length} รายการ</div>`
-                          : ''
-                      }
-                    </div>
-                  `
+                    `
                     : `
-                    <div style="padding:10px 12px;background:#f8fafc;border-radius:10px;color:#475569">
-                      ไม่พบรายการซ้ำในฐานข้อมูล
-                    </div>
-                  `
+                      <div style="padding:10px 12px;background:#f8fafc;border-radius:10px;color:#475569">
+                        ไม่พบรายการซ้ำในฐานข้อมูล
+                      </div>
+                    `
                 }
               </div>
             `
@@ -211,7 +260,7 @@ export class MaterialComponent implements OnInit {
         },
         error: (err) => {
           this.isSyncing = false;
-
+  
           Swal.fire({
             icon: 'error',
             title: 'Sync Failed',

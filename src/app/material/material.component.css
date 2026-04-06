@@ -165,11 +165,17 @@
     width: 100%;
     overflow: auto;
     border-radius: 0 0 18px 18px;
+  
+    --head-h: 52px;
+    --row-h: 56px;
+    max-height: calc(var(--head-h) + (10 * var(--row-h)));
   }
   
   .material-table {
     min-width: 860px;
     margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
   }
   
   .material-table thead th {
@@ -191,6 +197,8 @@
     padding: 12px 14px;
     border-bottom: 1px solid #eef2f7;
     vertical-align: middle;
+    height: var(--row-h);
+
   }
   
   .material-table tbody tr:hover {
@@ -300,4 +308,36 @@
     .action-btn {
       width: 100%;
     }
+  }
+
+
+
+
+  /* ========================
+  Material Type
+  ======================== */
+
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    border: 1px solid transparent;
+  }
+  
+  .type-material {
+    background: rgba(245, 158, 11, 0.12);
+    color: #b45309;
+    border-color: rgba(245, 158, 11, 0.28);
+  }
+  
+  .type-chemical {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+    border-color: rgba(37, 99, 235, 0.28);
   }

@@ -82,6 +82,8 @@
                 <th style="width: 220px;">Material No</th>
                 <th>Material Name</th>
                 <th style="width: 220px;">Spec</th>
+                <th style="width: 140px;">Account Code</th>
+                <th style="width: 140px;">Type</th>
                 <th style="width: 180px;">Created At</th>
               </tr>
             </thead>
@@ -102,6 +104,18 @@
   
                 <td>
                   <div class="material-spec">{{ row.materialSpec || '-' }}</div>
+                </td>
+
+                <td>
+                  <div class="account-code">{{ row.accountCode || '-' }}</div>
+                </td>
+                <td>
+                    <div
+                    class="type-badge"
+                    [ngClass]="row.accountCode === '4520' ? 'type-material' : 'type-chemical'"
+                  >
+                    {{ row.accountCode === '4520' ? 'Material' : 'Chemical' }}
+                  </div>
                 </td>
   
                 <td>

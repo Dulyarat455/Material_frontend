@@ -987,6 +987,7 @@ export class StorageComponent {
       { key: 'itemNo', label: 'Material No' },
       { key: 'coil', label: 'Coil' },
       { key: 'qtyKgsPcs', label: 'Qty Kgs/Pcs' },
+      { key: 'unit', label: 'Unit' },
       { key: 'itemName', label: 'Item Name' },
       { key: 'specDwg', label: 'Spec/Dwg' },
       { key: 'lotNo', label: 'Lot No.' },
