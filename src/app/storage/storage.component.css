@@ -860,3 +860,134 @@
     cursor: not-allowed;
     opacity: 1;
   }
+
+
+
+
+
+
+
+
+  /* =====================
+  Area Chemical
+  ===================== */
+
+
+
+  .fp-right-stack {
+    --right-col-width: 156px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    justify-self: start;
+    align-self: start;
+    width: var(--right-col-width);
+  }
+  
+  .fp-right {
+    width: var(--right-col-width);
+    box-sizing: border-box;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 14px;
+    background: #fff;
+    padding: 6px;
+    justify-self: start;
+    align-self: start;
+  }
+  
+  .fp-right-head {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+    justify-content: flex-end;
+  }
+  
+  .fp-right-two-col {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    column-gap: 4px;
+    row-gap: 6px;
+    justify-content: start;
+    align-content: start;
+  }
+  
+  .chemical-area-card {
+    width: calc(var(--right-col-width) + 100px);
+    margin-left: -100px;
+    box-sizing: border-box;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 14px;
+    background: #fff;
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: 0.12s ease;
+    overflow: hidden;
+  }
+  
+  .chemical-area-card:hover {
+    box-shadow: 0 10px 18px rgba(15, 23, 42, 0.10);
+    transform: translateY(-1px);
+  }
+  
+  .chemical-area-card.is-selected {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  }
+  
+  .chemical-area-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .chemical-area-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  .chemical-dot {
+    background: #2563eb;
+  }
+  
+  .chemical-pill {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+  }
+  
+  .chemical-area-subtitle {
+    font-size: 11px;
+    color: #64748b;
+  }
+  
+  /* จอกลาง */
+  @media (max-width: 1200px) {
+    .chemical-area-card {
+      width: var(--right-col-width);
+      margin-left: 0;
+    }
+  }
+  
+  /* จอเล็ก */
+  @media (max-width: 768px) {
+    .fp-right-stack {
+      width: 100%;
+      --right-col-width: 100%;
+      align-items: stretch;
+    }
+  
+    .fp-right {
+      width: 100%;
+    }
+  
+    .fp-right-two-col {
+      justify-content: center;
+    }
+  
+    .chemical-area-card {
+      width: 100%;
+      margin-left: 0;
+    }
+  }

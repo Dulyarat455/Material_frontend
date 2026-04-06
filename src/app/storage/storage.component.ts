@@ -251,7 +251,7 @@ export class StorageComponent {
 @ViewChild('returnScanSupplier') returnScanSupplier?: ElementRef<HTMLInputElement>;
 @ViewChild('returnScanAmount') returnScanAmount?: ElementRef<HTMLInputElement>;
 
-  viewMode: 'NONE' | 'SLOT' | 'PENDING' = 'NONE';
+  viewMode: 'NONE' | 'SLOT' | 'PENDING' | 'CHEMICAL' = 'NONE';
   panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'RETURN_STOCK_IN' = 'TABLE';
 
   stockForm = {
@@ -381,6 +381,7 @@ export class StorageComponent {
 
   // ใช้ข้อมูลจริงจาก API
   pendingItems: MaterialItem[] = [];
+  chemicalItems: MaterialItem[] = [];
 
   // ใช้ API แทน mock
   slots: SlotRow[] = [];
@@ -398,6 +399,12 @@ export class StorageComponent {
   get pendingCount() {
     return this.pendingItems.length;
   }
+
+
+  get chemicalCount() {
+    return this.chemicalItems.length;
+  }
+  
 
   get rejectedCount() {
     return this.slots.filter(s => s.status === 'REJECTED').length;
@@ -567,6 +574,70 @@ export class StorageComponent {
         }
       });
     });
+
+
+
+
+    this.pendingItems.forEach((m, index) => {
+      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+  
+      if (materialNo === key) {
+        rows.push({
+          uid: `Pending_${m.incomingId || index}_${m.invNo}`,
+          checked: false,
+          area: 'Pending',
+          receivedDate: m.receivedAt || '',
+          jobNo: m.jobNo || '',
+          invoice: m.invNo || '',
+          qty: Number(m.qty || 0),
+          remark: m.remark || '',
+  
+          itemNo: m.materialNo || m.itemNo || '',
+          itemName: m.itemName || m.description || '',
+          itemSpec: m.itemSpec || '',
+          coil: m.coil != null ? Number(m.coil) : undefined,
+          unit: m.uom || '',
+  
+          incomingId: Number(m.incomingId || 0),
+          storeId: Number(m.storeId || 0),
+          sourceStoreCode: 'Pending',
+          stockNote: m.stockNote || ''
+        });
+      }
+    });
+  
+
+
+
+    this.chemicalItems.forEach((m, index) => {
+      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+  
+      if (materialNo === key) {
+        rows.push({
+          uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
+          checked: false,
+          area: 'Chemical',
+          receivedDate: m.receivedAt || '',
+          jobNo: m.jobNo || '',
+          invoice: m.invNo || '',
+          qty: Number(m.qty || 0),
+          remark: m.remark || '',
+  
+          itemNo: m.materialNo || m.itemNo || '',
+          itemName: m.itemName || m.description || '',
+          itemSpec: m.itemSpec || '',
+          coil: m.coil != null ? Number(m.coil) : undefined,
+          unit: m.uom || '',
+  
+          incomingId: Number(m.incomingId || 0),
+          storeId: Number(m.storeId || 0),
+          sourceStoreCode: 'Chemical',
+          stockNote: m.stockNote || ''
+        });
+      }
+    });
+
+
   
     this.stockOutRows = rows;
   
@@ -1186,7 +1257,9 @@ export class StorageComponent {
   onClickSlot(s: SlotRow) {
     this.viewMode = 'SLOT';
     this.selectedSlot = s;
+
     this.stockForm.storageArea = s.storeCode;
+    this.returnStockForm.storageArea = s.storeCode;
 
     switch (this.panelMode) {
       case 'MOVE_AREA':
@@ -1198,6 +1271,12 @@ export class StorageComponent {
         setTimeout(() => this.focusScanFirst(), 0);
         return;
 
+
+      case 'RETURN_STOCK_IN':
+        setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+      return;
+      
+
       case 'TABLE':
       default:
         return;
@@ -1207,7 +1286,9 @@ export class StorageComponent {
   onClickPendingArea() {
     this.viewMode = 'PENDING';
     this.selectedSlot = null;
+
     this.stockForm.storageArea = 'Pending';
+    this.returnStockForm.storageArea = 'Pending';
 
     if (this.panelMode === 'MOVE_AREA') {
       this.moveDestinationArea = 'Pending';
@@ -1217,7 +1298,39 @@ export class StorageComponent {
     if (this.panelMode === 'STOCK_IN' || this.panelMode === 'STOCK_OUT') {
       setTimeout(() => this.focusScanFirst(), 0);
     }
+
+    if (this.panelMode === 'RETURN_STOCK_IN') {
+      setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+    }
+
+
   }
+
+
+  onClickChemicalArea() {
+    this.viewMode = 'CHEMICAL';
+    this.selectedSlot = null;
+
+    this.stockForm.storageArea = 'Chemical';
+    this.returnStockForm.storageArea = 'Chemical';
+  
+    if (this.panelMode === 'MOVE_AREA') {
+      this.moveDestinationArea = 'Chemical';
+      return;
+    }
+  
+    if (this.panelMode === 'STOCK_IN' || this.panelMode === 'STOCK_OUT') {
+      setTimeout(() => this.focusScanFirst(), 0);
+    }
+
+    if (this.panelMode === 'RETURN_STOCK_IN') {
+      setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+    }
+
+  }
+
+
+
 
   onChangeMoveDestinationArea() {
     const area = (this.moveDestinationArea || '').trim();
@@ -1236,6 +1349,15 @@ export class StorageComponent {
       this.stockForm.storageArea = 'Pending';
       return;
     }
+
+
+    if (area === 'Chemical') {
+      this.viewMode = 'CHEMICAL';
+      this.selectedSlot = null;
+      this.stockForm.storageArea = 'Chemical';
+      return;
+    }
+
 
     const slot = this.slots.find(s => s.storeCode === area);
 
@@ -1378,6 +1500,41 @@ export class StorageComponent {
         });
       }
     });
+
+
+
+    this.chemicalItems.forEach((m, index) => {
+      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+  
+      if (materialNo === key) {
+        rows.push({
+          uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
+          checked: false,
+          area: 'Chemical',
+          receivedDate: m.receivedAt || '',
+          invoice: m.invNo || '',
+          qty: Number(m.qty || 0),
+          remark: m.remark || '',
+          toArea: '',
+  
+          itemNo: m.materialNo || m.itemNo || '',
+          itemName: m.itemName || m.description || '',
+          itemSpec: m.itemSpec || '',
+          coil: m.coil != null ? Number(m.coil) : undefined,
+          unit: m.uom || '',
+  
+          sourceStoreCode: 'Chemical',
+          sourceInvNo: m.invNo || '',
+  
+          jobNo: m.jobNo || '',
+          incomingId: Number(m.incomingId || 0),
+          storeId: Number(m.storeId || 0),
+          stockNote: m.stockNote || ''
+        });
+      }
+    });
+
+
 
     this.moveRows = rows;
 
@@ -1596,18 +1753,20 @@ export class StorageComponent {
     this.http.get(config.apiServer + '/api/mc/fetchIncomingAll').subscribe({
       next: (res: any) => {
         const rows = res?.results || [];
-
+  
         const normalSlots: SlotRow[] = [];
         const pendingMaterials: MaterialItem[] = [];
-
+        const chemicalMaterials: MaterialItem[] = [];
+  
         rows.forEach((r: any) => {
           const zone = String(r.zone || '').toUpperCase();
           const row = String(r.row || '').toUpperCase();
-
+          const storeCode = String(r.storeCode || r.name || '').trim();
+  
           const materials = (r.materials || []).map((m: any) => ({
             incomingId: Number(m.incomingId || m.id || 0),
             storeId: Number(r.storeId || r.id || 0),
-
+  
             jobNo: m.jobNo || '',
             materialNo: m.materialNo || m.matCode || '',
             description: m.description || '',
@@ -1622,38 +1781,61 @@ export class StorageComponent {
             itemSpec: m.itemSpec || '',
             remark: m.remark || '',
             stockNote: m.stockNote || '',
-
+  
             timestmp: m.timeStmp || '',
             userId: Number(m.userId || 0),
             userName: m.userName || '',
             userEmpNo: m.userEmpNo || ''
           }));
-
-          if (r.storeCode === 'Pending' || zone === 'PENDING' || row === 'PENDING') {
+  
+          const isPending =
+            storeCode.toUpperCase() === 'PENDING' ||
+            zone === 'PENDING' ||
+            row === 'PENDING';
+  
+          const isChemical =
+            storeCode.toUpperCase() === 'CHEMICAL' ||
+            zone === 'CHEMICAL' ||
+            row === 'CHEMICAL';
+  
+          if (isPending) {
             pendingMaterials.push(...materials);
-          } else {
-            normalSlots.push({
-              storeId: Number(r.storeId || r.id || 0),
-              storeCode: r.storeCode || r.name || '',
-              zone: zone as 'A' | 'B' | 'C' | 'D',
-              row: row as 'TOP' | 'BTM',
-              status: this.normalizeSlotStatus(r.status),
-              usedQty: Number(r.usedQty || 0),
-              materials
-            });
+            return;
           }
+  
+          if (isChemical) {
+            chemicalMaterials.push(...materials);
+            return;
+          }
+  
+          normalSlots.push({
+            storeId: Number(r.storeId || r.id || 0),
+            storeCode,
+            zone: zone as 'A' | 'B' | 'C' | 'D',
+            row: row as 'TOP' | 'BTM',
+            status: this.normalizeSlotStatus(r.status),
+            usedQty: Number(r.usedQty || 0),
+            materials
+          });
         });
-
+  
         this.slots = normalSlots;
         this.pendingItems = pendingMaterials;
-
+        this.chemicalItems = chemicalMaterials;
+  
         if (this.viewMode === 'PENDING') {
           this.stockForm.storageArea = 'Pending';
           this.selectedSlot = null;
+        } else if (this.viewMode === 'CHEMICAL') {
+          this.stockForm.storageArea = 'Chemical';
+          this.selectedSlot = null;
         } else if (this.selectedSlot?.storeCode) {
-          const freshSelected = this.slots.find(s => s.storeCode === this.selectedSlot?.storeCode);
+          const freshSelected = this.slots.find(
+            s => s.storeCode === this.selectedSlot?.storeCode
+          );
+  
           this.selectedSlot = freshSelected || null;
-
+  
           if (freshSelected) {
             this.stockForm.storageArea = freshSelected.storeCode;
           } else if (this.viewMode === 'SLOT') {
@@ -1681,41 +1863,70 @@ export class StorageComponent {
     return 'EMPTY';
   }
 
-  onChangeStorageArea() {
-    const area = (this.stockForm.storageArea || '').trim();
 
+  onChangeStorageArea() {
+    const area =
+      this.panelMode === 'RETURN_STOCK_IN'
+        ? (this.returnStockForm.storageArea || '').trim()
+        : (this.stockForm.storageArea || '').trim();
+  
     if (!area) {
       this.selectedSlot = null;
-
-      if (this.viewMode === 'SLOT' || this.viewMode === 'PENDING') {
+  
+      if (
+        this.viewMode === 'SLOT' ||
+        this.viewMode === 'PENDING' ||
+        this.viewMode === 'CHEMICAL'
+      ) {
         this.viewMode = 'NONE';
       }
       return;
     }
-
+  
     if (area === 'Pending') {
       this.viewMode = 'PENDING';
       this.selectedSlot = null;
-
+      this.stockForm.storageArea = 'Pending';
+      this.returnStockForm.storageArea = 'Pending';
+  
       if (this.panelMode === 'MOVE_AREA') {
         this.moveDestinationArea = 'Pending';
       }
       return;
     }
-
+  
+    if (area === 'Chemical') {
+      this.viewMode = 'CHEMICAL';
+      this.selectedSlot = null;
+      this.stockForm.storageArea = 'Chemical';
+      this.returnStockForm.storageArea = 'Chemical';
+  
+      if (this.panelMode === 'MOVE_AREA') {
+        this.moveDestinationArea = 'Chemical';
+      }
+      return;
+    }
+  
     const slot = this.slots.find(s => s.storeCode === area);
-
+  
     if (slot) {
       this.selectedSlot = slot;
       this.viewMode = 'SLOT';
-
+  
+      this.stockForm.storageArea = slot.storeCode;
+      this.returnStockForm.storageArea = slot.storeCode;
+  
       if (this.panelMode === 'MOVE_AREA') {
         this.moveDestinationArea = slot.storeCode;
       }
     } else {
       this.selectedSlot = null;
+      this.viewMode = 'NONE';
     }
   }
+
+
+
 
   // ******** stockIn ************
   submitStockIn() {
