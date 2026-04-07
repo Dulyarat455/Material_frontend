@@ -360,8 +360,11 @@ export class StorageComponent {
   stockOutForm = {
     itemNo: '',
     itemName: '',
-    itemSpec: ''
+    itemSpec: '',
+    mcRemark: ''
   };
+
+  stockOutDenial = false;
 
   selectedTransactionJob: {
     id: number;
@@ -503,7 +506,8 @@ export class StorageComponent {
       this.stockOutForm = {
         itemNo: job.materialNo || '',
         itemName: job.materialName || '',
-        itemSpec: job.materialSpec || ''
+        itemSpec: job.materialSpec || '',
+        mcRemark:''
       };
   
       this.stockOutRows = [];
@@ -531,7 +535,8 @@ export class StorageComponent {
     this.stockOutForm = {
       itemNo: '',
       itemName: '',
-      itemSpec: ''
+      itemSpec: '',
+      mcRemark: ''
     };
   
     if (!key) {
@@ -645,7 +650,8 @@ export class StorageComponent {
       this.stockOutForm = {
         itemNo: this.selectedTransactionJob?.materialNo || rows[0].itemNo,
         itemName: this.selectedTransactionJob?.materialName || rows[0].itemName,
-        itemSpec: this.selectedTransactionJob?.materialSpec || rows[0].itemSpec
+        itemSpec: this.selectedTransactionJob?.materialSpec || rows[0].itemSpec,
+        mcRemark: this.stockOutForm.mcRemark || ''
       };
       return;
     }
@@ -970,7 +976,8 @@ export class StorageComponent {
       this.stockOutForm = {
         itemNo: '',
         itemName: '',
-        itemSpec: ''
+        itemSpec: '',
+        mcRemark: ''
       };
     }
   
@@ -2006,12 +2013,17 @@ export class StorageComponent {
 
 
   
-  private submitStockOutByProduction(picked: StockOutRow) {
+  private submitStockOutByProduction(picked: StockOutRow, denial: boolean = false) {
+    // update value for push Denial button
+    this.stockOutDenial = denial;
+
     const body = {
       jobId: this.selectedTransactionJob!.id,
       incomingId: picked.incomingId,
       userId: this.userId,
-      inchargeTime: new Date().toISOString()
+      inchargeTime: new Date().toISOString(),
+      mcRemark: (this.stockOutForm.mcRemark || '').trim(),
+      denial: this.stockOutDenial
     };
   
     this.isSavingStock = true;
@@ -2033,7 +2045,8 @@ export class StorageComponent {
           this.stockOutForm = {
             itemNo: '',
             itemName: '',
-            itemSpec: ''
+            itemSpec: '',
+            mcRemark:  ''
           };
           this.panelMode = 'TABLE';
           
@@ -2056,7 +2069,7 @@ export class StorageComponent {
 
 
 
-  private openIncomingJobScanModal(picked: StockOutRow) {
+  private openIncomingJobScanModal(picked: StockOutRow, denial: boolean = false) {
     const expectedJobNo = this.normalizeScanValue(picked.jobNo);
   
     Swal.fire({
@@ -2249,13 +2262,15 @@ export class StorageComponent {
       }
     }).then((result) => {
       if (!result.isConfirmed) return;
-      this.submitStockOutByProduction(picked);
+      this.submitStockOutByProduction(picked, denial);
     });
   }
 
 
-  confirmStockOut() {
+  confirmStockOut(denial: boolean = false) {
     const selected = this.stockOutRows.filter(r => r.checked);
+
+    
   
     if (!this.selectedTransactionJob?.id) {
       Swal.fire({
@@ -2309,7 +2324,7 @@ export class StorageComponent {
     }).then((result) => {
       if (!result.isConfirmed) return;
   
-      this.openIncomingJobScanModal(picked);
+      this.openIncomingJobScanModal(picked, denial);
     });
   }
 
@@ -2520,6 +2535,8 @@ export class StorageComponent {
       storageArea: '',
       stockNote: ''
     };
+
+    
   
     setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
   }
