@@ -90,7 +90,16 @@
 
             <td>{{ row.dateTimePD }}</td>
             <td><span class="job-no">{{ row.jobNo }}</span></td>
-            <td><span class="type-pill type-issue">{{ row.type }}</span></td>
+            <td>
+              <span
+                class="type-pill kind-pill"
+                [ngClass]="row.accountCode === '4520' ? 'kind-material' : 'kind-chemical'"
+              >
+                {{ row.accountCode === '4520' ? 'Material' : 'Chemical' }}
+              </span>
+            </td>
+          
+
             <td><span class="material-no">{{ row.materialNo }}</span></td>
             <td>{{ row.materialName }}</td>
             <td>{{ row.materialSpec }}</td>
@@ -177,7 +186,14 @@
 
             <td>{{ row.dateTimePD }}</td>
             <td><span class="job-no">{{ row.jobNo }}</span></td>
-            <td><span class="type-pill type-return">{{ row.type }}</span></td>
+            <td>
+              <span
+                class="type-pill kind-pill"
+                [ngClass]="row.accountCode === '4520' ? 'kind-material' : 'kind-chemical'"
+              >
+                {{ row.accountCode === '4520' ? 'Material' : 'Chemical' }}
+              </span>
+            </td>
             <td><span class="material-no">{{ row.materialNo }}</span></td>
             <td>{{ row.materialName }}</td>
             <td>{{ row.materialSpec }}</td>

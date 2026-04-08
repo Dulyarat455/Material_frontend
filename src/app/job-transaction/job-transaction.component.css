@@ -483,3 +483,37 @@ remark button
   50%  { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
+
+
+
+/* 
+
+=============================
+type Material (accountCode )
+============================= */
+
+
+.kind-pill{
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+}
+
+/* Material = โทนส้ม */
+.kind-material{
+  background: linear-gradient(180deg, #fff1e7 0%, #ffe4d1 100%);
+  color: #9a3412;
+  border: 1px solid rgba(154, 52, 18, 0.18);
+}
+
+/* Chemical = โทนฟ้า */
+.kind-chemical{
+  background: linear-gradient(180deg, #e7f0ff 0%, #dbe7ff 100%);
+  color: #1d4ed8;
+  border: 1px solid rgba(29, 78, 216, 0.18);
+}

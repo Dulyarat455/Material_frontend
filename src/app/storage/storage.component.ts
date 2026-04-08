@@ -2013,21 +2013,37 @@ export class StorageComponent {
 
 
   
-  private submitStockOutByProduction(picked: StockOutRow, denial: boolean = false) {
+  private submitStockOutByProduction(picked?: StockOutRow, denial: boolean = false) {
     // update value for push Denial button
     this.stockOutDenial = denial;
 
-    const body = {
+    const body: any = {
       jobId: this.selectedTransactionJob!.id,
-      incomingId: picked.incomingId,
       userId: this.userId,
       inchargeTime: new Date().toISOString(),
       mcRemark: (this.stockOutForm.mcRemark || '').trim(),
       denial: this.stockOutDenial
     };
   
-    this.isSavingStock = true;
+    // ส่ง incomingId เฉพาะกรณี stock out ปกติ
+    if (!denial) {
+      if (!picked?.incomingId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Incoming',
+          text: 'ไม่พบ Incoming ที่เลือกสำหรับทำ Stock Out'
+        });
+        return;
+      }
   
+      body.incomingId = picked.incomingId;
+    }
+
+  
+    this.isSavingStock = true;
+
+    console.log("bodyStockOutByProduction = ", body);
+    
     this.http.post(config.apiServer + '/api/mc/stockOutByProduction', body).subscribe({
       next: (res: any) => {
         this.isSavingStock = false;
@@ -2065,6 +2081,7 @@ export class StorageComponent {
         });
       }
     });
+
   }
 
 
@@ -2267,11 +2284,53 @@ export class StorageComponent {
   }
 
 
-  confirmStockOut(denial: boolean = false) {
-    const selected = this.stockOutRows.filter(r => r.checked);
 
-    
+
+
+
+
+  private confirmStockOutDenial() {
+    if (!this.selectedTransactionJob) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Job',
+        text: 'ไม่พบข้อมูล Job สำหรับการ Denial'
+      });
+      return;
+    }
   
+    Swal.fire({
+      icon: 'warning',
+      title: 'Confirm Denial',
+      html: `
+        <div style="text-align:left; line-height:1.9;">
+          <div style="margin-bottom:10px;">
+            คุณต้องการ <b style="color:#dc2626;">Denial / ยกเลิก Job</b> นี้ใช่หรือไม่
+          </div>
+  
+          <div><b>Request Job No:</b> ${this.escapeHtml(this.selectedTransactionJob.jobNo || '-')}</div>
+          <div><b>Material No:</b> ${this.escapeHtml(this.selectedTransactionJob.materialNo || '-')}</div>
+          <div><b>Material Name:</b> ${this.escapeHtml(this.selectedTransactionJob.materialName || '-')}</div>
+          <div><b>Material Spec:</b> ${this.escapeHtml(this.selectedTransactionJob.materialSpec || '-')}</div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Confirm Denial',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+  
+      this.submitStockOutByProduction(undefined, true);
+    });
+  }
+
+
+
+
+
+
+  confirmStockOut(denial: boolean = false) {
     if (!this.selectedTransactionJob?.id) {
       Swal.fire({
         icon: 'warning',
@@ -2289,6 +2348,14 @@ export class StorageComponent {
       });
       return;
     }
+  
+    // กรณี Denial: ไม่ต้องเลือก incoming
+    if (denial) {
+      this.confirmStockOutDenial();
+      return;
+    }
+  
+    const selected = this.stockOutRows.filter(r => r.checked);
   
     if (selected.length !== 1) {
       Swal.fire({
@@ -2311,10 +2378,9 @@ export class StorageComponent {
           <div><b>Material No:</b> ${this.escapeHtml(this.stockOutForm.itemNo || '-')}</div>
           <div><b>Area:</b> ${this.escapeHtml(picked.area || '-')}</div>
           <div><b>Invoice:</b> ${this.escapeHtml(picked.invoice || '-')}</div>
-           <div><b>Coil:</b> ${picked.coil || 0}</div>
+          <div><b>Coil:</b> ${picked.coil || 0}</div>
           <div><b>Qty:</b> ${picked.qty || 0}</div>
           <div><b>Unit:</b> ${picked.unit || '-'}</div>
-
         </div>
       `,
       showCancelButton: true,
@@ -2324,7 +2390,7 @@ export class StorageComponent {
     }).then((result) => {
       if (!result.isConfirmed) return;
   
-      this.openIncomingJobScanModal(picked, denial);
+      this.openIncomingJobScanModal(picked, false);
     });
   }
 

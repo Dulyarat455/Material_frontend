@@ -19,6 +19,7 @@ type JobRow = {
   mcNo: string;
   requestBy: string;
   remark?: string;
+  accountCode?: string;
   state?: string;
   priority?: 'Normal' | 'Urgent';
 };
@@ -126,6 +127,7 @@ export class JobTransactionComponent {
       mcNo: r?.areaName || '-',
       requestBy,
       remark: r?.remark || '',
+      accountCode: r?.accountCode || '',
       state: r?.state || '',
       priority
     };

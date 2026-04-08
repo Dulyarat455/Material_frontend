@@ -165,13 +165,22 @@
                 </span>
               </div>
                     
-              @if (r.priority === 'Urgent') {
+              
                 <div class="req-top-right">
-                  <div class="priority-pill" [class.urgent]="r.priority === 'Urgent'">
-                    {{ r.priority }}
-                  </div>
+                  @if (r.accountCode === "4520") {
+                     <div class="req-material">Material</div>
+                  }
+                  @if(r.accountCode !== "4520"){
+                    <div class="req-material">Chemical</div>
+                  }
+                      @if (r.priority === 'Urgent') {
+                        <div class="priority-pill" [class.urgent]="r.priority === 'Urgent'">
+                          {{ r.priority }}
+                        </div>
+                      }
+
                 </div>
-              }
+             
             </div>
 
             <div class="req-grid compact-row">
@@ -202,15 +211,29 @@
 
 
 
+              <div class="remark-actions">
                 <button
-                *ngIf="r.remark?.trim()"
-                type="button"
-                class="btn-remark"
-                (click)="showRemark(r)"
-                title="View remark"
-              >
-                <i class="fas fa-comment-dots"></i>
-              </button>
+                  *ngIf="r.remark?.trim()"
+                  type="button"
+                  class="btn-remark"
+                  (click)="showRemark(r)"
+                  title="Production remark"
+                >
+                  <i class="fas fa-comment-dots"></i>
+                </button>
+              
+                <button
+                  *ngIf="r.remarkMC?.trim()"
+                  type="button"
+                  class="btn-remark-mc ms-auto"
+                  (click)="showRemarkMC(r)"
+                  title="MC remark"
+                >
+                  <i class="fas fa-clipboard-check"></i>
+                </button>
+              </div>
+
+
 
             </div>
 

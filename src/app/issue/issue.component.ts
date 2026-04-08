@@ -18,7 +18,9 @@ type IssueRequestRow = {
   requestAt: string;
   status: 'Waiting' | 'Complete' | 'Denial';
   fifoHint?: string;
+  accountCode?: string;
   remark?: string;
+  remarkMC?: string;
 };
 
 type MaterialRow = {
@@ -313,7 +315,9 @@ export class IssueComponent {
             requestAt: this.formatDateTime(r?.requestTime),
             status,
             fifoHint: r?.jobNo ? `JOB#${r.jobNo}` : undefined,
-            remark: r?.remark || ''
+            remark: r?.remark || '',
+            remarkMC:r?.remarkMC || '',
+            accountCode:r?.accountCode || ''
           };
         });
 
@@ -413,4 +417,41 @@ export class IssueComponent {
       confirmButtonColor: '#2563eb'
     });
   }
+
+
+
+
+
+  showRemarkMC(row: IssueRequestRow) {
+    const remarkText = (row.remarkMC || '').trim();
+  
+    if (!remarkText) return;
+  
+    Swal.fire({
+      icon: 'success',
+      title: 'MC Acknowledge',
+      html: `
+        <div style="text-align:left; line-height:1.7;">
+         
+  
+          <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
+          <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
+  
+          <div style="
+            padding:12px;
+            border-radius:12px;
+             background:#f8fafc;
+            border:1px solid #e2e8f0;
+             color:#0f172a;
+            white-space:pre-wrap;
+            word-break:break-word;
+            box-shadow: inset 0 1px 0 rgba(123, 192, 235, 0.65);
+          ">${remarkText}</div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
 }

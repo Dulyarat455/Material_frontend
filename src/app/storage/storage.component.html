@@ -332,9 +332,7 @@
                             <button (click)="openMaterialDetailSwal(p)"> Detail </button>
                           </td>
                           <td class="text-center">
-                            <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(p)">
-                              Store
-                            </button>
+                            <button>out</button>
                           </td>
                         </tr>
 
@@ -357,9 +355,7 @@
                             <button (click)="openMaterialDetailSwal(c)">Detail</button>
                           </td>
                           <td class="text-center">
-                            <button class="btn btn-sm btn-primary" (click)="openQuickStoreSwal(c)">
-                              Store
-                            </button>
+                            <button>out</button>
                           </td>
                         </tr>
                     
@@ -800,17 +796,39 @@
                     </table>
                   </div>
 
-                 
-              
-                  <div class="panel-footer mt-3">
-                    <button
-                    class="btn btn-primary"
-                    (click)="confirmStockOut()"
-                    [disabled]="isSavingStock"
-                  >
-                    {{ isSavingStock ? 'Saving...' : 'Confirm Stock Out' }}
-                  </button>
+                  <div class="move-search-row mt-3">
+                    <label>MC Remark</label>
+                    <div class="move-search-group">
+                      <textarea
+                        rows="2"
+                        [(ngModel)]="stockOutForm.mcRemark"
+                        placeholder="กรอกหมายเหตุของ MC..."
+                        class="mc-remark-textarea"
+                      ></textarea>
+                    </div>
                   </div>
+
+
+
+                  <div class="panel-footer mt-3 d-flex align-items-center">
+                    <button
+                      class="btn btn-primary"
+                      (click)="confirmStockOut(false)"
+                      [disabled]="isSavingStock"
+                    >
+                      {{ isSavingStock ? 'Saving...' : 'Confirm Stock Out' }}
+                    </button>
+                  
+                    <button
+                      type="button"
+                      class="btn btn-danger ms-auto"
+                      (click)="confirmStockOut(true)"
+                      [disabled]="isSavingStock"
+                    >
+                      {{ isSavingStock ? 'Saving...' : 'Denial' }}
+                    </button>
+                  </div>
+
                 </div>
               </ng-container>
 
