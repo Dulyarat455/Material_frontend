@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import config from '../../config';
 
 type storeMasterRow = {
-  id: number;
+  id: number | null;
   name: string;
 };
 
@@ -328,7 +328,8 @@ export class StorageComponent {
       qtyKgsPcs: '',
     
       storageArea: '',
-      stockNote: ''
+      stockNote: '',
+      mcRemark: ''
   };
 
 
@@ -482,7 +483,8 @@ export class StorageComponent {
         qtyKgsPcs: '',
     
         storageArea: '',
-        stockNote: job.remark || ''
+        stockNote: '',
+        mcRemark: ''
       };
   
       Swal.fire({
@@ -1019,7 +1021,8 @@ export class StorageComponent {
         qtyKgsPcs: '',
     
         storageArea: '',
-        stockNote: ''
+        stockNote: '',
+        mcRemark: ''
       };
     }
   
@@ -1670,72 +1673,8 @@ export class StorageComponent {
     });
   }
 
-  // pending area ยังเป็น mock อยู่ ใช้ย้ายของจาก pending เข้า slot ชั่วคราว
-  // assignPendingToSlot(p: MaterialItem, slot: SlotRow) {
-  //   if (!slot) return;
-
-  //   if (slot.status === 'REJECTED') {
-  //     Swal.fire({
-  //       icon: 'warning',
-  //       title: 'Slot rejected',
-  //       text: 'ช่องนี้ถูก Reject ไม่สามารถจัดเก็บได้'
-  //     });
-  //     return;
-  //   }
-
-  //   this.pendingItems = this.pendingItems.filter(x => x !== p);
-
-  //   slot.materials = [...(slot.materials || []), { ...p }];
-  //   slot.usedQty = (slot.usedQty || 0) + p.qty;
-  //   slot.status = slot.usedQty > 0 ? 'OCCUPIED' : 'EMPTY';
-
-  //   this.selectedSlot = slot;
-  //   this.viewMode = 'SLOT';
-
-  //   if (this.panelMode !== 'TABLE' && this.panelMode !== 'MOVE_AREA') {
-  //     this.stockForm.storageArea = slot.storeCode;
-  //   }
-
-  //   Swal.fire({
-  //     icon: 'success',
-  //     title: 'Stored',
-  //     text: `จัดเก็บ ${p.matCode} เข้าช่อง ${slot.storeCode} แล้ว`,
-  //     timer: 900,
-  //     showConfirmButton: false
-  //   });
-  // }
-
-  // pending area ยังเป็น mock อยู่
-  openQuickStoreSwal(p: MaterialItem) {
-  //   const empty = this.slots.find(s => s.status === 'EMPTY');
-  //   if (!empty) {
-  //     Swal.fire({
-  //       icon: 'info',
-  //       title: 'No empty slot',
-  //       text: 'ไม่มีช่องว่างในระบบตอนนี้'
-  //     });
-  //     return;
-  //   }
-
-  //   Swal.fire({
-  //     title: 'Store material',
-  //     icon: 'question',
-  //     html: `<div style="text-align:left">
-  //       <div><b>Material:</b> ${p.matCode}</div>
-  //       <div><b>Qty:</b> ${p.qty} ${p.uom}</div>
-  //       <div><b>Suggested Slot:</b> ${empty.storeCode}</div>
-  //       <div style="color:#64748b; font-size:12px; margin-top:8px;">กด Confirm เพื่อย้ายจาก Pending → Slot</div>
-  //     </div>`,
-  //     showCancelButton: true,
-  //     confirmButtonText: 'Confirm',
-  //     cancelButtonText: 'Cancel',
-  //     confirmButtonColor: '#2563eb',
-  //   }).then(r => {
-  //     if (!r.isConfirmed) return;
-  //     this.assignPendingToSlot(p, empty);
-  //   });
-  }
-
+  
+  
   // โหลด dropdown storage area
   fetchStoreMaster() {
     this.http.get(config.apiServer + '/api/storeMaster/list').subscribe({
@@ -2328,6 +2267,45 @@ export class StorageComponent {
 
 
 
+  private confirmReturnStockIn() {
+    if (!this.selectedTransactionJob) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Job',
+        text: 'ไม่พบข้อมูล Job สำหรับการ Denial'
+      });
+      return;
+    }
+  
+    Swal.fire({
+      icon: 'warning',
+      title: 'Confirm Denial',
+      html: `
+        <div style="text-align:left; line-height:1.9;">
+          <div style="margin-bottom:10px;">
+            คุณต้องการ <b style="color:#dc2626;">Denial / ยกเลิก Job</b> นี้ใช่หรือไม่
+          </div>
+  
+          <div><b>Request Job No:</b> ${this.escapeHtml(this.selectedTransactionJob.jobNo || '-')}</div>
+          <div><b>Material No:</b> ${this.escapeHtml(this.selectedTransactionJob.materialNo || '-')}</div>
+          <div><b>Material Name:</b> ${this.escapeHtml(this.selectedTransactionJob.materialName || '-')}</div>
+          <div><b>Material Spec:</b> ${this.escapeHtml(this.selectedTransactionJob.materialSpec || '-')}</div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Confirm Denial',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+  
+      this.submitReturnStockIn(true);
+    });
+  }
+
+
+
+
 
 
   confirmStockOut(denial: boolean = false) {
@@ -2396,29 +2374,28 @@ export class StorageComponent {
 
 
 
-  private submitReturnStockIn() {
+  private submitReturnStockIn(denial: boolean = false) {
     if (this.isSavingStock) return;
-  
-    const store = this.storeMasters.find(x => x.name === this.returnStockForm.storageArea);
-  
-    // if (!this.selectedTransactionJob?.incomingId || !this.selectedTransactionJob?.id) {
-    //   Swal.fire({
-    //     icon: 'error',
-    //     title: 'Transaction data not found',
-    //     text: 'ไม่พบ incomingId หรือ jobId ของรายการ Return'
-    //   });
-    //   return;
-    // }
-  
-    if (!store?.id) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Missing Storage Area',
-        text: 'กรุณาเลือก Storage Area'
-      });
-      return;
+    
+    let store: storeMasterRow = {
+      id: null,
+      name: ''
+    };
+    if (!denial) {
+       store = this.storeMasters.find(x => x.name === this.returnStockForm.storageArea) || { id: null, name: '' }; ;
+    
+      if (!store?.id) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Storage Area',
+          text: 'กรุณาเลือก Storage Area'
+        });
+        return;
+      }
+
     }
-  
+
+    
     const body = {
       jobNoIncoming: this.returnStockForm.jobNoIncoming,
       jobId: this.selectedTransactionJob?.id,
@@ -2427,8 +2404,14 @@ export class StorageComponent {
       inchargeTime: new Date().toISOString(),
       stockNote: this.returnStockForm.stockNote || '',
       coil: this.returnStockForm.coil,
-      qty: this.returnStockForm.qtyKgsPcs
+      qty: this.returnStockForm.qtyKgsPcs,
+      mcRemark: this.returnStockForm.mcRemark,
+      denial: denial
     };
+
+
+    
+
   
     this.isSavingStock = true;
   
@@ -2459,8 +2442,14 @@ export class StorageComponent {
   }
 
 
-  confirmReturnStockAction() {
+  confirmReturnStockAction(denial: boolean = false) {
     if (this.panelMode !== 'RETURN_STOCK_IN') return;
+
+
+    if(denial){
+      this.confirmReturnStockIn()
+      return;
+    }
   
     const requiredFields = [
       { key: 'requestJobNo', label: 'Request Job No.' },
@@ -2554,7 +2543,7 @@ export class StorageComponent {
       confirmButtonColor: '#2563eb'
     }).then((result) => {
       if (!result.isConfirmed) return;
-      this.submitReturnStockIn();
+      this.submitReturnStockIn(false);
     });
   }
 
@@ -2599,7 +2588,8 @@ export class StorageComponent {
       qtyKgsPcs: '',
   
       storageArea: '',
-      stockNote: ''
+      stockNote: '',
+      mcRemark: ''
     };
 
     

@@ -161,11 +161,24 @@
                </span>
               </div>
 
+
+              <div class="req-top-right">
+                @if (r.accountCode === "4520") {
+                  <div class="req-material">Material</div>
+               }
+               @if(r.accountCode !== "4520"){
+                 <div class="req-material">Chemical</div>
+               }
+
               @if (r.priority === 'Urgent') {
                 <div class="return-pill" [class.urgent]="r.priority === 'Urgent'">
                   {{ r.priority }}
                 </div>
               }
+
+            </div>
+
+
             </div>
           
 
@@ -195,15 +208,30 @@
                 <span class="v">{{ r.requestAt }}</span>
               </div>
 
+
+              <div class="remark-actions">
+                  <button
+                  *ngIf="r.remark?.trim()"
+                  type="button"
+                  class="remark-icon-btn"
+                  (click)="showRemark(r)"
+                  title="View remark"
+                >
+                  <i class="fas fa-comment-dots"></i>
+                </button>
+
                 <button
-                *ngIf="r.remark?.trim()"
+                *ngIf="r.remarkMC?.trim()"
                 type="button"
-                class="remark-icon-btn"
-                (click)="showRemark(r)"
-                title="View remark"
+                class="btn-remark-mc ms-auto"
+                (click)="showRemarkMC(r)"
+                title="MC remark"
               >
-                <i class="fas fa-comment-dots"></i>
+                <i class="fas fa-clipboard-check"></i>
               </button>
+
+          </div>
+
             </div>
 
           </div>

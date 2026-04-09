@@ -796,6 +796,10 @@
                     </table>
                   </div>
 
+                  <div class="form-divider mc-divider">
+                    <span>To Production</span>
+                  </div>
+
                   <div class="move-search-row mt-3">
                     <label>MC Remark</label>
                     <div class="move-search-group">
@@ -1305,21 +1309,58 @@
                     <label>Stock Note</label>
                     <textarea rows="3" [(ngModel)]="returnStockForm.stockNote"></textarea>
                   </div>
-              
-                  <div class="stock-footer">
-                    <button class="btn-soft" type="button" (click)="resetReturnStockForm()">
-                      Clear
-                    </button>
-              
+
+
+                  <div class="form-divider mc-divider">
+                    <span>To Production</span>
+                  </div>
+
+
+                  <div class="move-search-row mt-3">
+                    <label>MC Remark</label>
+                    <div class="move-search-group">
+                      <textarea
+                        rows="2"
+                        [(ngModel)]="returnStockForm.mcRemark"
+                        placeholder="กรอกหมายเหตุของ MC..."
+                        class="mc-remark-textarea"
+                      ></textarea>
+                    </div>
+                  </div>
+
+
+
+                  <div class="return-action-bar">
                     <button
-                      class="btn-main"
                       type="button"
-                      (click)="confirmReturnStockAction()"
+                      class="btn btn-danger"
+                      (click)="confirmReturnStockAction(true)"
                       [disabled]="isSavingStock"
                     >
-                      {{ isSavingStock ? 'Saving...' : 'Confirm Return Stock In' }}
+                      {{ isSavingStock ? 'Saving...' : 'Denial' }}
                     </button>
+                  
+                    <div class="stock-footer-return">
+                      <button class="btn-soft" type="button" (click)="resetReturnStockForm()">
+                        Clear
+                      </button>
+                  
+                      <button
+                        class="btn-main"
+                        type="button"
+                        (click)="confirmReturnStockAction(false)"
+                        [disabled]="isSavingStock"
+                      >
+                        {{ isSavingStock ? 'Saving...' : 'Confirm Return Stock In' }}
+                      </button>
+                    </div>
                   </div>
+
+
+
+
+
+
                 </div>
               </ng-container>
 

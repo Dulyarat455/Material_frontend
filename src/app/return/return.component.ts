@@ -18,7 +18,9 @@ type ReturnRequestRow = {
   requestBy: string;
   requestAt: string;
   status: 'Waiting' | 'Complete' | 'Denial';
+  accountCode?: string;
   remark?: string;
+  remarkMC?: string;
   groupId?: number | null;
 };
 
@@ -322,6 +324,8 @@ export class ReturnComponent {
             requestAt: this.formatDateTime(r?.requestTime),
             status,
             remark: r?.remark || '',
+            remarkMC: r?.remarkMC || '',
+            accountCode:r?.accountCode || '',
             groupId: r?.groupId ?? null
           };
         });
@@ -446,4 +450,39 @@ export class ReturnComponent {
       confirmButtonColor: '#2563eb'
     });
   }
+
+
+  showRemarkMC(row: ReturnRequestRow) {
+      const remarkText = (row.remarkMC || '').trim();
+    
+      if (!remarkText) return;
+    
+      Swal.fire({
+        icon: 'success',
+        title: 'MC Acknowledge',
+        html: `
+          <div style="text-align:left; line-height:1.7;">
+           
+    
+            <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
+            <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
+    
+            <div style="
+              padding:12px;
+              border-radius:12px;
+               background:#f8fafc;
+              border:1px solid #e2e8f0;
+               color:#0f172a;
+              white-space:pre-wrap;
+              word-break:break-word;
+              box-shadow: inset 0 1px 0 rgba(123, 192, 235, 0.65);
+            ">${remarkText}</div>
+          </div>
+        `,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#2563eb'
+      });
+    }
+
+
 }

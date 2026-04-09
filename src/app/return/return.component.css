@@ -550,3 +550,59 @@ Group Name
   background: #06b6d4;
   box-shadow: 0 0 0 3px rgba(6,182,212,.15);
 }
+
+
+
+
+
+
+
+
+
+.remark-actions{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+
+.btn-remark-mc{
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid  rgba(2,6,23,.1);
+  background:#fff;
+  color:#f4a734;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .15s ease;
+  margin-left: auto;   /* ตัวนี้คือที่ดันไปขวาสุด */
+}
+
+.btn-remark-mc:hover{
+  background:#eff6ff;
+  transform: translateY(-1px);
+}
+
+.btn-remark-mc:active{
+  transform: translateY(0);
+}
+
+
+
+
+
+
+
+.req-top-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  flex-shrink:0;
+}
