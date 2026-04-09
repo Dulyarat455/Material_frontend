@@ -754,7 +754,9 @@
                       </thead>
               
                       <tbody>
-                        <tr *ngFor="let row of stockOutRows">
+                        <tr *ngFor="let row of stockOutRows"
+                           [class.stockout-oldest-row]="isOldestStockOutRow(row)"
+                        >
                           <td class="text-center">
                             <input
                             type="checkbox"

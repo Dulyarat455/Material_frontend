@@ -530,10 +530,42 @@ export class StorageComponent {
   
 
 
+
+  oldestStockOutReceivedDate = '';
+
+
+  private toSortableTime(value?: string): number {
+    const v = (value || '').trim();
+    if (!v) return Number.MAX_SAFE_INTEGER;
+  
+    const direct = Date.parse(v);
+    if (!Number.isNaN(direct)) return direct;
+  
+    const m = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+    if (m) {
+      const [, dd, mm, yyyy] = m;
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd)).getTime();
+    }
+  
+    return Number.MAX_SAFE_INTEGER;
+  }
+  
+  isOldestStockOutRow(row: StockOutRow): boolean {
+    if (!this.oldestStockOutReceivedDate) return false;
+  
+    return (
+      this.toSortableTime(row.receivedDate) ===
+      this.toSortableTime(this.oldestStockOutReceivedDate)
+    );
+  }
+
+
+
   searchStockOutItem() {
     const key = (this.stockOutSearchItemNo || '').trim().toLowerCase();
   
     this.stockOutRows = [];
+    this.oldestStockOutReceivedDate = '';
     this.stockOutForm = {
       itemNo: '',
       itemName: '',
@@ -581,10 +613,7 @@ export class StorageComponent {
         }
       });
     });
-
-
-
-
+  
     this.pendingItems.forEach((m, index) => {
       const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
   
@@ -613,9 +642,6 @@ export class StorageComponent {
       }
     });
   
-
-
-
     this.chemicalItems.forEach((m, index) => {
       const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
   
@@ -643,8 +669,14 @@ export class StorageComponent {
         });
       }
     });
-
-
+  
+    rows.sort((a, b) => {
+      return this.toSortableTime(a.receivedDate) - this.toSortableTime(b.receivedDate);
+    });
+  
+    this.oldestStockOutReceivedDate = rows.length
+      ? (rows[0].receivedDate || '')
+      : '';
   
     this.stockOutRows = rows;
   

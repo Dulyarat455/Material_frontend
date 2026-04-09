@@ -1084,3 +1084,24 @@
     gap: 8px;
     margin-top: 0;
   }
+
+
+
+
+
+
+  /* ===============================
+   highlight FIFO STOCKOUT_PANEL
+  =============================== */
+
+  .stockout-oldest-row td {
+    background: #dcfce7 !important;
+  }
+  
+  .stockout-oldest-row:hover td {
+    background: #bbf7d0 !important;
+  }
+  
+  .stockout-oldest-row td:first-child {
+    border-left: 4px solid #22c55e;
+  }
