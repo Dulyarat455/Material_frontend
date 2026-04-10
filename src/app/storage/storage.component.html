@@ -272,6 +272,7 @@
                     <span *ngIf="panelMode === 'STOCK_OUT'">Stock Out</span>
                     <span *ngIf="panelMode === 'MOVE_AREA'">Move Area</span>
                     <span *ngIf="panelMode === 'RETURN_STOCK_IN'">Return Stock In</span>
+                    <span *ngIf="panelMode === 'MOVE_AREA_SCAN'">Move Area Scan</span>
                   </ng-template>
                 </div>
 
@@ -290,6 +291,13 @@
                     (click)="setPanelMode('MOVE_AREA')">
                     Move Area
                   </button>
+
+                  <button
+                  class="mode-btn"
+                  [class.active]="panelMode === 'MOVE_AREA_SCAN'"
+                  (click)="setPanelMode('MOVE_AREA_SCAN')">
+                  Move Area Scan
+                </button>
 
                   <button
                     class="mode-btn ghost"
@@ -985,6 +993,370 @@
                   </div>
                 </div>
               </ng-container>
+
+
+
+
+
+               <!-- MOVE AREA SCAN MODE -->
+               <ng-container *ngIf="panelMode === 'MOVE_AREA_SCAN'">
+                <div class="stock-panel">
+              
+                  <div class="stock-row">
+                    <label>Job No.</label>
+                    <input
+                      #moveAreaScanJobNo
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.jobNo"
+                      (keydown.enter)="onMoveAreaScanEnter('jobNo', $event)"
+                      (blur)="onMoveAreaScanEnter('jobNo', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>yearMonth</label>
+                    <input
+                      #moveAreaScanYearMonth
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.yearMonth"
+                      (keydown.enter)="onMoveAreaScanEnter('yearMonth', $event)"
+                      (blur)="onMoveAreaScanEnter('yearMonth', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>recivedDate</label>
+                    <input
+                      #moveAreaScanRecivedDate
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.recivedDate"
+                      (keydown.enter)="onMoveAreaScanEnter('recivedDate', $event)"
+                      (blur)="onMoveAreaScanEnter('recivedDate', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>inspector</label>
+                    <input
+                      #moveAreaScanInspector
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.inspector"
+                      (keydown.enter)="onMoveAreaScanEnter('inspector', $event)"
+                      (blur)="onMoveAreaScanEnter('inspector', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>UnloadBy</label>
+                    <input
+                      #moveAreaScanUnloadBy
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.unloadBy"
+                      (keydown.enter)="onMoveAreaScanEnter('unloadBy', $event)"
+                      (blur)="onMoveAreaScanEnter('unloadBy', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>invoiceOne</label>
+                    <input
+                      #moveAreaScanInvoiceOne
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.invoiceOne"
+                      (keydown.enter)="onMoveAreaScanEnter('invoiceOne', $event)"
+                      (blur)="onMoveAreaScanEnter('invoiceOne', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>taxInvNo</label>
+                    <input
+                      #moveAreaScanTaxInvNo
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.taxInvNo"
+                      (keydown.enter)="onMoveAreaScanEnter('taxInvNo', $event)"
+                      (blur)="onMoveAreaScanEnter('taxInvNo', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>materialNo</label>
+                    <input
+                      #moveAreaScanItemNo
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.itemNo"
+                      (keydown.enter)="onMoveAreaScanEnter('itemNo', $event)"
+                      (blur)="onMoveAreaScanEnter('itemNo', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>unitPrice</label>
+                    <input
+                      #moveAreaScanUnitPrice
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.unitPrice"
+                      (keydown.enter)="onMoveAreaScanEnter('unitPrice', $event)"
+                      (blur)="onMoveAreaScanEnter('unitPrice', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>qtyOfPalletPack</label>
+                    <input
+                      #moveAreaScanQtyOfPalletPack
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.qtyOfPalletPack"
+                      (keydown.enter)="onMoveAreaScanEnter('qtyOfPalletPack', $event)"
+                      (blur)="onMoveAreaScanEnter('qtyOfPalletPack', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>coil</label>
+                    <input
+                      #moveAreaScanCoil
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.coil"
+                      (keydown.enter)="onMoveAreaScanEnter('coil', $event)"
+                      (blur)="onMoveAreaScanEnter('coil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>qtyKgsPcs</label>
+                    <input
+                      #moveAreaScanQtyKgsPcs
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.qtyKgsPcs"
+                      (keydown.enter)="onMoveAreaScanEnter('qtyKgsPcs', $event)"
+                      (blur)="onMoveAreaScanEnter('qtyKgsPcs', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>Unit</label>
+                    <input
+                      #moveAreaScanUnit
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.unit"
+                      (keydown.enter)="onMoveAreaScanEnter('unit', $event)"
+                      (blur)="onMoveAreaScanEnter('unit', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>kgsCoil</label>
+                    <input
+                      #moveAreaScanKgsCoil
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.kgsCoil"
+                      (keydown.enter)="onMoveAreaScanEnter('kgsCoil', $event)"
+                      (blur)="onMoveAreaScanEnter('kgsCoil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>odCoil</label>
+                    <input
+                      #moveAreaScanOdCoil
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.odCoil"
+                      (keydown.enter)="onMoveAreaScanEnter('odCoil', $event)"
+                      (blur)="onMoveAreaScanEnter('odCoil', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>remark</label>
+                    <input
+                      #moveAreaScanRemark
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.remark"
+                      (keydown.enter)="onMoveAreaScanEnter('remark', $event)"
+                      (blur)="onMoveAreaScanEnter('remark', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>millSheet</label>
+                    <input
+                      #moveAreaScanMillSheet
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.millSheet"
+                      (keydown.enter)="onMoveAreaScanEnter('millSheet', $event)"
+                      (blur)="onMoveAreaScanEnter('millSheet', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>Item Name.</label>
+                    <input
+                      #moveAreaScanItemName
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.itemName"
+                      (keydown.enter)="onMoveAreaScanEnter('itemName', $event)"
+                      (blur)="onMoveAreaScanEnter('itemName', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>Spec/Dwg</label>
+                    <input
+                      #moveAreaScanSpecDwg
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.specDwg"
+                      (keydown.enter)="onMoveAreaScanEnter('specDwg', $event)"
+                      (blur)="onMoveAreaScanEnter('specDwg', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>Lot No.</label>
+                    <input
+                      #moveAreaScanLotNo
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.lotNo"
+                      (keydown.enter)="onMoveAreaScanEnter('lotNo', $event)"
+                      (blur)="onMoveAreaScanEnter('lotNo', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>quantity</label>
+                    <input
+                      #moveAreaScanQuantity
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.quantity"
+                      (keydown.enter)="onMoveAreaScanEnter('quantity', $event)"
+                      (blur)="onMoveAreaScanEnter('quantity', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>rosh</label>
+                    <input
+                      #moveAreaScanRosh
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.rosh"
+                      (keydown.enter)="onMoveAreaScanEnter('rosh', $event)"
+                      (blur)="onMoveAreaScanEnter('rosh', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>result</label>
+                    <input
+                      #moveAreaScanResult
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.result"
+                      (keydown.enter)="onMoveAreaScanEnter('result', $event)"
+                      (blur)="onMoveAreaScanEnter('result', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>supplier</label>
+                    <input
+                      #moveAreaScanSupplier
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.supplier"
+                      (keydown.enter)="onMoveAreaScanEnter('supplier', $event)"
+                      (blur)="onMoveAreaScanEnter('supplier', $event)"
+                    />
+                  </div>
+              
+                  <div class="stock-row stock-row-hidden">
+                    <label>amount</label>
+                    <input
+                      #moveAreaScanAmount
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.amount"
+                      (keydown.enter)="onMoveAreaScanEnter('amount', $event)"
+                      (blur)="onMoveAreaScanEnter('amount', $event)"
+                    />
+                  </div>
+              
+                  <div class="form-divider mc-divider">
+                    <span>Found Source</span>
+                  </div>
+              
+                  <div class="move-form-grid stockout-form-grid">
+                    <div class="move-form-row">
+                      <label>Found Job No</label>
+                      <div class="value-box">{{ moveAreaScanForm.foundJobNo || '-' }}</div>
+                    </div>
+                    <div class="move-form-row">
+                      <label>Material No</label>
+                      <div class="value-box">{{ moveAreaScanForm.foundItemNo || '-' }}</div>
+                    </div>
+                    <div class="move-form-row">
+                      <label>Material Name</label>
+                      <div class="value-box">{{ moveAreaScanForm.foundItemName || '-' }}</div>
+                    </div>
+                    <div class="move-form-row">
+                      <label>Spec</label>
+                      <div class="value-box">{{ moveAreaScanForm.foundItemSpec || '-' }}</div>
+                    </div>
+                    <div class="move-form-row">
+                      <label>Source Area</label>
+                      <div class="value-box">{{ moveAreaScanForm.foundArea || '-' }}</div>
+                    </div>
+                    <div class="move-form-row">
+                      <label>Incoming ID</label>
+                      <div class="value-box">{{ moveAreaScanForm.incomingId || '-' }}</div>
+                    </div>
+                  </div>
+              
+                  <div class="form-divider mc-divider">
+                    <span>Destination Area</span>
+                  </div>
+              
+                  <div class="stock-row">
+                    <label>Store Code</label>
+                    <input
+                      #moveAreaScanStoreCode
+                      type="text"
+                      [(ngModel)]="moveAreaScanForm.storeCode"
+                      (keydown.enter)="onMoveAreaScanEnter('storeCode', $event)"
+                      (blur)="onMoveAreaScanEnter('storeCode', $event)"
+                    />
+                  </div>
+              
+                  <div class="move-form-grid stockout-form-grid">
+                    <div class="move-form-row">
+                      <label>Target Store Code</label>
+                      <div class="value-box">{{ moveAreaScanForm.targetStoreCode || '-' }}</div>
+                    </div>
+                    <div class="move-form-row">
+                      <label>Target Store ID</label>
+                      <div class="value-box">{{ moveAreaScanForm.targetStoreId || '-' }}</div>
+                    </div>
+                  </div>
+              
+                  <div class="panel-footer mt-3 d-flex align-items-center">
+                    <button
+                      class="btn btn-primary"
+                      type="button"
+                      (click)="submitMoveAreaScan()"
+                    >
+                      Prepare Move Request
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

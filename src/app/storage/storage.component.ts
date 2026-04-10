@@ -180,6 +180,35 @@ type StockScanField =
 
 
 
+  type MoveAreaScanField =
+  | 'jobNo'
+  | 'yearMonth'
+  | 'recivedDate'
+  | 'inspector'
+  | 'unloadBy'
+  | 'invoiceOne'
+  | 'taxInvNo'
+  | 'itemNo'
+  | 'unitPrice'
+  | 'qtyOfPalletPack'
+  | 'coil'
+  | 'qtyKgsPcs'
+  | 'unit'
+  | 'kgsCoil'
+  | 'odCoil'
+  | 'remark'
+  | 'millSheet'
+  | 'itemName'
+  | 'specDwg'
+  | 'lotNo'
+  | 'quantity'
+  | 'rosh'
+  | 'result'
+  | 'supplier'
+  | 'amount'
+  | 'storeCode';
+
+
 @Component({
   selector: 'app-storage',
   standalone: true,
@@ -251,8 +280,40 @@ export class StorageComponent {
 @ViewChild('returnScanSupplier') returnScanSupplier?: ElementRef<HTMLInputElement>;
 @ViewChild('returnScanAmount') returnScanAmount?: ElementRef<HTMLInputElement>;
 
+
+
+
+//moveAreaScan
+@ViewChild('moveAreaScanYearMonth') moveAreaScanYearMonth?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanRecivedDate') moveAreaScanRecivedDate?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanInspector') moveAreaScanInspector?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanUnloadBy') moveAreaScanUnloadBy?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanInvoiceOne') moveAreaScanInvoiceOne?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanTaxInvNo') moveAreaScanTaxInvNo?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanItemNo') moveAreaScanItemNo?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanUnitPrice') moveAreaScanUnitPrice?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanQtyOfPalletPack') moveAreaScanQtyOfPalletPack?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanCoil') moveAreaScanCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanQtyKgsPcs') moveAreaScanQtyKgsPcs?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanUnit') moveAreaScanUnit?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanKgsCoil') moveAreaScanKgsCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanOdCoil') moveAreaScanOdCoil?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanRemark') moveAreaScanRemark?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanMillSheet') moveAreaScanMillSheet?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanItemName') moveAreaScanItemName?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanSpecDwg') moveAreaScanSpecDwg?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanLotNo') moveAreaScanLotNo?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanQuantity') moveAreaScanQuantity?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanRosh') moveAreaScanRosh?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanResult') moveAreaScanResult?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanSupplier') moveAreaScanSupplier?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanAmount') moveAreaScanAmount?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanJobNo') moveAreaScanJobNo?: ElementRef<HTMLInputElement>;
+@ViewChild('moveAreaScanStoreCode') moveAreaScanStoreCode?: ElementRef<HTMLInputElement>;
+
+
   viewMode: 'NONE' | 'SLOT' | 'PENDING' | 'CHEMICAL' = 'NONE';
-  panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'RETURN_STOCK_IN' = 'TABLE';
+  panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA'  | 'MOVE_AREA_SCAN' | 'RETURN_STOCK_IN' = 'TABLE';
 
   stockForm = {
     jobNo: '',
@@ -332,6 +393,50 @@ export class StorageComponent {
       mcRemark: ''
   };
 
+
+
+ // state for moveAreaScan
+ moveAreaScanForm = {
+  // scanner input
+  jobNo: '',
+  yearMonth: '',
+  recivedDate: '',
+  inspector: '',
+  unloadBy: '',
+  invoiceOne: '',
+  taxInvNo: '',
+  itemNo: '',
+  unitPrice: '',
+  qtyOfPalletPack: '',
+  coil: '',
+  qtyKgsPcs: '',
+  unit: '',
+  kgsCoil: '',
+  odCoil: '',
+  remark: '',
+  millSheet: '',
+  itemName: '',
+  specDwg: '',
+  lotNo: '',
+  quantity: '',
+  rosh: '',
+  result: '',
+  supplier: '',
+  amount: '',
+
+  // destination scan
+  storeCode: '',
+
+  // found result
+  foundJobNo: '',
+  foundItemNo: '',
+  foundItemName: '',
+  foundItemSpec: '',
+  foundArea: '',
+  incomingId: null as number | null,
+  targetStoreId: null as number | null,
+  targetStoreCode: ''
+};
 
 
   moveSearchItemNo = '';
@@ -637,6 +742,227 @@ private buildMaterialRowsByItemNo(itemNo: string): StockOutRow[] {
   return rows;
 }
 
+
+
+
+private buildMaterialRowsByJobNo(jobNo: string): StockOutRow[] {
+  const key = (jobNo || '').trim().toLowerCase();
+  if (!key) return [];
+
+  const rows: StockOutRow[] = [];
+
+  this.slots.forEach((slot) => {
+    (slot.materials || []).forEach((m, index) => {
+      const sourceJobNo = (m.jobNo || '').trim().toLowerCase();
+      if (sourceJobNo !== key) return;
+
+      rows.push({
+        uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
+        checked: false,
+        area: slot.storeCode,
+        receivedDate: m.receivedAt || '',
+        jobNo: m.jobNo || '',
+        invoice: m.invNo || '',
+        qty: Number(m.qty || 0),
+        remark: m.remark || '',
+        itemNo: m.materialNo || m.itemNo || '',
+        itemName: m.itemName || m.description || '',
+        itemSpec: m.itemSpec || '',
+        coil: m.coil != null ? Number(m.coil) : undefined,
+        unit: m.uom || '',
+        incomingId: Number(m.incomingId || 0),
+        storeId: Number(slot.storeId || m.storeId || 0),
+        sourceStoreCode: slot.storeCode,
+        stockNote: m.stockNote || ''
+      });
+    });
+  });
+
+  this.pendingItems.forEach((m, index) => {
+    const sourceJobNo = (m.jobNo || '').trim().toLowerCase();
+    if (sourceJobNo !== key) return;
+
+    rows.push({
+      uid: `Pending_${m.incomingId || index}_${m.invNo}`,
+      checked: false,
+      area: 'Pending',
+      receivedDate: m.receivedAt || '',
+      jobNo: m.jobNo || '',
+      invoice: m.invNo || '',
+      qty: Number(m.qty || 0),
+      remark: m.remark || '',
+      itemNo: m.materialNo || m.itemNo || '',
+      itemName: m.itemName || m.description || '',
+      itemSpec: m.itemSpec || '',
+      coil: m.coil != null ? Number(m.coil) : undefined,
+      unit: m.uom || '',
+      incomingId: Number(m.incomingId || 0),
+      storeId: Number(m.storeId || 0),
+      sourceStoreCode: 'Pending',
+      stockNote: m.stockNote || ''
+    });
+  });
+
+  this.chemicalItems.forEach((m, index) => {
+    const sourceJobNo = (m.jobNo || '').trim().toLowerCase();
+    if (sourceJobNo !== key) return;
+
+    rows.push({
+      uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
+      checked: false,
+      area: 'Chemical',
+      receivedDate: m.receivedAt || '',
+      jobNo: m.jobNo || '',
+      invoice: m.invNo || '',
+      qty: Number(m.qty || 0),
+      remark: m.remark || '',
+      itemNo: m.materialNo || m.itemNo || '',
+      itemName: m.itemName || m.description || '',
+      itemSpec: m.itemSpec || '',
+      coil: m.coil != null ? Number(m.coil) : undefined,
+      unit: m.uom || '',
+      incomingId: Number(m.incomingId || 0),
+      storeId: Number(m.storeId || 0),
+      sourceStoreCode: 'Chemical',
+      stockNote: m.stockNote || ''
+    });
+  });
+
+  rows.sort((a, b) => this.toSortableTime(a.receivedDate) - this.toSortableTime(b.receivedDate));
+  return rows;
+}
+
+
+
+
+
+private findSlotByStoreCode(storeCode: string): SlotRow | null {
+  const key = (storeCode || '').trim();
+  if (!key) return null;
+  return this.slots.find(s => s.storeCode === key) || null;
+}
+
+private findStoreMasterByCode(storeCode: string): storeMasterRow | null {
+  const key = (storeCode || '').trim();
+  if (!key) return null;
+  return this.storeMasters.find(x => x.name === key) || null;
+}
+
+
+
+
+
+searchMoveAreaScanJob() {
+  const key = (this.moveAreaScanForm.jobNo || '').trim();
+
+  this.moveAreaScanForm.foundJobNo = '';
+  this.moveAreaScanForm.foundItemNo = '';
+  this.moveAreaScanForm.foundItemName = '';
+  this.moveAreaScanForm.foundItemSpec = '';
+  this.moveAreaScanForm.foundArea = '';
+  this.moveAreaScanForm.incomingId = null;
+
+  if (!key) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Missing Job No',
+      text: 'กรุณา Scan Job No'
+    });
+    return;
+  }
+
+  const rows = this.buildMaterialRowsByJobNo(key);
+
+  if (!rows.length) {
+    Swal.fire({
+      icon: 'info',
+      title: 'No item found',
+      text: `ไม่พบ Incoming Job No : ${key}`
+    });
+    return;
+  }
+
+  if (rows.length > 1) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Found multiple items',
+      text: `พบมากกว่า 1 รายการสำหรับ Job No : ${key} กรุณาตรวจสอบ data`
+    });
+    return;
+  }
+
+  const picked = rows[0];
+
+  this.moveAreaScanForm.foundJobNo = picked.jobNo || '';
+  this.moveAreaScanForm.foundItemNo = picked.itemNo || '';
+  this.moveAreaScanForm.foundItemName = picked.itemName || '';
+  this.moveAreaScanForm.foundItemSpec = picked.itemSpec || '';
+  this.moveAreaScanForm.foundArea = picked.sourceStoreCode || picked.area || '';
+  this.moveAreaScanForm.incomingId = picked.incomingId || null;
+
+  this.moveRows = [{
+    uid: picked.uid,
+    checked: true,
+    area: picked.area,
+    receivedDate: picked.receivedDate,
+    invoice: picked.invoice,
+    qty: picked.qty,
+    remark: picked.remark,
+    toArea: '',
+    itemNo: picked.itemNo,
+    itemName: picked.itemName,
+    itemSpec: picked.itemSpec,
+    coil: picked.coil,
+    unit: picked.unit,
+    sourceStoreCode: picked.sourceStoreCode,
+    sourceInvNo: picked.invoice,
+    jobNo: picked.jobNo,
+    incomingId: picked.incomingId,
+    storeId: picked.storeId,
+    stockNote: picked.stockNote
+  }];
+}
+
+
+
+searchMoveAreaScanStoreCode() {
+  const key = (this.moveAreaScanForm.storeCode || '').trim();
+
+  this.moveAreaScanForm.targetStoreId = null;
+  this.moveAreaScanForm.targetStoreCode = '';
+
+  if (!key) {
+    this.selectedSlot = null;
+    if (this.viewMode === 'SLOT') this.viewMode = 'NONE';
+    return;
+  }
+
+  const slot = this.findSlotByStoreCode(key);
+  const store = this.findStoreMasterByCode(key);
+
+  if (!slot || !store?.id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Store Code',
+      text: `ไม่พบ Store Code : ${key}`
+    });
+    return;
+  }
+
+  this.selectedSlot = slot;
+  this.viewMode = 'SLOT';
+  this.moveAreaScanForm.targetStoreId = Number(store.id || 0);
+  this.moveAreaScanForm.targetStoreCode = store.name || '';
+}
+
+
+
+
+
+
+
+
+
 private getOldestTimeFromRows(rows: { receivedDate?: string }[]): number {
   if (!rows.length) return Number.MAX_SAFE_INTEGER;
   return Math.min(...rows.map(r => this.toSortableTime(r.receivedDate)));
@@ -669,7 +995,10 @@ private isTableOccupiedHighlight(s: SlotRow): boolean {
 }
 
 private isMoveAreaGreen(slotId: string): boolean {
-  if (this.panelMode !== 'MOVE_AREA') return false;
+  if (this.panelMode !== 'MOVE_AREA' && this.panelMode !== 'MOVE_AREA_SCAN') {
+    return false;
+  }
+
   if (!this.moveRows.length) return false;
 
   const oldestAreas = this.getOldestAreaSetFromRows(
@@ -685,7 +1014,10 @@ private isMoveAreaGreen(slotId: string): boolean {
 
 
 private isMoveAreaOrange(slotId: string): boolean {
-  if (this.panelMode !== 'MOVE_AREA') return false;
+  if (this.panelMode !== 'MOVE_AREA' && this.panelMode !== 'MOVE_AREA_SCAN') {
+    return false;
+  }
+
   if (!this.moveRows.length) return false;
 
   const allAreas = this.getAreaSetFromRows(
@@ -724,33 +1056,6 @@ private isStockOutOrange(slotId: string): boolean {
   return allAreas.has(slotId) && !oldestAreas.has(slotId);
 }
 
-
-
-// private getReturnCandidateRows(): StockOutRow[] {
-//   return this.buildMaterialRowsByItemNo(this.returnStockForm.itemNo || '');
-// }
-
-// private isReturnGreen(slotId: string): boolean {
-//   if (this.panelMode !== 'RETURN_STOCK_IN') return false;
-
-//   const rows = this.getReturnCandidateRows();
-//   if (!rows.length) return false;
-
-//   const oldestAreas = this.getOldestAreaSetFromRows(rows);
-//   return oldestAreas.has(slotId);
-// }
-
-// private isReturnOrange(slotId: string): boolean {
-//   if (this.panelMode !== 'RETURN_STOCK_IN') return false;
-
-//   const rows = this.getReturnCandidateRows();
-//   if (!rows.length) return false;
-
-//   const allAreas = this.getAreaSetFromRows(rows);
-//   const oldestAreas = this.getOldestAreaSetFromRows(rows);
-
-//   return allAreas.has(slotId) && !oldestAreas.has(slotId);
-// }
 
 
 
@@ -970,6 +1275,128 @@ searchStockOutItem() {
   }
 
 
+
+
+  onMoveAreaScanEnter(field: MoveAreaScanField, ev: any) {
+    if (ev?.key === 'Enter') ev.preventDefault();
+    if (this.panelMode !== 'MOVE_AREA_SCAN') return;
+  
+    switch (field) {
+      case 'jobNo':
+        if (!this.moveAreaScanForm.jobNo) return;
+        return this.focusEl(this.moveAreaScanYearMonth);
+  
+      case 'yearMonth':
+        if (!this.moveAreaScanForm.yearMonth) return;
+        return this.focusEl(this.moveAreaScanRecivedDate);
+  
+      case 'recivedDate':
+        if (!this.moveAreaScanForm.recivedDate) return;
+        return this.focusEl(this.moveAreaScanInspector);
+  
+      case 'inspector':
+        if (!this.moveAreaScanForm.inspector) return;
+        return this.focusEl(this.moveAreaScanUnloadBy);
+  
+      case 'unloadBy':
+        if (!this.moveAreaScanForm.unloadBy) return;
+        return this.focusEl(this.moveAreaScanInvoiceOne);
+  
+      case 'invoiceOne':
+        if (!this.moveAreaScanForm.invoiceOne) return;
+        return this.focusEl(this.moveAreaScanTaxInvNo);
+  
+      case 'taxInvNo':
+        if (!this.moveAreaScanForm.taxInvNo) return;
+        return this.focusEl(this.moveAreaScanItemNo);
+  
+      case 'itemNo':
+        if (!this.moveAreaScanForm.itemNo) return;
+        return this.focusEl(this.moveAreaScanUnitPrice);
+  
+      case 'unitPrice':
+        if (!this.moveAreaScanForm.unitPrice) return;
+        return this.focusEl(this.moveAreaScanQtyOfPalletPack);
+  
+      case 'qtyOfPalletPack':
+        if (!this.moveAreaScanForm.qtyOfPalletPack) return;
+        return this.focusEl(this.moveAreaScanCoil);
+  
+      case 'coil':
+        if (!this.moveAreaScanForm.coil) return;
+        return this.focusEl(this.moveAreaScanQtyKgsPcs);
+  
+      case 'qtyKgsPcs':
+        if (!this.moveAreaScanForm.qtyKgsPcs) return;
+        return this.focusEl(this.moveAreaScanUnit);
+  
+      case 'unit':
+        if (!this.moveAreaScanForm.unit) return;
+        return this.focusEl(this.moveAreaScanKgsCoil);
+  
+      case 'kgsCoil':
+        if (!this.moveAreaScanForm.kgsCoil) return;
+        return this.focusEl(this.moveAreaScanOdCoil);
+  
+      case 'odCoil':
+        if (!this.moveAreaScanForm.odCoil) return;
+        return this.focusEl(this.moveAreaScanRemark);
+  
+      case 'remark':
+        if (!this.moveAreaScanForm.remark) return;
+        return this.focusEl(this.moveAreaScanMillSheet);
+  
+      case 'millSheet':
+        if (!this.moveAreaScanForm.millSheet) return;
+        return this.focusEl(this.moveAreaScanItemName);
+  
+      case 'itemName':
+        if (!this.moveAreaScanForm.itemName) return;
+        return this.focusEl(this.moveAreaScanSpecDwg);
+  
+      case 'specDwg':
+        if (!this.moveAreaScanForm.specDwg) return;
+        return this.focusEl(this.moveAreaScanLotNo);
+  
+      case 'lotNo':
+        if (!this.moveAreaScanForm.lotNo) return;
+        return this.focusEl(this.moveAreaScanQuantity);
+  
+      case 'quantity':
+        if (!this.moveAreaScanForm.quantity) return;
+        return this.focusEl(this.moveAreaScanRosh);
+  
+      case 'rosh':
+        if (!this.moveAreaScanForm.rosh) return;
+        return this.focusEl(this.moveAreaScanResult);
+  
+      case 'result':
+        if (!this.moveAreaScanForm.result) return;
+        return this.focusEl(this.moveAreaScanSupplier);
+  
+      case 'supplier':
+        if (!this.moveAreaScanForm.supplier) return;
+        return this.focusEl(this.moveAreaScanAmount);
+  
+      case 'amount':
+        if (!this.moveAreaScanForm.amount) return;
+        this.searchMoveAreaScanJob();
+        return this.focusEl(this.moveAreaScanStoreCode);
+  
+      case 'storeCode':
+        if (!this.moveAreaScanForm.storeCode) return;
+        this.searchMoveAreaScanStoreCode();
+        return;
+    }
+  }
+
+
+
+
+
+
+
+
   onReturnStockEnter(field: ReturnStockField, ev: any) {
     if (ev?.key === 'Enter') ev.preventDefault();
     if (this.panelMode !== 'RETURN_STOCK_IN') return;
@@ -1088,7 +1515,7 @@ searchStockOutItem() {
 
 
 
-  setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA' | 'RETURN_STOCK_IN') {
+  setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA'  | 'MOVE_AREA_SCAN' | 'RETURN_STOCK_IN') {
     this.panelMode = mode;
   
     // ใช้กับ stock in เดิมเท่านั้น
@@ -1171,6 +1598,48 @@ searchStockOutItem() {
         mcRemark: ''
       };
     }
+
+
+    if (mode !== 'MOVE_AREA_SCAN') {
+      this.moveAreaScanForm = {
+        jobNo: '',
+        yearMonth: '',
+        recivedDate: '',
+        inspector: '',
+        unloadBy: '',
+        invoiceOne: '',
+        taxInvNo: '',
+        itemNo: '',
+        unitPrice: '',
+        qtyOfPalletPack: '',
+        coil: '',
+        qtyKgsPcs: '',
+        unit: '',
+        kgsCoil: '',
+        odCoil: '',
+        remark: '',
+        millSheet: '',
+        itemName: '',
+        specDwg: '',
+        lotNo: '',
+        quantity: '',
+        rosh: '',
+        result: '',
+        supplier: '',
+        amount: '',
+        storeCode: '',
+        foundJobNo: '',
+        foundItemNo: '',
+        foundItemName: '',
+        foundItemSpec: '',
+        foundArea: '',
+        incomingId: null,
+        targetStoreId: null,
+        targetStoreCode: ''
+      };
+    }
+
+
   
     // selectedTransactionJob ให้ล้างเมื่อไม่ใช่ flow transaction
     if (mode !== 'STOCK_OUT' && mode !== 'RETURN_STOCK_IN') {
@@ -1184,6 +1653,12 @@ searchStockOutItem() {
     if (mode === 'RETURN_STOCK_IN') {
       setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
     }
+
+
+    if (mode === 'MOVE_AREA_SCAN') {
+      setTimeout(() => this.focusEl(this.moveAreaScanJobNo), 0);
+    }
+
   }
 
 
@@ -1380,12 +1855,16 @@ searchStockOutItem() {
   
   private shouldOrangeHighlight(s: SlotRow): boolean {
     if (this.panelMode === 'MOVE_AREA') {
-      // ยังไม่ search = ใช้แบบ table เดิม
       if (!this.moveSearchItemNo?.trim()) {
         return this.hasAnyMaterialInSlot(s);
       }
+      return this.isMoveAreaOrange(s.storeCode);
+    }
   
-      // search แล้ว = ส้มเฉพาะ area ที่มี material นี้แต่ไม่ oldest
+    if (this.panelMode === 'MOVE_AREA_SCAN') {
+      if (!this.moveRows.length) {
+        return this.hasAnyMaterialInSlot(s);
+      }
       return this.isMoveAreaOrange(s.storeCode);
     }
   
@@ -1394,11 +1873,9 @@ searchStockOutItem() {
     }
   
     if (this.panelMode === 'RETURN_STOCK_IN') {
-      // ใช้แบบ table เดิม
       return this.hasAnyMaterialInSlot(s);
     }
   
-    // TABLE / STOCK_IN / default
     return this.hasAnyMaterialInSlot(s);
   }
   
@@ -2775,6 +3252,72 @@ searchStockOutItem() {
     
   
     setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+  }
+
+
+
+
+
+  submitMoveAreaScan() {
+    if (!this.moveAreaScanForm.incomingId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Incoming',
+        text: 'กรุณา Scan Job No ก่อน'
+      });
+      return;
+    }
+  
+    if (!this.moveAreaScanForm.targetStoreId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Destination Store',
+        text: 'กรุณา Scan Store Code ปลายทางก่อน'
+      });
+      return;
+    }
+
+
+    if (
+      (this.moveAreaScanForm.foundArea || '').trim() ===
+      (this.moveAreaScanForm.targetStoreCode || '').trim()
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Destination',
+        text: 'ปลายทางต้องไม่ใช่ Area เดียวกับต้นทาง'
+      });
+      return;
+    }
+  
+    const body = {
+      incomingId: this.moveAreaScanForm.incomingId,
+      storeId: this.moveAreaScanForm.targetStoreId,
+      userId: this.userId,
+      inchargeTime: new Date().toISOString(),
+      sourceJobNo: this.moveAreaScanForm.foundJobNo,
+      sourceStoreCode: this.moveAreaScanForm.foundArea,
+      targetStoreCode: this.moveAreaScanForm.targetStoreCode
+    };
+  
+    console.log('MOVE_AREA_SCAN body =>', body);
+  
+    Swal.fire({
+      icon: 'info',
+      title: 'Prepared request body',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div><b>Incoming ID:</b> ${body.incomingId}</div>
+          <div><b>Store ID:</b> ${body.storeId}</div>
+          <div><b>Source Job No:</b> ${this.escapeHtml(body.sourceJobNo || '-')}</div>
+          <div><b>Source Area:</b> ${this.escapeHtml(body.sourceStoreCode || '-')}</div>
+          <div><b>Target Area:</b> ${this.escapeHtml(body.targetStoreCode || '-')}</div>
+        </div>
+      `
+    });
+  
+    // TODO: รอ backend API
+    // this.http.post(config.apiServer + '/api/mc/moveAreaScan', body).subscribe(...)
   }
 
 

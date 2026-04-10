@@ -1127,3 +1127,44 @@
     border-color: rgba(245, 158, 11, 0.70) !important;
     background: rgba(245, 158, 11, 0.14) !important;
   }
+
+
+
+
+
+
+  /* =============
+  mobile version
+  ============= */
+
+
+
+
+  @media (max-width: 991.98px) {
+    .floorplan {
+      grid-template-columns: 1fr !important;
+      column-gap: 0;
+      row-gap: 0;
+    }
+  
+    .fp-left-stack,
+    .fp-right-stack {
+      display: none !important;
+    }
+  
+    .fp-table {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-width: 0;
+    }
+  
+    .panel-topbar {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  
+    .panel-actions {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+  }
