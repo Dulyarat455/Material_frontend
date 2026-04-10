@@ -1105,3 +1105,25 @@
   .stockout-oldest-row td:first-child {
     border-left: 4px solid #22c55e;
   }
+
+
+
+
+
+
+  .is-move-green {
+    border-color: rgba(34, 197, 94, 0.85) !important;
+    background: rgba(34, 197, 94, 0.18) !important;
+  }
+  
+  .is-stockout-green,
+  .is-return-green {
+    border-color: rgba(34, 197, 94, 0.90) !important;
+    background: rgba(34, 197, 94, 0.22) !important;
+  }
+  
+  .is-stockout-orange,
+  .is-return-orange {
+    border-color: rgba(245, 158, 11, 0.70) !important;
+    background: rgba(245, 158, 11, 0.14) !important;
+  }

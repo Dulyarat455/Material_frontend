@@ -531,171 +531,285 @@ export class StorageComponent {
 
 
 
-  oldestStockOutReceivedDate = '';
+oldestStockOutReceivedDate = '';
+oldestReturnReceivedDate = '';
 
+private toSortableTime(value?: string): number {
+  const v = (value || '').trim();
+  if (!v) return Number.MAX_SAFE_INTEGER;
 
-  private toSortableTime(value?: string): number {
-    const v = (value || '').trim();
-    if (!v) return Number.MAX_SAFE_INTEGER;
-  
-    const direct = Date.parse(v);
-    if (!Number.isNaN(direct)) return direct;
-  
-    const m = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
-    if (m) {
-      const [, dd, mm, yyyy] = m;
-      return new Date(Number(yyyy), Number(mm) - 1, Number(dd)).getTime();
-    }
-  
-    return Number.MAX_SAFE_INTEGER;
-  }
-  
-  isOldestStockOutRow(row: StockOutRow): boolean {
-    if (!this.oldestStockOutReceivedDate) return false;
-  
-    return (
-      this.toSortableTime(row.receivedDate) ===
-      this.toSortableTime(this.oldestStockOutReceivedDate)
-    );
+  const direct = Date.parse(v);
+  if (!Number.isNaN(direct)) return direct;
+
+  const m = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (m) {
+    const [, dd, mm, yyyy] = m;
+    return new Date(Number(yyyy), Number(mm) - 1, Number(dd)).getTime();
   }
 
+  return Number.MAX_SAFE_INTEGER;
+}
 
+private buildMaterialRowsByItemNo(itemNo: string): StockOutRow[] {
+  const key = (itemNo || '').trim().toLowerCase();
+  if (!key) return [];
 
-  searchStockOutItem() {
-    const key = (this.stockOutSearchItemNo || '').trim().toLowerCase();
-  
-    this.stockOutRows = [];
-    this.oldestStockOutReceivedDate = '';
-    this.stockOutForm = {
-      itemNo: '',
-      itemName: '',
-      itemSpec: '',
-      mcRemark: ''
-    };
-  
-    if (!key) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Missing Material No',
-        text: 'กรุณากรอก Material No'
-      });
-      return;
-    }
-  
-    const rows: StockOutRow[] = [];
-  
-    this.slots.forEach((slot) => {
-      (slot.materials || []).forEach((m, index) => {
-        const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-  
-        if (materialNo === key) {
-          rows.push({
-            uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
-            checked: false,
-            area: slot.storeCode,
-            receivedDate: m.receivedAt || '',
-            jobNo: m.jobNo || '',
-            invoice: m.invNo || '',
-            qty: Number(m.qty || 0),
-            remark: m.remark || '',
-  
-            itemNo: m.materialNo || m.itemNo || '',
-            itemName: m.itemName || m.description || '',
-            itemSpec: m.itemSpec || '',
-            coil: m.coil != null ? Number(m.coil) : undefined,
-            unit: m.uom || '',
-  
-            incomingId: Number(m.incomingId || 0),
-            storeId: Number(slot.storeId || m.storeId || 0),
-            sourceStoreCode: slot.storeCode,
-            stockNote: m.stockNote || ''
-          });
-        }
+  const rows: StockOutRow[] = [];
+
+  this.slots.forEach((slot) => {
+    (slot.materials || []).forEach((m, index) => {
+      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+      if (materialNo !== key) return;
+
+      rows.push({
+        uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
+        checked: false,
+        area: slot.storeCode,
+        receivedDate: m.receivedAt || '',
+        jobNo: m.jobNo || '',
+        invoice: m.invNo || '',
+        qty: Number(m.qty || 0),
+        remark: m.remark || '',
+        itemNo: m.materialNo || m.itemNo || '',
+        itemName: m.itemName || m.description || '',
+        itemSpec: m.itemSpec || '',
+        coil: m.coil != null ? Number(m.coil) : undefined,
+        unit: m.uom || '',
+        incomingId: Number(m.incomingId || 0),
+        storeId: Number(slot.storeId || m.storeId || 0),
+        sourceStoreCode: slot.storeCode,
+        stockNote: m.stockNote || ''
       });
     });
-  
-    this.pendingItems.forEach((m, index) => {
-      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-  
-      if (materialNo === key) {
-        rows.push({
-          uid: `Pending_${m.incomingId || index}_${m.invNo}`,
-          checked: false,
-          area: 'Pending',
-          receivedDate: m.receivedAt || '',
-          jobNo: m.jobNo || '',
-          invoice: m.invNo || '',
-          qty: Number(m.qty || 0),
-          remark: m.remark || '',
-  
-          itemNo: m.materialNo || m.itemNo || '',
-          itemName: m.itemName || m.description || '',
-          itemSpec: m.itemSpec || '',
-          coil: m.coil != null ? Number(m.coil) : undefined,
-          unit: m.uom || '',
-  
-          incomingId: Number(m.incomingId || 0),
-          storeId: Number(m.storeId || 0),
-          sourceStoreCode: 'Pending',
-          stockNote: m.stockNote || ''
-        });
-      }
+  });
+
+  this.pendingItems.forEach((m, index) => {
+    const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+    if (materialNo !== key) return;
+
+    rows.push({
+      uid: `Pending_${m.incomingId || index}_${m.invNo}`,
+      checked: false,
+      area: 'Pending',
+      receivedDate: m.receivedAt || '',
+      jobNo: m.jobNo || '',
+      invoice: m.invNo || '',
+      qty: Number(m.qty || 0),
+      remark: m.remark || '',
+      itemNo: m.materialNo || m.itemNo || '',
+      itemName: m.itemName || m.description || '',
+      itemSpec: m.itemSpec || '',
+      coil: m.coil != null ? Number(m.coil) : undefined,
+      unit: m.uom || '',
+      incomingId: Number(m.incomingId || 0),
+      storeId: Number(m.storeId || 0),
+      sourceStoreCode: 'Pending',
+      stockNote: m.stockNote || ''
     });
-  
-    this.chemicalItems.forEach((m, index) => {
-      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-  
-      if (materialNo === key) {
-        rows.push({
-          uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
-          checked: false,
-          area: 'Chemical',
-          receivedDate: m.receivedAt || '',
-          jobNo: m.jobNo || '',
-          invoice: m.invNo || '',
-          qty: Number(m.qty || 0),
-          remark: m.remark || '',
-  
-          itemNo: m.materialNo || m.itemNo || '',
-          itemName: m.itemName || m.description || '',
-          itemSpec: m.itemSpec || '',
-          coil: m.coil != null ? Number(m.coil) : undefined,
-          unit: m.uom || '',
-  
-          incomingId: Number(m.incomingId || 0),
-          storeId: Number(m.storeId || 0),
-          sourceStoreCode: 'Chemical',
-          stockNote: m.stockNote || ''
-        });
-      }
+  });
+
+  this.chemicalItems.forEach((m, index) => {
+    const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+    if (materialNo !== key) return;
+
+    rows.push({
+      uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
+      checked: false,
+      area: 'Chemical',
+      receivedDate: m.receivedAt || '',
+      jobNo: m.jobNo || '',
+      invoice: m.invNo || '',
+      qty: Number(m.qty || 0),
+      remark: m.remark || '',
+      itemNo: m.materialNo || m.itemNo || '',
+      itemName: m.itemName || m.description || '',
+      itemSpec: m.itemSpec || '',
+      coil: m.coil != null ? Number(m.coil) : undefined,
+      unit: m.uom || '',
+      incomingId: Number(m.incomingId || 0),
+      storeId: Number(m.storeId || 0),
+      sourceStoreCode: 'Chemical',
+      stockNote: m.stockNote || ''
     });
+  });
+
+  rows.sort((a, b) => this.toSortableTime(a.receivedDate) - this.toSortableTime(b.receivedDate));
+  return rows;
+}
+
+private getOldestTimeFromRows(rows: { receivedDate?: string }[]): number {
+  if (!rows.length) return Number.MAX_SAFE_INTEGER;
+  return Math.min(...rows.map(r => this.toSortableTime(r.receivedDate)));
+}
+
+private getAreaSetFromRows(rows: { sourceStoreCode?: string; area?: string }[]): Set<string> {
+  return new Set(rows.map(r => (r.sourceStoreCode || r.area || '').trim()).filter(Boolean));
+}
+
+private getOldestAreaSetFromRows(
+  rows: { receivedDate?: string; sourceStoreCode?: string; area?: string }[]
+): Set<string> {
+  const oldestTime = this.getOldestTimeFromRows(rows);
+  if (oldestTime === Number.MAX_SAFE_INTEGER) return new Set<string>();
+
+  return new Set(
+    rows
+      .filter(r => this.toSortableTime(r.receivedDate) === oldestTime)
+      .map(r => (r.sourceStoreCode || r.area || '').trim())
+      .filter(Boolean)
+  );
+}
+
+private hasAnyMaterialInSlot(s: SlotRow): boolean {
+  return !!(s.materials && s.materials.length);
+}
+
+private isTableOccupiedHighlight(s: SlotRow): boolean {
+  return s.status !== 'REJECTED' && this.hasAnyMaterialInSlot(s);
+}
+
+private isMoveAreaGreen(slotId: string): boolean {
+  if (this.panelMode !== 'MOVE_AREA') return false;
+  if (!this.moveRows.length) return false;
+
+  const oldestAreas = this.getOldestAreaSetFromRows(
+    this.moveRows.map(r => ({
+      receivedDate: r.receivedDate,
+      sourceStoreCode: r.sourceStoreCode,
+      area: r.area
+    }))
+  );
+
+  return oldestAreas.has(slotId);
+}
+
+
+private isMoveAreaOrange(slotId: string): boolean {
+  if (this.panelMode !== 'MOVE_AREA') return false;
+  if (!this.moveRows.length) return false;
+
+  const allAreas = this.getAreaSetFromRows(
+    this.moveRows.map(r => ({
+      sourceStoreCode: r.sourceStoreCode,
+      area: r.area
+    }))
+  );
+
+  const oldestAreas = this.getOldestAreaSetFromRows(
+    this.moveRows.map(r => ({
+      receivedDate: r.receivedDate,
+      sourceStoreCode: r.sourceStoreCode,
+      area: r.area
+    }))
+  );
+
+  return allAreas.has(slotId) && !oldestAreas.has(slotId);
+}
+
+private isStockOutGreen(slotId: string): boolean {
+  if (this.panelMode !== 'STOCK_OUT') return false;
+  if (!this.stockOutRows.length) return false;
+
+  const oldestAreas = this.getOldestAreaSetFromRows(this.stockOutRows);
+  return oldestAreas.has(slotId);
+}
+
+private isStockOutOrange(slotId: string): boolean {
+  if (this.panelMode !== 'STOCK_OUT') return false;
+  if (!this.stockOutRows.length) return false;
+
+  const allAreas = this.getAreaSetFromRows(this.stockOutRows);
+  const oldestAreas = this.getOldestAreaSetFromRows(this.stockOutRows);
+
+  return allAreas.has(slotId) && !oldestAreas.has(slotId);
+}
+
+
+
+// private getReturnCandidateRows(): StockOutRow[] {
+//   return this.buildMaterialRowsByItemNo(this.returnStockForm.itemNo || '');
+// }
+
+// private isReturnGreen(slotId: string): boolean {
+//   if (this.panelMode !== 'RETURN_STOCK_IN') return false;
+
+//   const rows = this.getReturnCandidateRows();
+//   if (!rows.length) return false;
+
+//   const oldestAreas = this.getOldestAreaSetFromRows(rows);
+//   return oldestAreas.has(slotId);
+// }
+
+// private isReturnOrange(slotId: string): boolean {
+//   if (this.panelMode !== 'RETURN_STOCK_IN') return false;
+
+//   const rows = this.getReturnCandidateRows();
+//   if (!rows.length) return false;
+
+//   const allAreas = this.getAreaSetFromRows(rows);
+//   const oldestAreas = this.getOldestAreaSetFromRows(rows);
+
+//   return allAreas.has(slotId) && !oldestAreas.has(slotId);
+// }
+
+
+
+
   
-    rows.sort((a, b) => {
-      return this.toSortableTime(a.receivedDate) - this.toSortableTime(b.receivedDate);
-    });
-  
-    this.oldestStockOutReceivedDate = rows.length
-      ? (rows[0].receivedDate || '')
-      : '';
-  
-    this.stockOutRows = rows;
-  
-    if (rows.length) {
-      this.stockOutForm = {
-        itemNo: this.selectedTransactionJob?.materialNo || rows[0].itemNo,
-        itemName: this.selectedTransactionJob?.materialName || rows[0].itemName,
-        itemSpec: this.selectedTransactionJob?.materialSpec || rows[0].itemSpec,
-        mcRemark: this.stockOutForm.mcRemark || ''
-      };
-      return;
-    }
-  
+isOldestStockOutRow(row: StockOutRow): boolean {
+  if (!this.oldestStockOutReceivedDate) return false;
+
+  return (
+    this.toSortableTime(row.receivedDate) ===
+    this.toSortableTime(this.oldestStockOutReceivedDate)
+  );
+}
+
+
+
+
+
+searchStockOutItem() {
+  const key = (this.stockOutSearchItemNo || '').trim();
+
+  this.stockOutRows = [];
+  this.oldestStockOutReceivedDate = '';
+  this.stockOutForm = {
+    itemNo: '',
+    itemName: '',
+    itemSpec: '',
+    mcRemark: ''
+  };
+
+  if (!key) {
     Swal.fire({
-      icon: 'info',
-      title: 'No item found',
-      text: `ไม่พบ Material No : ${this.stockOutSearchItemNo}`
+      icon: 'warning',
+      title: 'Missing Material No',
+      text: 'กรุณากรอก Material No'
     });
+    return;
   }
+
+  const rows = this.buildMaterialRowsByItemNo(key);
+  this.stockOutRows = rows;
+  this.oldestStockOutReceivedDate = rows.length ? (rows[0].receivedDate || '') : '';
+
+  if (rows.length) {
+    this.stockOutForm = {
+      itemNo: this.selectedTransactionJob?.materialNo || rows[0].itemNo,
+      itemName: this.selectedTransactionJob?.materialName || rows[0].itemName,
+      itemSpec: this.selectedTransactionJob?.materialSpec || rows[0].itemSpec,
+      mcRemark: this.stockOutForm.mcRemark || ''
+    };
+    return;
+  }
+
+  Swal.fire({
+    icon: 'info',
+    title: 'No item found',
+    text: `ไม่พบ Material No : ${this.stockOutSearchItemNo}`
+  });
+}
 
 
   isAllStockOutChecked(): boolean {
@@ -1244,16 +1358,50 @@ export class StorageComponent {
   }
 
   slotClass(s: SlotRow) {
+    const slotId = s.storeCode;
+  
     return {
       'slot-card': true,
-      'st-occupied': s.status === 'OCCUPIED',
-      'st-partial': s.status === 'PARTIAL',
-      'st-empty': s.status === 'EMPTY',
+  
+      // base
       'st-rejected': s.status === 'REJECTED',
+      'st-empty': s.status !== 'REJECTED' && !this.shouldOrangeHighlight(s),
+      'st-occupied': s.status !== 'REJECTED' && this.shouldOrangeHighlight(s),
+  
+      // selected
       'is-selected': this.selectedSlot?.storeCode === s.storeCode && this.viewMode === 'SLOT',
-      'is-move-highlight': this.isMoveHighlighted(s.storeCode)
+  
+      // special highlight
+      'is-move-green': this.isMoveAreaGreen(slotId),
+      'is-stockout-green': this.isStockOutGreen(slotId),
+      'is-stockout-orange': this.isStockOutOrange(slotId),
     };
   }
+  
+  private shouldOrangeHighlight(s: SlotRow): boolean {
+    if (this.panelMode === 'MOVE_AREA') {
+      // ยังไม่ search = ใช้แบบ table เดิม
+      if (!this.moveSearchItemNo?.trim()) {
+        return this.hasAnyMaterialInSlot(s);
+      }
+  
+      // search แล้ว = ส้มเฉพาะ area ที่มี material นี้แต่ไม่ oldest
+      return this.isMoveAreaOrange(s.storeCode);
+    }
+  
+    if (this.panelMode === 'STOCK_OUT') {
+      return this.isStockOutOrange(s.storeCode);
+    }
+  
+    if (this.panelMode === 'RETURN_STOCK_IN') {
+      // ใช้แบบ table เดิม
+      return this.hasAnyMaterialInSlot(s);
+    }
+  
+    // TABLE / STOCK_IN / default
+    return this.hasAnyMaterialInSlot(s);
+  }
+  
 
   isMoveHighlighted(slotId: string): boolean {
     return this.panelMode === 'MOVE_AREA' &&
