@@ -1004,13 +1004,31 @@
               
                   <div class="stock-row">
                     <label>Job No.</label>
-                    <input
-                      #moveAreaScanJobNo
-                      type="text"
-                      [(ngModel)]="moveAreaScanForm.jobNo"
-                      (keydown.enter)="onMoveAreaScanEnter('jobNo', $event)"
-                      (blur)="onMoveAreaScanEnter('jobNo', $event)"
-                    />
+                    <div class="move-search-group">
+                      <input
+                        #moveAreaScanJobNo
+                        type="text"
+                        [(ngModel)]="moveAreaScanForm.jobNo"
+                        (input)="onMoveAreaScanInputChange()"
+                        (keydown.enter)="onMoveAreaScanEnter('jobNo', $event)"
+                        (blur)="onMoveAreaScanEnter('jobNo', $event)"
+                      />
+                  
+                      <button
+                        type="button"
+                        class="btn-search"
+                        (click)="searchMoveAreaScanJob()"
+                        [disabled]="!isMoveAreaScanReady"
+                      >
+                        <span *ngIf="isMoveAreaScanScanning">
+                          <i class="fas fa-spinner fa-spin me-1"></i>
+                          Scanning
+                        </span>
+                        <span *ngIf="!isMoveAreaScanScanning">
+                          Search
+                        </span>
+                      </button>
+                    </div>
                   </div>
               
                   <div class="stock-row stock-row-hidden">
@@ -1272,6 +1290,7 @@
                       #moveAreaScanAmount
                       type="text"
                       [(ngModel)]="moveAreaScanForm.amount"
+                      (input)="onMoveAreaScanInputChange()"
                       (keydown.enter)="onMoveAreaScanEnter('amount', $event)"
                       (blur)="onMoveAreaScanEnter('amount', $event)"
                     />
@@ -1351,7 +1370,7 @@
 
 
 
-              
+
 
               <!-- RETURN STOCKIN MODE -->
 

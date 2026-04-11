@@ -486,6 +486,12 @@ export class StorageComponent {
 
   
 
+
+  //part move area scan panel  
+
+  isMoveAreaScanReady = false;
+  isMoveAreaScanScanning = false;
+
   //use push button clear for move Area scan 
   isClearingMoveAreaScan = false;
 
@@ -1057,6 +1063,10 @@ clearMoveAreaScanForm() {
     stockNote: ''
   };
 
+
+  this.isMoveAreaScanReady = false;
+  this.isMoveAreaScanScanning = false;
+
   this.moveRows = [];
   this.selectedSlot = null;
   this.viewMode = 'NONE';
@@ -1387,10 +1397,25 @@ searchStockOutItem() {
 
 
 
+  updateMoveAreaScanState() {
+    const jobNo = (this.moveAreaScanForm.jobNo || '').toString().trim();
+    const amount = (this.moveAreaScanForm.amount || '').toString().trim();
+  
+    this.isMoveAreaScanReady = !!amount;
+    this.isMoveAreaScanScanning = !!jobNo && !amount;
+  }
+
+  onMoveAreaScanInputChange() {
+    this.updateMoveAreaScanState();
+  }
+
+
   onMoveAreaScanEnter(field: MoveAreaScanField, ev: any) {
     if (this.isClearingMoveAreaScan) return;
     if (ev?.key === 'Enter') ev.preventDefault();
     if (this.panelMode !== 'MOVE_AREA_SCAN') return;
+
+    this.updateMoveAreaScanState();
   
     switch (field) {
       case 'jobNo':
