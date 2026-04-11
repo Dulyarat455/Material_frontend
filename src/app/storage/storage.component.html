@@ -1302,10 +1302,7 @@
                       <label>Source Area</label>
                       <div class="value-box">{{ moveAreaScanForm.foundArea || '-' }}</div>
                     </div>
-                    <div class="move-form-row">
-                      <label>Incoming ID</label>
-                      <div class="value-box">{{ moveAreaScanForm.incomingId || '-' }}</div>
-                    </div>
+                    
                   </div>
               
                   <div class="form-divider mc-divider">
@@ -1328,19 +1325,23 @@
                       <label>Target Store Code</label>
                       <div class="value-box">{{ moveAreaScanForm.targetStoreCode || '-' }}</div>
                     </div>
-                    <div class="move-form-row">
-                      <label>Target Store ID</label>
-                      <div class="value-box">{{ moveAreaScanForm.targetStoreId || '-' }}</div>
-                    </div>
+                  
                   </div>
               
-                  <div class="panel-footer mt-3 d-flex align-items-center">
+                  <div class="stock-footer">
+                    <button
+                      class="btn-soft"
+                      type="button"
+                      (click)="clearMoveAreaScanForm()"
+                      >
+                      Clear
+                    </button>
                     <button
                       class="btn btn-primary"
                       type="button"
                       (click)="submitMoveAreaScan()"
                     >
-                      Prepare Move Request
+                      Move Area 
                     </button>
                   </div>
                 </div>
@@ -1350,16 +1351,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
+              
 
               <!-- RETURN STOCKIN MODE -->
 

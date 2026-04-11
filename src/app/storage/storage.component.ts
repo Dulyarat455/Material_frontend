@@ -434,6 +434,7 @@ export class StorageComponent {
   foundItemSpec: '',
   foundArea: '',
   incomingId: null as number | null,
+  sourceStoreId: null as number | null,
   targetStoreId: null as number | null,
   targetStoreCode: '',
   stockNote: ''
@@ -483,11 +484,10 @@ export class StorageComponent {
     incomingId?: number | null;
   } | null = null;
 
-  // isReturnFromTransaction = false;
-  // returnJobInfo: TransactionNavJob | null = null;
+  
 
-
-
+  //use push button clear for move Area scan 
+  isClearingMoveAreaScan = false;
 
 
   // ใช้ข้อมูลจริงจาก API
@@ -852,7 +852,46 @@ private findStoreMasterByCode(storeCode: string): storeMasterRow | null {
 
 
 
-
+private resetMoveAreaScanForm() {
+  this.moveAreaScanForm = {
+    jobNo: '',
+    yearMonth: '',
+    recivedDate: '',
+    inspector: '',
+    unloadBy: '',
+    invoiceOne: '',
+    taxInvNo: '',
+    itemNo: '',
+    unitPrice: '',
+    qtyOfPalletPack: '',
+    coil: '',
+    qtyKgsPcs: '',
+    unit: '',
+    kgsCoil: '',
+    odCoil: '',
+    remark: '',
+    millSheet: '',
+    itemName: '',
+    specDwg: '',
+    lotNo: '',
+    quantity: '',
+    rosh: '',
+    result: '',
+    supplier: '',
+    amount: '',
+    storeCode: '',
+    foundJobNo: '',
+    foundItemNo: '',
+    foundItemName: '',
+    foundItemSpec: '',
+    foundArea: '',
+    incomingId: null,
+    sourceStoreId: null,
+    targetStoreId: null,
+    targetStoreCode: '',
+    stockNote: ''
+  };
+}
 
 searchMoveAreaScanJob() {
   const key = (this.moveAreaScanForm.jobNo || '').trim();
@@ -863,6 +902,7 @@ searchMoveAreaScanJob() {
   this.moveAreaScanForm.foundItemSpec = '';
   this.moveAreaScanForm.foundArea = '';
   this.moveAreaScanForm.incomingId = null;
+  this.moveAreaScanForm.sourceStoreId = null;
   this.moveAreaScanForm.stockNote = '';
 
   if (!key) {
@@ -878,6 +918,8 @@ searchMoveAreaScanJob() {
 
   if (!rows.length) {
     this.moveRows = [];
+    this.resetMoveAreaScanForm();
+    this.selectedSlot = null;
     Swal.fire({
       icon: 'info',
       title: 'No item found',
@@ -903,6 +945,7 @@ searchMoveAreaScanJob() {
   this.moveAreaScanForm.foundItemSpec = picked.itemSpec || '';
   this.moveAreaScanForm.foundArea = picked.sourceStoreCode || picked.area || '';
   this.moveAreaScanForm.incomingId = picked.incomingId || null;
+  this.moveAreaScanForm.sourceStoreId = picked.storeId || null;
   this.moveAreaScanForm.stockNote = picked.stockNote || '';
 
 
@@ -931,6 +974,15 @@ searchMoveAreaScanJob() {
 
 
 
+private resetMoveAreaScanDestination() {
+  this.moveAreaScanForm.storeCode = '';
+  this.moveAreaScanForm.targetStoreId = null;
+  this.moveAreaScanForm.targetStoreCode = '';
+}
+
+
+
+
 searchMoveAreaScanStoreCode() {
   const key = (this.moveAreaScanForm.storeCode || '').trim();
 
@@ -947,6 +999,8 @@ searchMoveAreaScanStoreCode() {
   const store = this.findStoreMasterByCode(key);
 
   if (!slot || !store?.id) {
+    this.resetMoveAreaScanDestination();
+    this.selectedSlot = null;
     Swal.fire({
       icon: 'warning',
       title: 'Invalid Store Code',
@@ -962,7 +1016,57 @@ searchMoveAreaScanStoreCode() {
 }
 
 
+clearMoveAreaScanForm() {
+  this.isClearingMoveAreaScan = true;
+  this.moveAreaScanForm = {
+    jobNo: '',
+    yearMonth: '',
+    recivedDate: '',
+    inspector: '',
+    unloadBy: '',
+    invoiceOne: '',
+    taxInvNo: '',
+    itemNo: '',
+    unitPrice: '',
+    qtyOfPalletPack: '',
+    coil: '',
+    qtyKgsPcs: '',
+    unit: '',
+    kgsCoil: '',
+    odCoil: '',
+    remark: '',
+    millSheet: '',
+    itemName: '',
+    specDwg: '',
+    lotNo: '',
+    quantity: '',
+    rosh: '',
+    result: '',
+    supplier: '',
+    amount: '',
+    storeCode: '',
+    foundJobNo: '',
+    foundItemNo: '',
+    foundItemName: '',
+    foundItemSpec: '',
+    foundArea: '',
+    incomingId: null,
+    sourceStoreId: null,
+    targetStoreId: null,
+    targetStoreCode: '',
+    stockNote: ''
+  };
 
+  this.moveRows = [];
+  this.selectedSlot = null;
+  this.viewMode = 'NONE';
+
+  this.focusEl(this.moveAreaScanJobNo);
+
+  setTimeout(() => {
+    this.isClearingMoveAreaScan = false;
+  }, 0);
+}
 
 
 
@@ -1284,6 +1388,7 @@ searchStockOutItem() {
 
 
   onMoveAreaScanEnter(field: MoveAreaScanField, ev: any) {
+    if (this.isClearingMoveAreaScan) return;
     if (ev?.key === 'Enter') ev.preventDefault();
     if (this.panelMode !== 'MOVE_AREA_SCAN') return;
   
@@ -1640,6 +1745,7 @@ searchStockOutItem() {
         foundItemSpec: '',
         foundArea: '',
         incomingId: null,
+        sourceStoreId: null,
         targetStoreId: null,
         targetStoreCode: '',
         stockNote: ''
@@ -3265,9 +3371,9 @@ searchStockOutItem() {
 
 
 
-  submitMoveAreaScan() {
+  async submitMoveAreaScan() {
     if (!this.moveAreaScanForm.incomingId) {
-      Swal.fire({
+      await Swal.fire({
         icon: 'warning',
         title: 'Missing Incoming',
         text: 'กรุณา Scan Job No ก่อน'
@@ -3275,21 +3381,29 @@ searchStockOutItem() {
       return;
     }
   
+    if (!this.moveAreaScanForm.sourceStoreId) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Missing Source Store',
+        text: 'ไม่พบ Source Store ของ Material นี้'
+      });
+      return;
+    }
+  
     if (!this.moveAreaScanForm.targetStoreId) {
-      Swal.fire({
+      await Swal.fire({
         icon: 'warning',
         title: 'Missing Destination Store',
         text: 'กรุณา Scan Store Code ปลายทางก่อน'
       });
       return;
     }
-
-
+  
     if (
       (this.moveAreaScanForm.foundArea || '').trim() ===
       (this.moveAreaScanForm.targetStoreCode || '').trim()
     ) {
-      Swal.fire({
+      await Swal.fire({
         icon: 'warning',
         title: 'Invalid Destination',
         text: 'ปลายทางต้องไม่ใช่ Area เดียวกับต้นทาง'
@@ -3297,37 +3411,126 @@ searchStockOutItem() {
       return;
     }
   
+    if (!this.userId) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Missing User',
+        text: 'ไม่พบ userId ของผู้ใช้งาน'
+      });
+      return;
+    }
+  
     const body = {
       incomingId: this.moveAreaScanForm.incomingId,
-      storeId: this.moveAreaScanForm.targetStoreId,
+      storeId: this.moveAreaScanForm.sourceStoreId,
       userId: this.userId,
-      inchargeTime: new Date().toISOString(),
-      sourceJobNo: this.moveAreaScanForm.foundJobNo,
-      sourceStoreCode: this.moveAreaScanForm.foundArea,
-      targetStoreCode: this.moveAreaScanForm.targetStoreCode,
+      storeCodeDestination: this.moveAreaScanForm.targetStoreCode,
       stockNote: this.moveAreaScanForm.stockNote || ''
     };
   
-    console.log('MOVE_AREA_SCAN body =>', body);
-  
-    Swal.fire({
-      icon: 'info',
-      title: 'Prepared request body',
+    const confirm = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Move Area',
       html: `
-        <div style="text-align:left; line-height:1.8;">
-          <div><b>Incoming ID:</b> ${body.incomingId}</div>
-          <div><b>Store ID:</b> ${body.storeId}</div>
-          <div><b>Source Job No:</b> ${this.escapeHtml(body.sourceJobNo || '-')}</div>
-          <div><b>Source Area:</b> ${this.escapeHtml(body.sourceStoreCode || '-')}</div>
-          <div><b>Target Area:</b> ${this.escapeHtml(body.targetStoreCode || '-')}</div>
+        <div style="text-align:left; line-height:1.9;">
+          <div><b>Job No:</b> ${this.escapeHtml(this.moveAreaScanForm.foundJobNo || '-')}</div>
+          <div><b>Source Area:</b> ${this.escapeHtml(this.moveAreaScanForm.foundArea || '-')}</div>
+          <div><b>Destination Area:</b> ${this.escapeHtml(this.moveAreaScanForm.targetStoreCode || '-')}</div>
         </div>
-      `
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Confirm Move',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
     });
   
-    // TODO: รอ backend API
-    // this.http.post(config.apiServer + '/api/mc/moveAreaScan', body).subscribe(...)
+    if (!confirm.isConfirmed) return;
+  
+    this.isMovingArea = true;
+  
+    this.http.post(`${config.apiServer}/api/mc/moveArea`, body).subscribe({
+      next: async (res: any) => {
+        this.isMovingArea = false;
+  
+        await Swal.fire({
+          icon: 'success',
+          title: 'Move Area Success',
+          text: 'ย้าย Area เรียบร้อยแล้ว',
+          timer: 1400,
+          showConfirmButton: false
+        });
+  
+        this.moveAreaScanForm = {
+          jobNo: '',
+          yearMonth: '',
+          recivedDate: '',
+          inspector: '',
+          unloadBy: '',
+          invoiceOne: '',
+          taxInvNo: '',
+          itemNo: '',
+          unitPrice: '',
+          qtyOfPalletPack: '',
+          coil: '',
+          qtyKgsPcs: '',
+          unit: '',
+          kgsCoil: '',
+          odCoil: '',
+          remark: '',
+          millSheet: '',
+          itemName: '',
+          specDwg: '',
+          lotNo: '',
+          quantity: '',
+          rosh: '',
+          result: '',
+          supplier: '',
+          amount: '',
+          storeCode: '',
+          foundJobNo: '',
+          foundItemNo: '',
+          foundItemName: '',
+          foundItemSpec: '',
+          foundArea: '',
+          incomingId: null,
+          sourceStoreId: null,
+          targetStoreId: null,
+          targetStoreCode: '',
+          stockNote: ''
+        };
+  
+        this.moveRows = [];
+        this.selectedSlot = null;
+        this.viewMode = 'NONE';
+  
+        this.fetchStorageMap();
+        this.focusEl(this.moveAreaScanJobNo);
+      },
+      error: async (err) => {
+        this.isMovingArea = false;
+  
+        let message = 'เกิดข้อผิดพลาดในการย้าย Area';
+  
+        if (err?.error?.message === 'store_not_found') {
+          message = 'ไม่พบ Store ปลายทาง';
+        } else if (err?.error?.message === 'old_transaction_not_found') {
+          message = 'ไม่พบตำแหน่งเดิมของ Material นี้';
+        } else if (err?.error?.message === 'incoming_not_found') {
+          message = 'ไม่พบ Incoming นี้ในระบบ';
+        } else if (err?.error?.message === 'missing_required_fields') {
+          message = 'ข้อมูลส่งไปไม่ครบ';
+        } else if (err?.error?.error) {
+          message = err.error.error;
+        }
+  
+        await Swal.fire({
+          icon: 'error',
+          title: 'Move Area Failed',
+          text: message
+        });
+      }
+    });
   }
-
 
 
 
