@@ -1,6 +1,6 @@
 const config = {
  // apiServer: 'http://localhost:3001', //For Test
-   apiServer: 'http://10.121.50.66:3001', //Production PLB085
+   apiServer: 'http://10.121.49.179:3001', //Production PLB085
   // apiServer: 'http://10.121.1.85:3001', //Production PLB085
   // apiServer: 'http://10.121.1.85/scrapAPI', //Production PLB085
 };

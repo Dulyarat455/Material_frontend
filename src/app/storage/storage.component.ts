@@ -435,7 +435,9 @@ export class StorageComponent {
   foundArea: '',
   incomingId: null as number | null,
   targetStoreId: null as number | null,
-  targetStoreCode: ''
+  targetStoreCode: '',
+  stockNote: ''
+
 };
 
 
@@ -861,6 +863,7 @@ searchMoveAreaScanJob() {
   this.moveAreaScanForm.foundItemSpec = '';
   this.moveAreaScanForm.foundArea = '';
   this.moveAreaScanForm.incomingId = null;
+  this.moveAreaScanForm.stockNote = '';
 
   if (!key) {
     Swal.fire({
@@ -874,6 +877,7 @@ searchMoveAreaScanJob() {
   const rows = this.buildMaterialRowsByJobNo(key);
 
   if (!rows.length) {
+    this.moveRows = [];
     Swal.fire({
       icon: 'info',
       title: 'No item found',
@@ -899,6 +903,8 @@ searchMoveAreaScanJob() {
   this.moveAreaScanForm.foundItemSpec = picked.itemSpec || '';
   this.moveAreaScanForm.foundArea = picked.sourceStoreCode || picked.area || '';
   this.moveAreaScanForm.incomingId = picked.incomingId || null;
+  this.moveAreaScanForm.stockNote = picked.stockNote || '';
+
 
   this.moveRows = [{
     uid: picked.uid,
@@ -1635,7 +1641,8 @@ searchStockOutItem() {
         foundArea: '',
         incomingId: null,
         targetStoreId: null,
-        targetStoreCode: ''
+        targetStoreCode: '',
+        stockNote: ''
       };
     }
 
@@ -3297,7 +3304,8 @@ searchStockOutItem() {
       inchargeTime: new Date().toISOString(),
       sourceJobNo: this.moveAreaScanForm.foundJobNo,
       sourceStoreCode: this.moveAreaScanForm.foundArea,
-      targetStoreCode: this.moveAreaScanForm.targetStoreCode
+      targetStoreCode: this.moveAreaScanForm.targetStoreCode,
+      stockNote: this.moveAreaScanForm.stockNote || ''
     };
   
     console.log('MOVE_AREA_SCAN body =>', body);
