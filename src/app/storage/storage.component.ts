@@ -2865,6 +2865,19 @@ searchStockOutItem() {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
           }
+
+
+          .swal2-popup .stock-row-hidden {
+            position: absolute;
+            left: -99999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+          }
+
         </style>
   
         <div class="stock-panel">
@@ -2879,31 +2892,31 @@ searchStockOutItem() {
   
           <div class="stock-row">
             <label>Job No.</label>
-            <input id="swal-scan-jobno" type="text" autocomplete="off" placeholder="Scan Job No." />
+            <input id="swal-scan-jobno" type="text" autocomplete="off"  placeholder="⌁ Scan QR / Job No." />
           </div>
   
-          <div class="stock-row"><label>yearMonth</label><input id="swal-scan-yearMonth" type="text" /></div>
-          <div class="stock-row"><label>recivedDate</label><input id="swal-scan-recivedDate" type="text" /></div>
-          <div class="stock-row"><label>inspector</label><input id="swal-scan-inspector" type="text" /></div>
-          <div class="stock-row"><label>UnloadBy</label><input id="swal-scan-unloadBy" type="text" /></div>
-          <div class="stock-row"><label>invoiceOne</label><input id="swal-scan-invoiceOne" type="text" /></div>
-          <div class="stock-row"><label>taxInvNo</label><input id="swal-scan-taxInvNo" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>yearMonth</label><input id="swal-scan-yearMonth" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>recivedDate</label><input id="swal-scan-recivedDate" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>inspector</label><input id="swal-scan-inspector" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>UnloadBy</label><input id="swal-scan-unloadBy" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>invoiceOne</label><input id="swal-scan-invoiceOne" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>taxInvNo</label><input id="swal-scan-taxInvNo" type="text" /></div>
           <div class="stock-row"><label>materialNo</label><input id="swal-scan-itemNo" type="text" /></div>
-          <div class="stock-row"><label>unitPrice</label><input id="swal-scan-unitPrice" type="text" /></div>
-          <div class="stock-row"><label>qtyOfPalletPack</label><input id="swal-scan-qtyOfPalletPack" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>unitPrice</label><input id="swal-scan-unitPrice" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>qtyOfPalletPack</label><input id="swal-scan-qtyOfPalletPack" type="text" /></div>
           <div class="stock-row"><label>coil</label><input id="swal-scan-coil" type="text" /></div>
           <div class="stock-row"><label>qtyKgsPcs</label><input id="swal-scan-qtyKgsPcs" type="text" /></div>
           <div class="stock-row"><label>unit</label><input id="swal-scan-unit" type="text" /></div>
-          <div class="stock-row"><label>kgsCoil</label><input id="swal-scan-kgsCoil" type="text" /></div>
-          <div class="stock-row"><label>odCoil</label><input id="swal-scan-odCoil" type="text" /></div>
-          <div class="stock-row"><label>remark</label><input id="swal-scan-remark" type="text" /></div>
-          <div class="stock-row"><label>millSheet</label><input id="swal-scan-millSheet" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>kgsCoil</label><input id="swal-scan-kgsCoil" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>odCoil</label><input id="swal-scan-odCoil" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>remark</label><input id="swal-scan-remark" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>millSheet</label><input id="swal-scan-millSheet" type="text" /></div>
           <div class="stock-row"><label>Item Name.</label><input id="swal-scan-itemName" type="text" /></div>
           <div class="stock-row"><label>Spec/Dwg</label><input id="swal-scan-specDwg" type="text" /></div>
-          <div class="stock-row"><label>Lot No.</label><input id="swal-scan-lotNo" type="text" /></div>
-          <div class="stock-row"><label>packing</label><input id="swal-scan-quantity" type="text" /></div>
-          <div class="stock-row"><label>rosh</label><input id="swal-scan-rosh" type="text" /></div>
-          <div class="stock-row"><label>result</label><input id="swal-scan-result" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>Lot No.</label><input id="swal-scan-lotNo" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>packing</label><input id="swal-scan-quantity" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>rosh</label><input id="swal-scan-rosh" type="text" /></div>
+          <div class="stock-row stock-row-hidden"><label>result</label><input id="swal-scan-result" type="text" /></div>
           <div class="stock-row"><label>supplier</label><input id="swal-scan-supplier" type="text" /></div>
           <div class="stock-row"><label>amount</label><input id="swal-scan-amount" type="text" /></div>
         </div>
@@ -3558,6 +3571,411 @@ searchStockOutItem() {
   }
 
 
+
+
+  // ============
+  //  outStock
+  // ============
+
+
+  private normalizeValue(value: any): string {
+    return (value || '').toString().trim().toLowerCase();
+  }
+
+
+
+  openTableOutRemarkModal(item: MaterialItem) {
+    Swal.fire({
+      icon: 'question',
+      title: 'Stock Out Remark',
+      input: 'textarea',
+      inputLabel: 'Remark / Reason',
+      inputPlaceholder: 'กรอกเหตุผลสำหรับการ Stock Out Material',
+      inputAttributes: {
+        'aria-label': 'Remark / Reason'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Next',
+      cancelButtonText: 'Cancel',
+      inputValidator: (value) => {
+        if (!(value || '').trim()) {
+          return 'กรุณากรอก Remark';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      const remark = (result.value || '').toString().trim();
+      this.openTableOutScanModal(item, remark);
+    });
+  }
+
+
+
+
+  openTableOutScanModal(item: MaterialItem, remark: string) {
+    const expectedJobNo = this.normalizeValue(item.jobNo);
+  
+    Swal.fire({
+      title: 'Scan Incoming Material',
+      width: 760,
+      html: `
+        <style>
+          .table-out-panel {
+            padding-top: 6px;
+            max-height: 65vh;
+            overflow-y: auto;
+          }
+          .table-out-row {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+          }
+          .table-out-row label {
+            font-size: 14px;
+            font-weight: 700;
+            text-align: left;
+          }
+          .table-out-row input {
+            width: 100%;
+            min-height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(2, 6, 23, 0.12);
+            padding: 8px 10px;
+            outline: none;
+          }
+          .table-out-row-hidden {
+            position: absolute;
+            left: -99999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+          }
+          .table-out-note {
+            text-align: left;
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 12px;
+            line-height: 1.7;
+          }
+        </style>
+  
+        <div class="table-out-note">
+          <div><b>Expected Job No:</b> ${this.escapeHtml(item.jobNo || '-')}</div>
+          <div><b>Material No:</b> ${this.escapeHtml(item.materialNo || item.itemNo || '-')}</div>
+          <div><b>Item Name:</b> ${this.escapeHtml(item.itemName || item.description || '-')}</div>
+          <div><b>Remark:</b> ${this.escapeHtml(remark || '-')}</div>
+        </div>
+  
+        <div class="table-out-panel">
+          <div class="table-out-row">
+            <label>Job No.</label>
+            <input id="tblOutJobNo" type="text" placeholder="⌁ Scan QR / Job No." />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>yearMonth</label>
+            <input id="tblOutYearMonth" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>recivedDate</label>
+            <input id="tblOutRecivedDate" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>inspector</label>
+            <input id="tblOutInspector" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>UnloadBy</label>
+            <input id="tblOutUnloadBy" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>invoiceOne</label>
+            <input id="tblOutInvoiceOne" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>taxInvNo</label>
+            <input id="tblOutTaxInvNo" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>materialNo</label>
+            <input id="tblOutItemNo" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>unitPrice</label>
+            <input id="tblOutUnitPrice" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>qtyOfPalletPack</label>
+            <input id="tblOutQtyOfPalletPack" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>coil</label>
+            <input id="tblOutCoil" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>qtyKgsPcs</label>
+            <input id="tblOutQtyKgsPcs" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>Unit</label>
+            <input id="tblOutUnit" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>kgsCoil</label>
+            <input id="tblOutKgsCoil" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>odCoil</label>
+            <input id="tblOutOdCoil" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>remark</label>
+            <input id="tblOutRemark" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>millSheet</label>
+            <input id="tblOutMillSheet" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>Item Name.</label>
+            <input id="tblOutItemName" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>Spec/Dwg</label>
+            <input id="tblOutSpecDwg" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>Lot No.</label>
+            <input id="tblOutLotNo" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>quantity</label>
+            <input id="tblOutQuantity" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>rosh</label>
+            <input id="tblOutRosh" type="text" />
+          </div>
+  
+          <div class="table-out-row table-out-row-hidden">
+            <label>result</label>
+            <input id="tblOutResult" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>supplier</label>
+            <input id="tblOutSupplier" type="text" />
+          </div>
+  
+          <div class="table-out-row">
+            <label>amount</label>
+            <input id="tblOutAmount" type="text" />
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Verify & Out',
+      cancelButtonText: 'Cancel',
+      focusConfirm: false,
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        if (!popup) return;
+  
+        const fieldOrder = [
+          'tblOutJobNo',
+          'tblOutYearMonth',
+          'tblOutRecivedDate',
+          'tblOutInspector',
+          'tblOutUnloadBy',
+          'tblOutInvoiceOne',
+          'tblOutTaxInvNo',
+          'tblOutItemNo',
+          'tblOutUnitPrice',
+          'tblOutQtyOfPalletPack',
+          'tblOutCoil',
+          'tblOutQtyKgsPcs',
+          'tblOutUnit',
+          'tblOutKgsCoil',
+          'tblOutOdCoil',
+          'tblOutRemark',
+          'tblOutMillSheet',
+          'tblOutItemName',
+          'tblOutSpecDwg',
+          'tblOutLotNo',
+          'tblOutQuantity',
+          'tblOutRosh',
+          'tblOutResult',
+          'tblOutSupplier',
+          'tblOutAmount'
+        ];
+  
+        const focusField = (id: string) => {
+          const el = popup.querySelector(`#${id}`) as HTMLInputElement | null;
+          if (!el) return;
+          el.focus();
+          el.select?.();
+        };
+  
+        const jobNoInput = popup.querySelector('#tblOutJobNo') as HTMLInputElement | null;
+        const amountInput = popup.querySelector('#tblOutAmount') as HTMLInputElement | null;
+        const confirmBtn = Swal.getConfirmButton();
+  
+        const toggleVerifyButton = () => {
+          if (!confirmBtn) return;
+          const hasJobNo = !!(jobNoInput?.value || '').trim();
+          const hasAmount = !!(amountInput?.value || '').trim();
+          confirmBtn.disabled = !(hasJobNo && hasAmount);
+        };
+  
+        if (confirmBtn) {
+          confirmBtn.disabled = true;
+        }
+  
+        fieldOrder.forEach((id, index) => {
+          const el = popup.querySelector(`#${id}`) as HTMLInputElement | null;
+          if (!el) return;
+  
+          el.addEventListener('input', toggleVerifyButton);
+          el.addEventListener('change', toggleVerifyButton);
+          el.addEventListener('keyup', toggleVerifyButton);
+  
+          el.addEventListener('keydown', (ev: KeyboardEvent) => {
+            if (ev.key !== 'Enter') return;
+            ev.preventDefault();
+  
+            const nextId = fieldOrder[index + 1];
+            if (nextId) {
+              focusField(nextId);
+            }
+          });
+        });
+  
+        toggleVerifyButton();
+        focusField('tblOutJobNo');
+      },
+      preConfirm: () => {
+        const scanJobNo = (document.getElementById('tblOutJobNo') as HTMLInputElement | null)?.value || '';
+        const amount = (document.getElementById('tblOutAmount') as HTMLInputElement | null)?.value || '';
+  
+        if (!scanJobNo.trim() || !amount.trim()) {
+          Swal.showValidationMessage('กรุณา รอข้อมูล จากการ Scan');
+          return false;
+        }
+  
+        if (this.normalizeValue(scanJobNo) !== expectedJobNo) {
+          Swal.showValidationMessage('Job No ที่ scan ไม่ตรงกับ Material ที่เลือก');
+          return false;
+        }
+  
+        return {
+          jobNo: scanJobNo.trim(),
+          amount: amount.trim()
+        };
+      }
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.submitTableOut(item, remark);
+    });
+  }
+
+
+
+  submitTableOut(item: MaterialItem, remark: string) {
+    if (!item?.incomingId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Incoming ID',
+        text: 'ไม่พบ incomingId ของ Material นี้'
+      });
+      return;
+    }
+  
+    if (!this.userId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing User',
+        text: 'ไม่พบ userId ของผู้ใช้งาน'
+      });
+      return;
+    }
+  
+    const body = {
+      incomingId: Number(item.incomingId),
+      inchargeByUserId: Number(this.userId),
+      remark: (remark || '').trim()
+    };
+  
+    this.http.post(`${config.apiServer}/api/mc/stockOutMaterial`, body).subscribe({
+      next: async () => {
+        await Swal.fire({
+          icon: 'success',
+          title: 'Stock Out Success',
+          text: `Material Job No ${item.jobNo || '-'} ถูกนำออกจากระบบแล้ว`,
+          timer: 1400,
+          showConfirmButton: false
+        });
+  
+        this.fetchStorageMap();
+  
+        if (this.viewMode === 'SLOT' && this.selectedSlot?.storeCode) {
+          const code = this.selectedSlot.storeCode;
+          setTimeout(() => {
+            const slot = this.slots.find(s => s.storeCode === code) || null;
+            this.selectedSlot = slot;
+          }, 250);
+        }
+      },
+      error: async (err) => {
+        let message = 'เกิดข้อผิดพลาดในการ Stock Out';
+  
+        if (err?.error?.message === 'missing_required_fields') {
+          message = 'ข้อมูลส่งไม่ครบ';
+        } else if (err?.error?.message === 'incoming_notFound') {
+          message = 'ไม่พบ Incoming นี้ในระบบ';
+        } else if (err?.error?.message === 'incoming_in_stockOut_already') {
+          message = 'Material นี้ถูก Stock Out ไปแล้ว';
+        } else if (err?.error?.message === 'do_not_have_this_incoming_inStore') {
+          message = 'ไม่มี Material Incoming นี้ใน Store';
+        } else if (err?.error?.error) {
+          message = err.error.error;
+        } else if (err?.error?.message) {
+          message = err.error.message;
+        }
+  
+        await Swal.fire({
+          icon: 'error',
+          title: 'Stock Out Failed',
+          text: message
+        });
+      }
+    });
+  }
 
 
 

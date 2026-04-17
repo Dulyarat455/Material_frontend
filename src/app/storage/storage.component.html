@@ -340,7 +340,7 @@
                             <button (click)="openMaterialDetailSwal(p)"> Detail </button>
                           </td>
                           <td class="text-center">
-                            <button>out</button>
+                            <button type="button" (click)="openTableOutRemarkModal(p)">out</button>
                           </td>
                         </tr>
 
@@ -363,7 +363,7 @@
                             <button (click)="openMaterialDetailSwal(c)">Detail</button>
                           </td>
                           <td class="text-center">
-                            <button>out</button>
+                            <button type="button" (click)="openTableOutRemarkModal(c)">out</button>
                           </td>
                         </tr>
                     
@@ -384,7 +384,9 @@
                           <td class="text-center">{{ m.qty }}</td>
                           <td class="muted">{{ m.uom }}</td>
                           <td class="muted"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
-                          <td class="text-center"><button>out</button></td>
+                          <td class="text-center">
+                            <button type="button" (click)="openTableOutRemarkModal(m)">out</button>
+                          </td>
                         </tr>
 
                         <tr *ngIf="!(selectedSlot?.materials?.length)">
