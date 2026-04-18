@@ -926,11 +926,17 @@ searchMoveAreaScanJob() {
     this.moveRows = [];
     this.resetMoveAreaScanForm();
     this.selectedSlot = null;
+  
     Swal.fire({
       icon: 'info',
       title: 'No item found',
       text: `ไม่พบ Incoming Job No : ${key}`
+    }).then(() => {
+      setTimeout(() => {
+        this.focusEl(this.moveAreaScanJobNo);
+      }, 0);
     });
+  
     return;
   }
 
@@ -984,6 +990,7 @@ private resetMoveAreaScanDestination() {
   this.moveAreaScanForm.storeCode = '';
   this.moveAreaScanForm.targetStoreId = null;
   this.moveAreaScanForm.targetStoreCode = '';
+  
 }
 
 

@@ -6,6 +6,10 @@ import { IssueComponent } from './issue/issue.component';
 import { ReturnComponent } from './return/return.component';
 import { JobTransactionComponent } from './job-transaction/job-transaction.component';
 import { MaterialComponent } from './material/material.component';
+import { InventoryReportComponent } from './inventory-report/inventory-report.component';
+import { TransactionJobReportComponent } from './transaction-job-report/transaction-job-report.component';
+import { TransactionStoreReportComponent } from './transaction-store-report/transaction-store-report.component';
+import { StockOutReportComponent } from './stock-out-report/stock-out-report.component';
 
 export const routes: Routes = [
 
@@ -50,9 +54,34 @@ export const routes: Routes = [
     component: MaterialComponent,
   },
 
- 
+
 
   
+  {
+    path: 'inventory',
+    component: InventoryReportComponent,
+  },
+
+
+
+  {
+    path: 'transactionJob',
+    component: TransactionJobReportComponent,
+  },
+
+
+  {
+    path: 'transactionStore',
+    component: TransactionStoreReportComponent,
+  },
+
+
+  {
+    path: 'stockOut',
+    component: StockOutReportComponent,
+  },
+
+
   {
     path: '404',
     component: NotFoundComponent,
