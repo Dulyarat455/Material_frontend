@@ -1,0 +1,170 @@
+<div class="material-page">
+    <div class="page-shell">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-header-icon">
+            <i class="fa fa-users"></i>
+          </div>
+  
+          <div class="page-header-text">
+            <div class="page-title">User Master</div>
+            <div class="page-subtitle">Manage user account and register member</div>
+          </div>
+        </div>
+  
+        <div class="page-header-right">
+          <div class="stat-chip">
+            <span class="stat-label">Total</span>
+            <span class="stat-value">{{ filteredRows.length }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="toolbar-card">
+        <div class="toolbar-left">
+          <button
+            class="btn btn-primary action-btn"
+            type="button"
+            (click)="openAddMemberModal()"
+          >
+            <i class="fa fa-user-plus me-2"></i>
+            Add Member
+          </button>
+  
+          <button
+            class="btn btn-outline-secondary action-btn"
+            type="button"
+            [disabled]="isLoading"
+            (click)="fetchUserList()"
+          >
+            <i class="fa fa-refresh me-2"></i>
+            Refresh
+          </button>
+        </div>
+  
+        <div class="toolbar-right">
+          <div class="search-box">
+            <i class="fa fa-search search-icon"></i>
+            <input
+              type="text"
+              class="form-control search-input"
+              placeholder="Search rfId / empNo / name / role / group / section / jobNo"
+              [(ngModel)]="searchText"
+              (input)="onSearchChange()"
+            />
+          </div>
+        </div>
+      </div>
+  
+      <div class="table-card">
+        <div class="table-head">
+          <div class="table-title">User List</div>
+          <div class="table-subtitle">
+            แสดงข้อมูลผู้ใช้งานจาก User และ MapSectionGroupUser
+          </div>
+        </div>
+  
+        <div class="table-wrap">
+          <table class="table table-hover align-middle mb-0 material-table">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Index</th>
+                <th style="width: 160px;">RFID</th>
+                <th style="width: 160px;">Password</th>
+                <th style="width: 140px;">Emp No</th>
+                <th style="width: 220px;">Name</th>
+                <th style="width: 140px;">Role</th>
+                <th style="width: 180px;">Group</th>
+                <th style="width: 180px;">Section</th>
+                <th style="width: 280px;">On-Process</th>
+                <th style="width: 110px;">Edit</th>
+                <th style="width: 110px;">Delete</th>
+              </tr>
+            </thead>
+  
+            <tbody *ngIf="!isLoading">
+              <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByRow">
+                <td><span class="index-badge">{{ i + 1 }}</span></td>
+                <td><div class="material-no">{{ row.rfId || '-' }}</div></td>
+                <td><div class="material-spec">{{ row.password || '-' }}</div></td>
+                <td><div class="material-no">{{ row.empNo || '-' }}</div></td>
+                <td><div class="material-name">{{ row.name || '-' }}</div></td>
+                <td><div class="material-spec">{{ row.role || '-' }}</div></td>
+                <td><div class="material-spec">{{ row.groupName || '-' }}</div></td>
+                <td><div class="material-spec">{{ row.sectionName || '-' }}</div></td>
+  
+                <td>
+                    <ng-container *ngIf="!row.hasPending">
+                      <div class="pending-pill">No pending</div>
+                    </ng-container>
+                  
+                    <ng-container *ngIf="row.hasPending">
+                      <button
+                        type="button"
+                        class="on-process-trigger"
+                        (click)="openOnProcessSummary(row)"
+                        [title]="'Issue ' + row.issueWaitCount + ' / Return ' + row.returnWaitCount"
+                      >
+                      <span class="process-chip process-issue" *ngIf="row.issueWaitCount > 0">
+                        Issue {{ row.issueWaitCount }}
+                      </span>
+                        <span class="process-chip process-return" *ngIf="row.returnWaitCount > 0">
+                          Return {{ row.returnWaitCount }}
+                        </span>
+                      
+                      </button>
+                    </ng-container>
+                  </td>
+                  
+                  <td class="text-center">
+                    <button
+                      type="button"
+                      class="table-action-btn btn-edit"
+                      [disabled]="row.hasPending"
+                      (click)="openEditMember(row)"
+                    >
+                      Edit
+                    </button>
+                  </td>
+                  
+                  <td class="text-center">
+                    <button
+                      type="button"
+                      class="table-action-btn btn-delete"
+                      [disabled]="row.hasPending"
+                      (click)="confirmDeleteMember(row)"
+                    >
+                      Delete
+                    </button>
+                  </td>
+
+              </tr>
+  
+              <tr *ngIf="!filteredRows.length">
+                <td colspan="11" class="empty-cell">
+                  <div class="empty-state">
+                    <i class="fa fa-inbox empty-icon"></i>
+                    <div class="empty-title">No user data found</div>
+                    <div class="empty-subtitle">
+                      ไม่พบข้อมูลที่ตรงกับคำค้น หรือยังไม่มีข้อมูลในระบบ
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+  
+            <tbody *ngIf="isLoading">
+              <tr>
+                <td colspan="11" class="loading-cell">
+                  <div class="loading-state">
+                    <i class="fa fa-spinner fa-spin me-2"></i>
+                    Loading user data...
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

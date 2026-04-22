@@ -10,6 +10,8 @@ import { InventoryReportComponent } from './inventory-report/inventory-report.co
 import { TransactionJobReportComponent } from './transaction-job-report/transaction-job-report.component';
 import { TransactionStoreReportComponent } from './transaction-store-report/transaction-store-report.component';
 import { StockOutReportComponent } from './stock-out-report/stock-out-report.component';
+import { RegisterComponent } from './register/register.component';
+import { TransactionAllReportComponent } from './transaction-all-report/transaction-all-report.component';
 
 export const routes: Routes = [
 
@@ -26,6 +28,12 @@ export const routes: Routes = [
   {
     path: 'signin',
     component: SignInComponent
+  },
+
+
+  {
+    path: 'register',
+    component: RegisterComponent
   },
 
 
@@ -79,6 +87,11 @@ export const routes: Routes = [
   {
     path: 'stockOut',
     component: StockOutReportComponent,
+  },
+
+  {
+    path: 'transactionAll',
+    component: TransactionAllReportComponent,
   },
 
 

@@ -2,55 +2,59 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
 import config from '../../config';
 
-type TransactionStoreReportRow = {
-  transactionStoreHistoryId: number;
-  storeName: string;
-  jobNoIncoming: string;
+type TransactionAllReportRow = {
+  areaName: string;
+  incomingJobNo: string;
   type: string;
-  timeStmp: string;
-  stockNote: string;
   inchargeBy: string;
-  inchargeEmpNo: string;
+  time: string | null;
 };
 
+
 @Component({
-  selector: 'app-transaction-store-report',
+  selector: 'app-transaction-all-report',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './transaction-store-report.component.html',
-  styleUrl: './transaction-store-report.component.css'
+  templateUrl: './transaction-all-report.component.html',
+  styleUrl: './transaction-all-report.component.css'
 })
-
-export class TransactionStoreReportComponent {
+export class TransactionAllReportComponent {
 
   constructor(private http: HttpClient) {}
 
   isLoading = false;
   searchText = '';
 
-  rows: TransactionStoreReportRow[] = [];
-  filteredRows: TransactionStoreReportRow[] = [];
+  rows: TransactionAllReportRow[] = [];
+  filteredRows: TransactionAllReportRow[] = [];
 
   ngOnInit() {
-    this.fetchTransactionStoreList();
+    this.fetchTransactionAllList();
   }
 
-  fetchTransactionStoreList() {
+  fetchTransactionAllList() {
     this.isLoading = true;
 
-    this.http.get<any>(`${config.apiServer}/api/transactionStore/list`).subscribe({
+    this.http.get<any>(`${config.apiServer}/api/transactionAll/list`).subscribe({
       next: (res) => {
         this.rows = Array.isArray(res?.results) ? res.results : [];
         this.applyFilter();
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('fetchTransactionStoreList error:', err);
+      error: async (err) => {
+        console.error('fetchTransactionAllList error:', err);
         this.rows = [];
         this.filteredRows = [];
         this.isLoading = false;
+
+        await Swal.fire({
+          icon: 'error',
+          title: 'Load Transaction All Failed',
+          text: err?.error?.message || err?.error?.error || 'ไม่สามารถโหลดข้อมูล Transaction All ได้'
+        });
       }
     });
   }
@@ -69,12 +73,10 @@ export class TransactionStoreReportComponent {
 
     this.filteredRows = this.rows.filter((row) => {
       return [
-        row.storeName,
-        row.jobNoIncoming,
+        row.areaName,
+        row.incomingJobNo,
         row.type,
-        row.stockNote,
-        row.inchargeBy,
-        row.inchargeEmpNo
+        row.inchargeBy
       ]
         .map(v => (v || '').toString().toLowerCase())
         .some(v => v.includes(key));
@@ -97,8 +99,8 @@ export class TransactionStoreReportComponent {
     });
   }
 
-  trackByRow(_index: number, row: TransactionStoreReportRow) {
-    return row.transactionStoreHistoryId;
+  trackByRow(index: number, row: TransactionAllReportRow) {
+    return `${row.type}_${row.incomingJobNo}_${row.time}_${index}`;
   }
 
 

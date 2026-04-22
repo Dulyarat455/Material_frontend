@@ -915,7 +915,12 @@ searchMoveAreaScanJob() {
     Swal.fire({
       icon: 'warning',
       title: 'Missing Job No',
-      text: 'กรุณา Scan Job No'
+      text: 'กรุณา Scan Job No',
+      returnFocus: false
+    }).then(() => {
+      setTimeout(() => {
+        this.focusEl(this.moveAreaScanJobNo);
+      }, 0);
     });
     return;
   }
@@ -926,14 +931,22 @@ searchMoveAreaScanJob() {
     this.moveRows = [];
     this.resetMoveAreaScanForm();
     this.selectedSlot = null;
+    this.viewMode = 'NONE';
+  
+    this.ignoreMoveAreaScanBlur = true;
   
     Swal.fire({
       icon: 'info',
       title: 'No item found',
-      text: `ไม่พบ Incoming Job No : ${key}`
+      text: `ไม่พบ Incoming Job No : ${key}`,
+      returnFocus: false
     }).then(() => {
       setTimeout(() => {
         this.focusEl(this.moveAreaScanJobNo);
+  
+        setTimeout(() => {
+          this.ignoreMoveAreaScanBlur = false;
+        }, 100);
       }, 0);
     });
   
@@ -941,13 +954,28 @@ searchMoveAreaScanJob() {
   }
 
   if (rows.length > 1) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Found multiple items',
-      text: `พบมากกว่า 1 รายการสำหรับ Job No : ${key} กรุณาตรวจสอบ data`
-    });
-    return;
-  }
+  this.moveRows = [];
+  this.selectedSlot = null;
+  this.viewMode = 'NONE';
+  this.ignoreMoveAreaScanBlur = true;
+
+  Swal.fire({
+    icon: 'warning',
+    title: 'Found multiple items',
+    text: `พบมากกว่า 1 รายการสำหรับ Job No : ${key} กรุณาตรวจสอบ data`,
+    returnFocus: false
+  }).then(() => {
+    setTimeout(() => {
+      this.focusEl(this.moveAreaScanJobNo);
+
+      setTimeout(() => {
+        this.ignoreMoveAreaScanBlur = false;
+      }, 100);
+    }, 0);
+  });
+
+  return;
+}
 
   const picked = rows[0];
 
@@ -982,6 +1010,10 @@ searchMoveAreaScanJob() {
     storeId: picked.storeId,
     stockNote: picked.stockNote
   }];
+
+  setTimeout(() => {
+    this.focusEl(this.moveAreaScanStoreCode);
+  }, 0);
 }
 
 
@@ -1014,11 +1046,23 @@ searchMoveAreaScanStoreCode() {
   if (!slot || !store?.id) {
     this.resetMoveAreaScanDestination();
     this.selectedSlot = null;
+  
+    this.ignoreMoveAreaScanBlur = true;
+  
     Swal.fire({
       icon: 'warning',
       title: 'Invalid Store Code',
       text: `ไม่พบ Store Code : ${key}`
+    }).then(() => {
+      setTimeout(() => {
+        this.focusEl(this.moveAreaScanStoreCode);
+  
+        setTimeout(() => {
+          this.ignoreMoveAreaScanBlur = false;
+        }, 100);
+      }, 0);
     });
+  
     return;
   }
 
@@ -1401,6 +1445,14 @@ searchStockOutItem() {
     }
   }
 
+  //for break blur on modal alert
+  ignoreMoveAreaScanBlur = false;
+
+
+  onMoveAreaScanBlur(field: MoveAreaScanField, ev: FocusEvent) {
+    if (this.ignoreMoveAreaScanBlur) return;
+    this.onMoveAreaScanEnter(field, ev);
+  }
 
 
 
@@ -1416,6 +1468,7 @@ searchStockOutItem() {
     this.updateMoveAreaScanState();
   }
 
+  
 
   onMoveAreaScanEnter(field: MoveAreaScanField, ev: any) {
     if (this.isClearingMoveAreaScan) return;
@@ -1524,7 +1577,7 @@ searchStockOutItem() {
       case 'amount':
         if (!this.moveAreaScanForm.amount) return;
         this.searchMoveAreaScanJob();
-        return this.focusEl(this.moveAreaScanStoreCode);
+        return 
   
       case 'storeCode':
         if (!this.moveAreaScanForm.storeCode) return;
@@ -3418,31 +3471,91 @@ searchStockOutItem() {
 
   async submitMoveAreaScan() {
     if (!this.moveAreaScanForm.incomingId) {
+      this.ignoreMoveAreaScanBlur = true;
+    
       await Swal.fire({
         icon: 'warning',
         title: 'Missing Incoming',
-        text: 'กรุณา Scan Job No ก่อน'
+        text: 'กรุณา Scan Job No ก่อน',
+        returnFocus: false
       });
+    
+      setTimeout(() => {
+        const active = document.activeElement as HTMLElement | null;
+        active?.blur?.();
+    
+        const el = this.moveAreaScanJobNo?.nativeElement;
+        if (el) {
+          el.focus();
+          el.select?.();
+        }
+    
+        setTimeout(() => {
+          this.ignoreMoveAreaScanBlur = false;
+        }, 200);
+      }, 120);
+    
       return;
     }
-  
+    
+   
     if (!this.moveAreaScanForm.sourceStoreId) {
+      this.ignoreMoveAreaScanBlur = true;
       await Swal.fire({
         icon: 'warning',
         title: 'Missing Source Store',
         text: 'ไม่พบ Source Store ของ Material นี้'
       });
+
+        setTimeout(() => {
+          const active = document.activeElement as HTMLElement | null;
+          active?.blur?.();
+      
+          const el = this.moveAreaScanJobNo?.nativeElement;
+          if (el) {
+            el.focus();
+            el.select?.();
+          }
+      
+          setTimeout(() => {
+            this.ignoreMoveAreaScanBlur = false;
+          }, 200);
+        }, 120);
       return;
     }
   
+   
     if (!this.moveAreaScanForm.targetStoreId) {
+      this.ignoreMoveAreaScanBlur = true;
+    
       await Swal.fire({
         icon: 'warning',
         title: 'Missing Destination Store',
-        text: 'กรุณา Scan Store Code ปลายทางก่อน'
+        text: 'กรุณา Scan Store Code ปลายทางก่อน',
+        returnFocus: false
       });
+    
+      const trigger = document.activeElement as HTMLElement | null;
+      trigger?.blur?.();
+    
+      setTimeout(() => {
+        const el = this.moveAreaScanStoreCode?.nativeElement;
+        if (el) {
+          el.focus();
+          el.select?.();
+        }
+    
+        setTimeout(() => {
+          this.ignoreMoveAreaScanBlur = false;
+        }, 250);
+      }, 200);
+    
       return;
     }
+
+
+
+
   
     if (
       (this.moveAreaScanForm.foundArea || '').trim() ===

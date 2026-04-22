@@ -841,7 +841,7 @@
                       (click)="confirmStockOut(true)"
                       [disabled]="isSavingStock"
                     >
-                      {{ isSavingStock ? 'Saving...' : 'Denial' }}
+                      {{ isSavingStock ? 'Saving...' : 'Deny' }}
                     </button>
                   </div>
 
@@ -1013,7 +1013,7 @@
                         [(ngModel)]="moveAreaScanForm.jobNo"
                         (input)="onMoveAreaScanInputChange()"
                         (keydown.enter)="onMoveAreaScanEnter('jobNo', $event)"
-                        (blur)="onMoveAreaScanEnter('jobNo', $event)"
+                        (blur)="onMoveAreaScanBlur('jobNo', $event)"
                       />
                   
                       <button
@@ -1040,7 +1040,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.yearMonth"
                       (keydown.enter)="onMoveAreaScanEnter('yearMonth', $event)"
-                      (blur)="onMoveAreaScanEnter('yearMonth', $event)"
+                      (blur)="onMoveAreaScanBlur('yearMonth', $event)"
                     />
                   </div>
               
@@ -1051,7 +1051,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.recivedDate"
                       (keydown.enter)="onMoveAreaScanEnter('recivedDate', $event)"
-                      (blur)="onMoveAreaScanEnter('recivedDate', $event)"
+                      (blur)="onMoveAreaScanBlur('recivedDate', $event)"
                     />
                   </div>
               
@@ -1062,7 +1062,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.inspector"
                       (keydown.enter)="onMoveAreaScanEnter('inspector', $event)"
-                      (blur)="onMoveAreaScanEnter('inspector', $event)"
+                      (blur)="onMoveAreaScanBlur('inspector', $event)"
                     />
                   </div>
               
@@ -1073,7 +1073,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.unloadBy"
                       (keydown.enter)="onMoveAreaScanEnter('unloadBy', $event)"
-                      (blur)="onMoveAreaScanEnter('unloadBy', $event)"
+                      (blur)="onMoveAreaScanBlur('unloadBy', $event)"
                     />
                   </div>
               
@@ -1084,7 +1084,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.invoiceOne"
                       (keydown.enter)="onMoveAreaScanEnter('invoiceOne', $event)"
-                      (blur)="onMoveAreaScanEnter('invoiceOne', $event)"
+                      (blur)="onMoveAreaScanBlur('invoiceOne', $event)"
                     />
                   </div>
               
@@ -1095,7 +1095,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.taxInvNo"
                       (keydown.enter)="onMoveAreaScanEnter('taxInvNo', $event)"
-                      (blur)="onMoveAreaScanEnter('taxInvNo', $event)"
+                      (blur)="onMoveAreaScanBlur('taxInvNo', $event)"
                     />
                   </div>
               
@@ -1106,7 +1106,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.itemNo"
                       (keydown.enter)="onMoveAreaScanEnter('itemNo', $event)"
-                      (blur)="onMoveAreaScanEnter('itemNo', $event)"
+                      (blur)="onMoveAreaScanBlur('itemNo', $event)"
                     />
                   </div>
               
@@ -1117,7 +1117,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.unitPrice"
                       (keydown.enter)="onMoveAreaScanEnter('unitPrice', $event)"
-                      (blur)="onMoveAreaScanEnter('unitPrice', $event)"
+                      (blur)="onMoveAreaScanBlur('unitPrice', $event)"
                     />
                   </div>
               
@@ -1128,7 +1128,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.qtyOfPalletPack"
                       (keydown.enter)="onMoveAreaScanEnter('qtyOfPalletPack', $event)"
-                      (blur)="onMoveAreaScanEnter('qtyOfPalletPack', $event)"
+                      (blur)="onMoveAreaScanBlur('qtyOfPalletPack', $event)"
                     />
                   </div>
               
@@ -1139,7 +1139,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.coil"
                       (keydown.enter)="onMoveAreaScanEnter('coil', $event)"
-                      (blur)="onMoveAreaScanEnter('coil', $event)"
+                      (blur)="onMoveAreaScanBlur('coil', $event)"
                     />
                   </div>
               
@@ -1150,7 +1150,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.qtyKgsPcs"
                       (keydown.enter)="onMoveAreaScanEnter('qtyKgsPcs', $event)"
-                      (blur)="onMoveAreaScanEnter('qtyKgsPcs', $event)"
+                      (blur)="onMoveAreaScanBlur('qtyKgsPcs', $event)"
                     />
                   </div>
               
@@ -1161,7 +1161,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.unit"
                       (keydown.enter)="onMoveAreaScanEnter('unit', $event)"
-                      (blur)="onMoveAreaScanEnter('unit', $event)"
+                      (blur)="onMoveAreaScanBlur('unit', $event)"
                     />
                   </div>
               
@@ -1172,7 +1172,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.kgsCoil"
                       (keydown.enter)="onMoveAreaScanEnter('kgsCoil', $event)"
-                      (blur)="onMoveAreaScanEnter('kgsCoil', $event)"
+                      (blur)="onMoveAreaScanBlur('kgsCoil', $event)"
                     />
                   </div>
               
@@ -1183,7 +1183,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.odCoil"
                       (keydown.enter)="onMoveAreaScanEnter('odCoil', $event)"
-                      (blur)="onMoveAreaScanEnter('odCoil', $event)"
+                      (blur)="onMoveAreaScanBlur('odCoil', $event)"
                     />
                   </div>
               
@@ -1194,7 +1194,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.remark"
                       (keydown.enter)="onMoveAreaScanEnter('remark', $event)"
-                      (blur)="onMoveAreaScanEnter('remark', $event)"
+                      (blur)="onMoveAreaScanBlur('remark', $event)"
                     />
                   </div>
               
@@ -1205,7 +1205,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.millSheet"
                       (keydown.enter)="onMoveAreaScanEnter('millSheet', $event)"
-                      (blur)="onMoveAreaScanEnter('millSheet', $event)"
+                      (blur)="onMoveAreaScanBlur('millSheet', $event)"
                     />
                   </div>
               
@@ -1216,7 +1216,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.itemName"
                       (keydown.enter)="onMoveAreaScanEnter('itemName', $event)"
-                      (blur)="onMoveAreaScanEnter('itemName', $event)"
+                      (blur)="onMoveAreaScanBlur('itemName', $event)"
                     />
                   </div>
               
@@ -1227,7 +1227,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.specDwg"
                       (keydown.enter)="onMoveAreaScanEnter('specDwg', $event)"
-                      (blur)="onMoveAreaScanEnter('specDwg', $event)"
+                      (blur)="onMoveAreaScanBlur('specDwg', $event)"
                     />
                   </div>
               
@@ -1238,7 +1238,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.lotNo"
                       (keydown.enter)="onMoveAreaScanEnter('lotNo', $event)"
-                      (blur)="onMoveAreaScanEnter('lotNo', $event)"
+                      (blur)="onMoveAreaScanBlur('lotNo', $event)"
                     />
                   </div>
               
@@ -1249,7 +1249,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.quantity"
                       (keydown.enter)="onMoveAreaScanEnter('quantity', $event)"
-                      (blur)="onMoveAreaScanEnter('quantity', $event)"
+                      (blur)="onMoveAreaScanBlur('quantity', $event)"
                     />
                   </div>
               
@@ -1260,7 +1260,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.rosh"
                       (keydown.enter)="onMoveAreaScanEnter('rosh', $event)"
-                      (blur)="onMoveAreaScanEnter('rosh', $event)"
+                      (blur)="onMoveAreaScanBlur('rosh', $event)"
                     />
                   </div>
               
@@ -1271,7 +1271,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.result"
                       (keydown.enter)="onMoveAreaScanEnter('result', $event)"
-                      (blur)="onMoveAreaScanEnter('result', $event)"
+                      (blur)="onMoveAreaScanBlur('result', $event)"
                     />
                   </div>
               
@@ -1282,7 +1282,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.supplier"
                       (keydown.enter)="onMoveAreaScanEnter('supplier', $event)"
-                      (blur)="onMoveAreaScanEnter('supplier', $event)"
+                      (blur)="onMoveAreaScanBlur('supplier', $event)"
                     />
                   </div>
               
@@ -1294,7 +1294,7 @@
                       [(ngModel)]="moveAreaScanForm.amount"
                       (input)="onMoveAreaScanInputChange()"
                       (keydown.enter)="onMoveAreaScanEnter('amount', $event)"
-                      (blur)="onMoveAreaScanEnter('amount', $event)"
+                      (blur)="onMoveAreaScanBlur('amount', $event)"
                     />
                   </div>
               
@@ -1337,7 +1337,7 @@
                       type="text"
                       [(ngModel)]="moveAreaScanForm.storeCode"
                       (keydown.enter)="onMoveAreaScanEnter('storeCode', $event)"
-                      (blur)="onMoveAreaScanEnter('storeCode', $event)"
+                      (blur)="onMoveAreaScanBlur('storeCode', $event)"
                     />
                   </div>
               
@@ -1724,7 +1724,7 @@
                       (click)="confirmReturnStockAction(true)"
                       [disabled]="isSavingStock"
                     >
-                      {{ isSavingStock ? 'Saving...' : 'Denial' }}
+                      {{ isSavingStock ? 'Saving...' : 'Deny' }}
                     </button>
                   
                     <div class="stock-footer-return">

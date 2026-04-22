@@ -17,9 +17,9 @@
   gap: 12px;
   background: #fff;
   border: 1px solid rgba(2, 6, 23, 0.08);
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 14px 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
 .page-header-left {
@@ -29,15 +29,14 @@
 }
 
 .page-header-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
-  font-size: 20px;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+  font-size: 19px;
 }
 
 .page-title {
@@ -60,9 +59,9 @@
 
 .stat-chip {
   min-width: 100px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  background: #ffffff;
   border: 1px solid rgba(37, 99, 235, 0.14);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 8px 12px;
   text-align: center;
 }
@@ -89,8 +88,8 @@
 .table-card {
   background: #fff;
   border: 1px solid rgba(2, 6, 23, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
 .toolbar-card {
@@ -111,7 +110,7 @@
 }
 
 .action-btn {
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 700;
   padding: 9px 13px;
 }
@@ -132,7 +131,7 @@
 }
 
 .search-input {
-  border-radius: 12px;
+  border-radius: 10px;
   padding-left: 36px;
   min-height: 40px;
   border: 1px solid #dbe3ef;
@@ -141,7 +140,7 @@
 
 .search-input:focus {
   border-color: #93c5fd;
-  box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 0.16rem rgba(37, 99, 235, 0.10);
 }
 
 .table-head {
@@ -164,15 +163,15 @@
 .table-wrap {
   width: 100%;
   overflow: auto;
-  border-radius: 0 0 18px 18px;
+  border-radius: 0 0 16px 16px;
   --head-h: 46px;
-  --row-h: 50px;
+  --row-h: 56px;
   max-height: calc(var(--head-h) + (10 * var(--row-h)));
 }
 
 .material-table {
   width: 100%;
-  min-width: 1200px;
+  min-width: 1500px;
   margin: 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -190,7 +189,7 @@
   letter-spacing: 0.35px;
   text-transform: uppercase;
   border-bottom: 1px solid #4a7db7;
-  border-right: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.16);
   padding: 8px 10px;
   white-space: nowrap;
 }
@@ -218,13 +217,13 @@
 }
 
 .material-table tbody tr:hover {
-  background: #cdddf0;
+  background: #cfdceb;
 }
 
 .index-badge {
   display: inline-flex;
-  min-width: 32px;
-  height: 32px;
+  min-width: 30px;
+  height: 30px;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
@@ -234,22 +233,34 @@
   font-size: 13px;
 }
 
-/* คง style เดิมไว้เฉพาะ Incoming Job No */
 .material-no {
   font-weight: 800;
   color: #0f172a;
-  letter-spacing: 0.15px;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+}
+
+.material-name {
+  color: #0f172a;
+  font-weight: 800;
   font-size: 14px;
 }
 
-/* ทุก column อื่นใช้ style เดียวกับ Type */
-.material-name,
 .material-spec,
-.time-text,
-.account-code {
+.time-text {
   color: #334155;
   font-weight: 700;
   font-size: 13px;
+}
+
+.material-no,
+.material-name,
+.material-spec,
+.time-text {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
 .empty-cell,
@@ -290,28 +301,106 @@
   to { transform: rotate(360deg); }
 }
 
-.cell-short {
-  white-space: nowrap;
+/* on-process */
+.pending-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 126px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: #edf4f2;
+  color: #0f766e;
+  border: 1px solid #cfded9;
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.cell-job,
-.cell-long,
-.cell-area,
-.cell-date {
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+.on-process-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  flex-wrap: wrap;
+  background: #eef3f8;
+  border: 1px solid #d7e0ea;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.material-no,
-.material-name,
-.material-spec,
-.account-code,
-.time-text {
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  line-height: 1.25;
+.on-process-trigger:hover {
+  background: #e6edf5;
+  border-color: #c8d4e0;
+}
+
+.process-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid transparent;
+}
+
+.process-issue {
+  background: #e7eefb;
+  color: #1d4ed8;
+  border-color: #cddcf7;
+}
+
+.process-return {
+  background: #e9f5ec;
+  color: #15803d;
+  border-color: #cfe7d6;
+}
+
+/* action buttons */
+.table-action-btn {
+  min-width: 72px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-edit {
+  background: #f1f5f9;
+  color: #2563eb;
+  border-color: #d9e2ec;
+}
+
+.btn-edit:hover:not(:disabled) {
+  background: #e8eef6;
+  border-color: #cbd5e1;
+}
+
+.btn-delete {
+  background: #faf5f5;
+  color: #dc2626;
+  border-color: #ead7d7;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: #f5ecec;
+  border-color: #ddc7c7;
+}
+
+.table-action-btn:disabled {
+  background: #f3f4f6;
+  color: #94a3b8;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
 }
 
 @media (max-width: 991.98px) {
@@ -348,6 +437,19 @@
   }
 
   .material-table {
-    min-width: 980px;
+    min-width: 1280px;
+  }
+
+  .pending-pill {
+    min-width: 116px;
+  }
+
+  .process-chip {
+    min-width: 72px;
+    font-size: 12px;
+  }
+
+  .table-action-btn {
+    min-width: 66px;
   }
 }

@@ -136,7 +136,7 @@
         <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
           <option value="Waiting">Waiting</option>
           <option value="Complete">Complete</option>
-          <option value="Denial">Denial</option>
+          <option value="Denial">Deny</option>
         </select>
 
         <button class="btn-soft" (click)="resetFilters()">Reset</button>
@@ -157,7 +157,7 @@
                   [class.complete]="r.status === 'Complete'"
                   [class.denial]="r.status === 'Denial'"
                 >
-                  {{ r.status }}
+                {{ r.status === 'Denial' ? 'Deny' : r.status }}
                </span>
               </div>
 

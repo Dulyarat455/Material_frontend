@@ -102,14 +102,19 @@ export class InventoryReportComponent {
     });
   }
 
-  formatNumber(value: any) {
+  formatNumber(value: any, digits: number = 0) {
     return Number(value || 0).toLocaleString('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
     });
   }
 
   trackByInventory(_index: number, row: InventoryReportRow) {
     return row.transactionStoreId;
   }
+
+
+ 
+
+
 }
