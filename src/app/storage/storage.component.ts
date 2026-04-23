@@ -1696,6 +1696,10 @@ searchStockOutItem() {
   
       case 'amount':
         if (!this.returnStockForm.amount) return;
+        if (this.returnStockForm.jobNoIncoming?.trim()) {
+          this.fetchIncomingStockNote(this.returnStockForm.jobNoIncoming);
+        }
+
         return this.focusEl(this.returnActualCoil);
   
       case 'coil':
@@ -4093,6 +4097,36 @@ searchStockOutItem() {
           title: 'Stock Out Failed',
           text: message
         });
+      }
+    });
+  }
+
+
+
+
+
+  private fetchIncomingStockNote(jobNo: string) {
+    const normalizedJobNo = (jobNo || '').trim();
+    if (!normalizedJobNo) {
+      this.returnStockForm.stockNote = '';
+      return;
+    }
+  
+    this.http.post<any>(`${config.apiServer}/api/mc/fetchOneIncoming`, {
+      jobNo: normalizedJobNo
+    }).subscribe({
+      next: (res) => {
+        this.returnStockForm.stockNote = String(res?.results || '').trim();
+      },
+      error: async (err) => {
+        console.error('fetchIncomingStockNote error:', err);
+        this.returnStockForm.stockNote = '';
+        await Swal.fire({
+                 icon: 'error',
+                 title: 'Load StockNote Failed',
+                 text: err?.error?.message || err?.error?.error || 'ไม่สามารถโหลดข้อมูล StockNote จากIncoming เดิม ได้'
+        });
+
       }
     });
   }
