@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import config from '../../config';
+import Swal from 'sweetalert2';
 
 type InventoryReportRow = {
   transactionStoreId: number;
@@ -21,6 +22,14 @@ type InventoryReportRow = {
   timeStmp: string;
 };
 
+type FilterKey =
+  | 'jobNo'
+  | 'materialNo'
+  | 'itemName'
+  | 'spec'
+  | 'lotNo'
+  | 'area';
+
 @Component({
   selector: 'app-inventory-report',
   standalone: true,
@@ -32,10 +41,46 @@ export class InventoryReportComponent {
   constructor(private http: HttpClient) {}
 
   isLoading = false;
-  searchText = '';
+
+  startDate = '';
+  endDate = '';
+
+  jobNoFilter = 'all';
+  materialNoFilter = 'all';
+  itemNameFilter = 'all';
+  specFilter = 'all';
+  lotNoFilter = 'all';
+  areaFilter = 'all';
 
   inventoryRows: InventoryReportRow[] = [];
   filteredRows: InventoryReportRow[] = [];
+
+  // visible options (relation กันทั้งหมด)
+  jobNoOptions: string[] = [];
+  materialNoOptions: string[] = [];
+  itemNameOptions: string[] = [];
+  specOptions: string[] = [];
+  lotNoOptions: string[] = [];
+  areaOptions: string[] = [];
+
+  // searchable dropdown state
+  dropdownOpen: Record<FilterKey, boolean> = {
+    jobNo: false,
+    materialNo: false,
+    itemName: false,
+    spec: false,
+    lotNo: false,
+    area: false
+  };
+
+  dropdownSearch: Record<FilterKey, string> = {
+    jobNo: '',
+    materialNo: '',
+    itemName: '',
+    spec: '',
+    lotNo: '',
+    area: ''
+  };
 
   ngOnInit() {
     this.fetchInventoryList();
@@ -50,40 +95,368 @@ export class InventoryReportComponent {
         this.applyFilter();
         this.isLoading = false;
       },
-      error: (err) => {
+      error: async (err) => {
         console.error('fetchInventoryList error:', err);
         this.inventoryRows = [];
         this.filteredRows = [];
+        this.resetAllOptions();
         this.isLoading = false;
+
+        await Swal.fire({
+          icon: 'error',
+          title: 'Load Inventory Failed',
+          text: err?.error?.message || err?.error?.error || 'ไม่สามารถโหลดข้อมูล Inventory ได้'
+        });
       }
     });
   }
 
-  onSearchChange() {
+  onFilterChange() {
     this.applyFilter();
   }
 
-  applyFilter() {
-    const key = (this.searchText || '').trim().toLowerCase();
+  clearFilters() {
+    this.startDate = '';
+    this.endDate = '';
 
-    if (!key) {
-      this.filteredRows = [...this.inventoryRows];
+    this.jobNoFilter = 'all';
+    this.materialNoFilter = 'all';
+    this.itemNameFilter = 'all';
+    this.specFilter = 'all';
+    this.lotNoFilter = 'all';
+    this.areaFilter = 'all';
+
+    this.dropdownSearch.jobNo = '';
+    this.dropdownSearch.materialNo = '';
+    this.dropdownSearch.itemName = '';
+    this.dropdownSearch.spec = '';
+    this.dropdownSearch.lotNo = '';
+    this.dropdownSearch.area = '';
+
+    this.closeAllDropdowns();
+    this.applyFilter();
+  }
+
+  private resetAllOptions() {
+    this.jobNoOptions = [];
+    this.materialNoOptions = [];
+    this.itemNameOptions = [];
+    this.specOptions = [];
+    this.lotNoOptions = [];
+    this.areaOptions = [];
+  }
+
+  private buildUniqueOptions(values: any[]): string[] {
+    return Array.from(
+      new Set(
+        values
+          .map(v => String(v || '').trim())
+          .filter(v => !!v)
+      )
+    ).sort((a, b) => a.localeCompare(b));
+  }
+
+  private toDateOnly(value?: string) {
+    if (!value) return null;
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return null;
+
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  private matchDateRange(row: InventoryReportRow): boolean {
+    const start = this.startDate ? this.toDateOnly(this.startDate) : null;
+    const end = this.endDate ? this.toDateOnly(this.endDate) : null;
+    const rowDate = this.toDateOnly(row.timeStmp);
+
+    const matchStartDate = !start || (!!rowDate && rowDate >= start);
+    const matchEndDate = !end || (!!rowDate && rowDate <= end);
+
+    return matchStartDate && matchEndDate;
+  }
+
+  private rowMatchesFilter(row: InventoryReportRow, excludeKey?: FilterKey): boolean {
+    if (!this.matchDateRange(row)) return false;
+
+    const matchJobNo =
+      excludeKey === 'jobNo' ||
+      this.jobNoFilter === 'all' ||
+      (row.jobNo || '') === this.jobNoFilter;
+
+    const matchMaterialNo =
+      excludeKey === 'materialNo' ||
+      this.materialNoFilter === 'all' ||
+      (row.materialNo || '') === this.materialNoFilter;
+
+    const matchItemName =
+      excludeKey === 'itemName' ||
+      this.itemNameFilter === 'all' ||
+      (row.itemName || '') === this.itemNameFilter;
+
+    const matchSpec =
+      excludeKey === 'spec' ||
+      this.specFilter === 'all' ||
+      (row.itemSpec || '') === this.specFilter;
+
+    const matchLotNo =
+      excludeKey === 'lotNo' ||
+      this.lotNoFilter === 'all' ||
+      (row.lotNo || '') === this.lotNoFilter;
+
+    const matchArea =
+      excludeKey === 'area' ||
+      this.areaFilter === 'all' ||
+      (row.area || '') === this.areaFilter;
+
+    return (
+      matchJobNo &&
+      matchMaterialNo &&
+      matchItemName &&
+      matchSpec &&
+      matchLotNo &&
+      matchArea
+    );
+  }
+
+  private rebuildRelatedOptions() {
+    this.jobNoOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'jobNo'))
+        .map(x => x.jobNo)
+    );
+
+    this.materialNoOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'materialNo'))
+        .map(x => x.materialNo)
+    );
+
+    this.itemNameOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'itemName'))
+        .map(x => x.itemName)
+    );
+
+    this.specOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'spec'))
+        .map(x => x.itemSpec)
+    );
+
+    this.lotNoOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'lotNo'))
+        .map(x => x.lotNo)
+    );
+
+    this.areaOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'area'))
+        .map(x => x.area)
+    );
+  }
+
+  private syncInvalidSelectedFilters() {
+    if (this.jobNoFilter !== 'all' && !this.jobNoOptions.includes(this.jobNoFilter)) {
+      this.jobNoFilter = 'all';
+      this.dropdownSearch.jobNo = '';
+    }
+
+    if (this.materialNoFilter !== 'all' && !this.materialNoOptions.includes(this.materialNoFilter)) {
+      this.materialNoFilter = 'all';
+      this.dropdownSearch.materialNo = '';
+    }
+
+    if (this.itemNameFilter !== 'all' && !this.itemNameOptions.includes(this.itemNameFilter)) {
+      this.itemNameFilter = 'all';
+      this.dropdownSearch.itemName = '';
+    }
+
+    if (this.specFilter !== 'all' && !this.specOptions.includes(this.specFilter)) {
+      this.specFilter = 'all';
+      this.dropdownSearch.spec = '';
+    }
+
+    if (this.lotNoFilter !== 'all' && !this.lotNoOptions.includes(this.lotNoFilter)) {
+      this.lotNoFilter = 'all';
+      this.dropdownSearch.lotNo = '';
+    }
+
+    if (this.areaFilter !== 'all' && !this.areaOptions.includes(this.areaFilter)) {
+      this.areaFilter = 'all';
+      this.dropdownSearch.area = '';
+    }
+  }
+
+  applyFilter() {
+    this.rebuildRelatedOptions();
+    this.syncInvalidSelectedFilters();
+    this.rebuildRelatedOptions();
+
+    this.filteredRows = this.inventoryRows.filter((row) => this.rowMatchesFilter(row));
+  }
+
+  // =========================
+  // Searchable dropdown logic
+  // =========================
+
+  getOptions(key: FilterKey): string[] {
+    switch (key) {
+      case 'jobNo': return this.jobNoOptions;
+      case 'materialNo': return this.materialNoOptions;
+      case 'itemName': return this.itemNameOptions;
+      case 'spec': return this.specOptions;
+      case 'lotNo': return this.lotNoOptions;
+      case 'area': return this.areaOptions;
+    }
+  }
+
+  getFilterValue(key: FilterKey): string {
+    switch (key) {
+      case 'jobNo': return this.jobNoFilter;
+      case 'materialNo': return this.materialNoFilter;
+      case 'itemName': return this.itemNameFilter;
+      case 'spec': return this.specFilter;
+      case 'lotNo': return this.lotNoFilter;
+      case 'area': return this.areaFilter;
+    }
+  }
+
+  setFilterValue(key: FilterKey, value: string) {
+    switch (key) {
+      case 'jobNo':
+        this.jobNoFilter = value;
+        break;
+      case 'materialNo':
+        this.materialNoFilter = value;
+        break;
+      case 'itemName':
+        this.itemNameFilter = value;
+        break;
+      case 'spec':
+        this.specFilter = value;
+        break;
+      case 'lotNo':
+        this.lotNoFilter = value;
+        break;
+      case 'area':
+        this.areaFilter = value;
+        break;
+    }
+  }
+
+  getDisplayedInputValue(key: FilterKey): string {
+    const filterValue = this.getFilterValue(key);
+    const searchValue = this.dropdownSearch[key];
+
+    if (this.dropdownOpen[key]) {
+      return searchValue;
+    }
+
+    return filterValue === 'all' ? '' : filterValue;
+  }
+
+  onDropdownFocus(key: FilterKey) {
+    this.closeAllDropdowns(key);
+    this.dropdownOpen[key] = true;
+
+    const currentValue = this.getFilterValue(key);
+    this.dropdownSearch[key] = currentValue === 'all' ? '' : currentValue;
+  }
+
+  onDropdownInput(key: FilterKey, value: string) {
+    this.dropdownSearch[key] = value;
+    this.dropdownOpen[key] = true;
+  }
+
+  onDropdownKeydown(key: FilterKey, event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.commitDropdownValue(key);
       return;
     }
 
-    this.filteredRows = this.inventoryRows.filter((row) => {
-      return [
-        row.jobNo,
-        row.materialNo,
-        row.itemName,
-        row.itemSpec,
-        row.lotNo,
-        row.area,
-        row.stockNote
-      ]
-        .map(v => (v || '').toString().toLowerCase())
-        .some(v => v.includes(key));
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelDropdownValue(key);
+    }
+  }
+
+  onDropdownBlur(key: FilterKey) {
+    setTimeout(() => {
+      this.commitDropdownValue(key);
+    }, 150);
+  }
+
+  selectDropdownOption(key: FilterKey, option: string) {
+    this.setFilterValue(key, option);
+    this.dropdownSearch[key] = option;
+    this.dropdownOpen[key] = false;
+    this.applyFilter();
+  }
+
+  clearDropdownSelection(key: FilterKey) {
+    this.setFilterValue(key, 'all');
+    this.dropdownSearch[key] = '';
+    this.dropdownOpen[key] = false;
+    this.applyFilter();
+  }
+
+  private commitDropdownValue(key: FilterKey) {
+    const typed = (this.dropdownSearch[key] || '').trim();
+    const options = this.getOptions(key);
+    const exact = options.find(x => x.trim().toLowerCase() === typed.toLowerCase());
+
+    if (!typed) {
+      this.setFilterValue(key, 'all');
+      this.dropdownSearch[key] = '';
+      this.dropdownOpen[key] = false;
+      this.applyFilter();
+      return;
+    }
+
+    // พิมพ์ไม่ครบ / ไม่มีใน list / ไม่ได้กดเลือก -> clear ทันที
+    if (!exact) {
+      this.setFilterValue(key, 'all');
+      this.dropdownSearch[key] = '';
+      this.dropdownOpen[key] = false;
+      this.applyFilter();
+      return;
+    }
+
+    // พิมพ์ครบตรงกับ option -> ใช้ค่านั้น
+    this.setFilterValue(key, exact);
+    this.dropdownSearch[key] = exact;
+    this.dropdownOpen[key] = false;
+    this.applyFilter();
+  }
+
+  private cancelDropdownValue(key: FilterKey) {
+    const currentValue = this.getFilterValue(key);
+    this.dropdownSearch[key] = currentValue === 'all' ? '' : currentValue;
+    this.dropdownOpen[key] = false;
+  }
+
+  closeAllDropdowns(exceptKey?: FilterKey) {
+    (Object.keys(this.dropdownOpen) as FilterKey[]).forEach((key) => {
+      if (key !== exceptKey) this.dropdownOpen[key] = false;
     });
+  }
+
+  getFilteredDropdownOptions(key: FilterKey): string[] {
+    const search = (this.dropdownSearch[key] || '').trim().toLowerCase();
+    const options = this.getOptions(key);
+
+    if (!search) return options;
+
+    return options.filter(x => x.toLowerCase().includes(search));
+  }
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.closeAllDropdowns();
   }
 
   formatDateTime(value?: string) {
@@ -112,9 +485,4 @@ export class InventoryReportComponent {
   trackByInventory(_index: number, row: InventoryReportRow) {
     return row.transactionStoreId;
   }
-
-
- 
-
-
 }

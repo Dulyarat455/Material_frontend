@@ -32,17 +32,78 @@
           </button>
   
           <button
-            class="btn btn-outline-secondary action-btn"
+          class="btn btn-warning action-btn"
+          type="button"
+          [disabled]="isLoading"
+          (click)="openImportExcel()"
+        >
+          <i class="fa fa-upload me-2"></i>
+          Import Excel
+        </button>
+
+
+          <button
+            class="btn btn-success action-btn"
             type="button"
             [disabled]="isLoading"
-            (click)="fetchUserList()"
+            (click)="exportExcel()"
           >
-            <i class="fa fa-refresh me-2"></i>
-            Refresh
+            <i class="fa fa-file-excel-o me-2"></i>
+            Export Excel
           </button>
+
+        <button
+        class="btn btn-outline-secondary action-btn"
+        type="button"
+        [disabled]="isLoading"
+        (click)="fetchUserList()"
+      >
+        <i class="fa fa-refresh me-2"></i>
+        Refresh
+      </button>
+
+
         </div>
   
         <div class="toolbar-right">
+          <div class="filter-box">
+            <select
+              class="form-select filter-select"
+              [(ngModel)]="roleFilter"
+              (ngModelChange)="onDropdownFilterChange()"
+            >
+              <option value="all">All Role</option>
+              <option value="admin">admin</option>
+              <option value="user">user</option>
+            </select>
+          </div>
+        
+          <div class="filter-box">
+            <select
+              class="form-select filter-select"
+              [(ngModel)]="groupFilter"
+              (ngModelChange)="onDropdownFilterChange()"
+            >
+              <option value="all">All Group</option>
+              <option *ngFor="let g of groups" [value]="g.id">
+                {{ g.name }}
+              </option>
+            </select>
+          </div>
+        
+          <div class="filter-box">
+            <select
+              class="form-select filter-select"
+              [(ngModel)]="sectionFilter"
+              (ngModelChange)="onDropdownFilterChange()"
+            >
+              <option value="all">All Section</option>
+              <option *ngFor="let s of sections" [value]="s.id">
+                {{ s.name }}
+              </option>
+            </select>
+          </div>
+        
           <div class="search-box">
             <i class="fa fa-search search-icon"></i>
             <input
@@ -53,7 +114,20 @@
               (input)="onSearchChange()"
             />
           </div>
+
+          <button
+            class="btn btn-outline-dark action-btn"
+            type="button"
+            (click)="clearFilters()"
+          >
+            <i class="fa fa-times me-2"></i>
+            Clear Filter
+          </button>
+          
         </div>
+
+
+
       </div>
   
       <div class="table-card">

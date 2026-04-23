@@ -403,6 +403,34 @@
   cursor: not-allowed;
 }
 
+
+
+
+
+
+.filter-box {
+  width: 180px;
+  max-width: 100%;
+}
+
+.filter-select {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid #dbe3ef;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.filter-select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 0.16rem rgba(37, 99, 235, 0.10);
+}
+
+
+
+
+
+
 @media (max-width: 991.98px) {
   .page-header {
     flex-direction: column;
@@ -451,5 +479,13 @@
 
   .table-action-btn {
     min-width: 66px;
+  }
+
+  .filter-box {
+    width: 100%;
+  }
+  
+  .filter-select {
+    width: 100%;
   }
 }

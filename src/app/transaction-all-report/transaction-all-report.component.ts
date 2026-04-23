@@ -8,11 +8,15 @@ import config from '../../config';
 type TransactionAllReportRow = {
   areaName: string;
   incomingJobNo: string;
+  materialNo: string;
+  materialName: string;
+  materialSpec: string;
+  lotNo: string;
+  qty: number;
   type: string;
   inchargeBy: string;
   time: string | null;
 };
-
 
 @Component({
   selector: 'app-transaction-all-report',
@@ -22,7 +26,6 @@ type TransactionAllReportRow = {
   styleUrl: './transaction-all-report.component.css'
 })
 export class TransactionAllReportComponent {
-
   constructor(private http: HttpClient) {}
 
   isLoading = false;
@@ -73,8 +76,13 @@ export class TransactionAllReportComponent {
 
     this.filteredRows = this.rows.filter((row) => {
       return [
-        row.areaName,
         row.incomingJobNo,
+        row.materialNo,
+        row.materialName,
+        row.materialSpec,
+        row.lotNo,
+        row.qty,
+        row.areaName,
         row.type,
         row.inchargeBy
       ]
@@ -99,9 +107,14 @@ export class TransactionAllReportComponent {
     });
   }
 
+  formatNumber(value: any) {
+    return Number(value || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+  }
+
   trackByRow(index: number, row: TransactionAllReportRow) {
     return `${row.type}_${row.incomingJobNo}_${row.time}_${index}`;
   }
-
-
 }

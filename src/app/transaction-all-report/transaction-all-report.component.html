@@ -1,123 +1,145 @@
 <div class="material-page">
-    <div class="page-shell">
-      <div class="page-header">
-        <div class="page-header-left">
-          <div class="page-header-icon">
-            <i class="fa fa-exchange"></i>
-          </div>
-  
-          <div class="page-header-text">
-            <div class="page-title">Transaction All Report</div>
-            <div class="page-subtitle">Combined history from TransactionStoreHistory, Job and StockOut</div>
-          </div>
+  <div class="page-shell">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon">
+          <i class="fa fa-exchange"></i>
         </div>
-  
-        <div class="page-header-right">
-          <div class="stat-chip">
-            <span class="stat-label">Total</span>
-            <span class="stat-value">{{ filteredRows.length }}</span>
-          </div>
-        </div>
-      </div>
-  
-      <div class="toolbar-card">
-        <div class="toolbar-left">
-          <button
-            class="btn btn-outline-secondary action-btn"
-            type="button"
-            [disabled]="isLoading"
-            (click)="fetchTransactionAllList()"
-          >
-            <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
-            Refresh
-          </button>
-        </div>
-  
-        <div class="toolbar-right">
-          <div class="search-box">
-            <i class="fa fa-search search-icon"></i>
-            <input
-              type="text"
-              class="form-control search-input"
-              placeholder="Search area / incoming job no / type / incharge"
-              [(ngModel)]="searchText"
-              (input)="onSearchChange()"
-            />
-          </div>
-        </div>
-      </div>
-  
-      <div class="table-card">
-        <div class="table-head">
-          <div class="table-title">Transaction All List</div>
-          <div class="table-subtitle">
-            แสดงข้อมูลรวมจากการเคลื่อนไหวทั้งหมด เรียงจากล่าสุดไปเก่าสุด
-          </div>
-        </div>
-  
-        <div class="table-wrap">
-          <table class="table table-hover align-middle mb-0 material-table">
-            <thead>
-              <tr>
-                <th style="width: 220px;">Incoming Job No</th>
-                <th style="width: 220px;">Area Name</th>
-                <th style="width: 160px;">Type</th>
-                <th style="width: 260px;">Incharge By</th>
-                <th style="width: 220px;">Time</th>
-              </tr>
-            </thead>
-  
-            <tbody *ngIf="!isLoading">
-              <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByRow">
-  
-                
-  
-                <td class="cell-job">
-                  <div class="material-no">{{ row.incomingJobNo || '-' }}</div>
-                </td>
 
-                <td class="cell-area">
-                    <div class="material-spec">{{ row.areaName || '-' }}</div>
-                </td>
-  
-                <td class="cell-short">
-                  <div class="material-spec">{{ row.type || '-' }}</div>
-                </td>
-  
-                <td class="cell-long">
-                  <div class="material-spec">{{ row.inchargeBy || '-' }}</div>
-                </td>
-  
-                <td class="cell-date">
-                  <div class="time-text">{{ formatDateTime(row.time) }}</div>
-                </td>
-              </tr>
-  
-              <tr *ngIf="!filteredRows.length">
-                <td colspan="6" class="empty-cell">
-                  <div class="empty-state">
-                    <i class="fa fa-inbox empty-icon"></i>
-                    <div class="empty-title">No transaction data found</div>
-                    <div class="empty-subtitle">
-                      ไม่พบข้อมูลที่ตรงกับคำค้น หรือยังไม่มีข้อมูลในระบบ
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-  
-            <tbody *ngIf="isLoading">
-              <tr>
-                <td colspan="5" class="loading-cell">
-                  <div class="loading-state">
-                    <i class="fa fa-spinner fa-spin me-2"></i>
-                    Loading transaction data...
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="page-header-text">
+          <div class="page-title">Transaction All Report</div>
+          <div class="page-subtitle">Combined history from TransactionStoreHistory, Job and StockOut</div>
+        </div>
+      </div>
+
+      <div class="page-header-right">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredRows.length }}</span>
         </div>
       </div>
     </div>
+
+    <div class="toolbar-card">
+      <div class="toolbar-left">
+        <button
+          class="btn btn-outline-secondary action-btn"
+          type="button"
+          [disabled]="isLoading"
+          (click)="fetchTransactionAllList()"
+        >
+          <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
+          Refresh
+        </button>
+      </div>
+
+      <div class="toolbar-right">
+        <div class="search-box">
+          <i class="fa fa-search search-icon"></i>
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="Search incoming job no / material / spec / lot / area / type / incharge"
+            [(ngModel)]="searchText"
+            (input)="onSearchChange()"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">
+        <div class="table-title">Transaction All List</div>
+        <div class="table-subtitle">
+          แสดงข้อมูลรวมจากการเคลื่อนไหวทั้งหมด เรียงจากล่าสุดไปเก่าสุด
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table table-hover align-middle mb-0 material-table">
+          <thead>
+            <tr>
+              <th style="width: 180px;">Incoming Job No</th>
+              <th style="width: 180px;">Material No</th>
+              <th style="width: 220px;">Material Name</th>
+              <th style="width: 180px;">Material Spec</th>
+              <th style="width: 170px;">Lot No</th>
+              <th style="width: 120px;">Qty</th>
+              <th style="width: 180px;">Area Name</th>
+              <th style="width: 150px;">Type</th>
+              <th style="width: 240px;">Incharge By</th>
+              <th style="width: 220px;">Time</th>
+            </tr>
+          </thead>
+
+          <tbody *ngIf="!isLoading">
+            <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByRow">
+              <td class="cell-job">
+                <div class="material-no">{{ row.incomingJobNo || '-' }}</div>
+              </td>
+
+              <td class="cell-job">
+                <div class="material-no">{{ row.materialNo || '-' }}</div>
+              </td>
+
+              <td class="cell-long">
+                <div class="material-spec">{{ row.materialName || '-' }}</div>
+              </td>
+
+              <td class="cell-long">
+                <div class="material-spec">{{ row.materialSpec || '-' }}</div>
+              </td>
+
+              <td class="cell-long">
+                <div class="material-spec">{{ row.lotNo || '-' }}</div>
+              </td>
+
+              <td class="cell-short text-end">
+                <div class="material-spec">{{ formatNumber(row.qty) }}</div>
+              </td>
+
+              <td class="cell-area">
+                <div class="material-spec">{{ row.areaName || '-' }}</div>
+              </td>
+
+              <td class="cell-short">
+                <div class="material-spec">{{ row.type || '-' }}</div>
+              </td>
+
+              <td class="cell-long">
+                <div class="material-spec">{{ row.inchargeBy || '-' }}</div>
+              </td>
+
+              <td class="cell-date">
+                <div class="time-text">{{ formatDateTime(row.time) }}</div>
+              </td>
+            </tr>
+
+            <tr *ngIf="!filteredRows.length">
+              <td colspan="10" class="empty-cell">
+                <div class="empty-state">
+                  <i class="fa fa-inbox empty-icon"></i>
+                  <div class="empty-title">No transaction data found</div>
+                  <div class="empty-subtitle">
+                    ไม่พบข้อมูลที่ตรงกับคำค้น หรือยังไม่มีข้อมูลในระบบ
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+          <tbody *ngIf="isLoading">
+            <tr>
+              <td colspan="10" class="loading-cell">
+                <div class="loading-state">
+                  <i class="fa fa-spinner fa-spin me-2"></i>
+                  Loading transaction data...
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
+</div>
