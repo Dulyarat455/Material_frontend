@@ -20,6 +20,7 @@ type InventoryReportRow = {
   area: string;
   stockNote: string;
   timeStmp: string;
+  
 };
 
 type FilterKey =
@@ -41,6 +42,7 @@ export class InventoryReportComponent {
   constructor(private http: HttpClient) {}
 
   isLoading = false;
+  isExporting = false;
 
   startDate = '';
   endDate = '';
@@ -55,7 +57,6 @@ export class InventoryReportComponent {
   inventoryRows: InventoryReportRow[] = [];
   filteredRows: InventoryReportRow[] = [];
 
-  // visible options (relation กันทั้งหมด)
   jobNoOptions: string[] = [];
   materialNoOptions: string[] = [];
   itemNameOptions: string[] = [];
@@ -63,7 +64,6 @@ export class InventoryReportComponent {
   lotNoOptions: string[] = [];
   areaOptions: string[] = [];
 
-  // searchable dropdown state
   dropdownOpen: Record<FilterKey, boolean> = {
     jobNo: false,
     materialNo: false,
@@ -118,7 +118,6 @@ export class InventoryReportComponent {
   clearFilters() {
     this.startDate = '';
     this.endDate = '';
-
     this.jobNoFilter = 'all';
     this.materialNoFilter = 'all';
     this.itemNameFilter = 'all';
@@ -298,10 +297,6 @@ export class InventoryReportComponent {
     this.filteredRows = this.inventoryRows.filter((row) => this.rowMatchesFilter(row));
   }
 
-  // =========================
-  // Searchable dropdown logic
-  // =========================
-
   getOptions(key: FilterKey): string[] {
     switch (key) {
       case 'jobNo': return this.jobNoOptions;
@@ -326,24 +321,12 @@ export class InventoryReportComponent {
 
   setFilterValue(key: FilterKey, value: string) {
     switch (key) {
-      case 'jobNo':
-        this.jobNoFilter = value;
-        break;
-      case 'materialNo':
-        this.materialNoFilter = value;
-        break;
-      case 'itemName':
-        this.itemNameFilter = value;
-        break;
-      case 'spec':
-        this.specFilter = value;
-        break;
-      case 'lotNo':
-        this.lotNoFilter = value;
-        break;
-      case 'area':
-        this.areaFilter = value;
-        break;
+      case 'jobNo': this.jobNoFilter = value; break;
+      case 'materialNo': this.materialNoFilter = value; break;
+      case 'itemName': this.itemNameFilter = value; break;
+      case 'spec': this.specFilter = value; break;
+      case 'lotNo': this.lotNoFilter = value; break;
+      case 'area': this.areaFilter = value; break;
     }
   }
 
@@ -417,7 +400,6 @@ export class InventoryReportComponent {
       return;
     }
 
-    // พิมพ์ไม่ครบ / ไม่มีใน list / ไม่ได้กดเลือก -> clear ทันที
     if (!exact) {
       this.setFilterValue(key, 'all');
       this.dropdownSearch[key] = '';
@@ -426,7 +408,6 @@ export class InventoryReportComponent {
       return;
     }
 
-    // พิมพ์ครบตรงกับ option -> ใช้ค่านั้น
     this.setFilterValue(key, exact);
     this.dropdownSearch[key] = exact;
     this.dropdownOpen[key] = false;
@@ -450,13 +431,67 @@ export class InventoryReportComponent {
     const options = this.getOptions(key);
 
     if (!search) return options;
-
     return options.filter(x => x.toLowerCase().includes(search));
   }
 
   @HostListener('document:click')
   onDocumentClick() {
     this.closeAllDropdowns();
+  }
+
+  private getExportPayload() {
+    return {
+      startDate: this.startDate || '',
+      endDate: this.endDate || '',
+      jobNo: this.jobNoFilter || 'all',
+      materialNo: this.materialNoFilter || 'all',
+      itemName: this.itemNameFilter || 'all',
+      spec: this.specFilter || 'all',
+      lotNo: this.lotNoFilter || 'all',
+      area: this.areaFilter || 'all'
+    };
+  }
+
+  exportExcel() {
+    if (this.isExporting) return;
+
+    this.isExporting = true;
+
+    this.http.post(
+      `${config.apiServer}/api/inventory/exportExcel`,
+      this.getExportPayload(),
+      { responseType: 'blob' }
+    ).subscribe({
+      next: (blob: Blob) => {
+        const file = new Blob([blob], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        const url = window.URL.createObjectURL(file);
+        const a = document.createElement('a');
+        const now = new Date();
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const filename =
+          `inventory_report_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.xlsx`;
+
+        a.href = url;
+        a.download = filename;
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+        this.isExporting = false;
+      },
+      error: async (err) => {
+        console.error('exportExcel error:', err);
+        this.isExporting = false;
+
+        await Swal.fire({
+          icon: 'error',
+          title: 'Export Failed',
+          text: err?.error?.message || err?.error?.error || 'ไม่สามารถ export excel ได้'
+        });
+      }
+    });
   }
 
   formatDateTime(value?: string) {

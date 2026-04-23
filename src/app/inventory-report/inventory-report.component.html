@@ -25,11 +25,22 @@
         <button
           class="btn btn-outline-secondary action-btn"
           type="button"
-          [disabled]="isLoading"
+          [disabled]="isLoading || isExporting"
           (click)="fetchInventoryList()"
         >
           <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
           Refresh
+        </button> 
+      
+        <button
+          class="btn btn-success action-btn export-btn"
+          type="button"
+          [disabled]="isLoading || isExporting"
+          (click)="exportExcel()"
+        >
+          <i class="fa fa-file-excel-o me-2" *ngIf="!isExporting"></i>
+          <i class="fa fa-spinner fa-spin me-2" *ngIf="isExporting"></i>
+          {{ isExporting ? 'Exporting...' : 'Export Excel' }}
         </button>
       </div>
 
