@@ -20,7 +20,13 @@ type InventoryReportRow = {
   area: string;
   stockNote: string;
   timeStmp: string;
-  
+
+
+   // ui state
+  isEditingStockNote?: boolean;
+  stockNoteDraft?: string;
+  originalStockNote?: string;
+  isSavingStockNote?: boolean;
 };
 
 type FilterKey =
@@ -64,6 +70,9 @@ export class InventoryReportComponent {
   lotNoOptions: string[] = [];
   areaOptions: string[] = [];
 
+
+  userId: number | null = null;
+
   dropdownOpen: Record<FilterKey, boolean> = {
     jobNo: false,
     materialNo: false,
@@ -83,6 +92,7 @@ export class InventoryReportComponent {
   };
 
   ngOnInit() {
+    this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.fetchInventoryList();
   }
 
@@ -493,6 +503,111 @@ export class InventoryReportComponent {
       }
     });
   }
+
+
+
+ 
+
+startEditStockNote(row: InventoryReportRow) {
+  if (row.isSavingStockNote) return;
+
+  this.filteredRows.forEach(r => {
+    if (r !== row && r.isEditingStockNote) {
+      this.cancelEditStockNote(r);
+    }
+  });
+
+  row.isEditingStockNote = true;
+  row.originalStockNote = row.stockNote || '';
+  row.stockNoteDraft = row.stockNote || '';
+}
+
+onStockNoteDraftChange(row: InventoryReportRow, value: string) {
+  row.stockNoteDraft = value;
+}
+
+hasStockNoteChanged(row: InventoryReportRow): boolean {
+  return (row.stockNoteDraft || '') !== (row.originalStockNote || '');
+}
+
+onStockNoteBlur(row: InventoryReportRow) {
+  setTimeout(() => {
+    if (!row.isEditingStockNote) return;
+
+    if (!this.hasStockNoteChanged(row)) {
+      this.cancelEditStockNote(row);
+    }
+  }, 150);
+}
+
+cancelEditStockNote(row: InventoryReportRow) {
+  row.stockNoteDraft = row.originalStockNote || row.stockNote || '';
+  row.isEditingStockNote = false;
+  row.isSavingStockNote = false;
+}
+
+private syncEditedStockNote(incomingId: number, stockNote: string) {
+  this.inventoryRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.stockNote = stockNote;
+      r.originalStockNote = stockNote;
+      r.stockNoteDraft = stockNote;
+      r.isEditingStockNote = false;
+      r.isSavingStockNote = false;
+    }
+  });
+
+  this.filteredRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.stockNote = stockNote;
+      r.originalStockNote = stockNote;
+      r.stockNoteDraft = stockNote;
+      r.isEditingStockNote = false;
+      r.isSavingStockNote = false;
+    }
+  });
+}
+
+saveStockNote(row: InventoryReportRow) {
+  if (row.isSavingStockNote) return;
+  if (!this.hasStockNoteChanged(row)) return;
+
+  row.isSavingStockNote = true;
+
+  const body = {
+    userId: this.userId, 
+    incomingId: row.incomingId,
+    stockNote: row.stockNoteDraft ?? ''
+  };
+
+  this.http.post<any>(`${config.apiServer}/api/inventory/editStockNote`, body).subscribe({
+    next: async () => {
+      const newValue = row.stockNoteDraft ?? '';
+      this.syncEditedStockNote(row.incomingId, newValue);
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: 'แก้ไข Stock Note เรียบร้อยแล้ว',
+        timer: 1000,
+        showConfirmButton: false
+      });
+    },
+    error: async (err) => {
+      console.error('saveStockNote error:', err);
+      row.isSavingStockNote = false;
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err?.error?.message || err?.error?.error || 'ไม่สามารถบันทึก Stock Note ได้'
+      });
+    }
+  });
+}
+
+
+
 
   formatDateTime(value?: string) {
     if (!value) return '-';

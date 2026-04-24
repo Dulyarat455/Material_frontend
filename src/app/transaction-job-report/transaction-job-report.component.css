@@ -116,34 +116,6 @@
   padding: 9px 13px;
 }
 
-.search-box {
-  position: relative;
-  width: 320px;
-  max-width: 100%;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #64748b;
-  font-size: 13px;
-}
-
-.search-input {
-  border-radius: 12px;
-  padding-left: 36px;
-  min-height: 40px;
-  border: 1px solid #dbe3ef;
-  box-shadow: none;
-}
-
-.search-input:focus {
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.12);
-}
-
 .table-head {
   padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(2, 6, 23, 0.06);
@@ -227,20 +199,6 @@
   vertical-align: top;
 }
 
-.index-badge {
-  display: inline-flex;
-  min-width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.10);
-  color: #1d4ed8;
-  font-weight: 800;
-  font-size: 13px;
-}
-
-/* คง style เดิมไว้เฉพาะ Job No และ Incoming Job No */
 .material-no {
   font-weight: 800;
   color: #0f172a;
@@ -248,7 +206,6 @@
   font-size: 14px;
 }
 
-/* ทุก column อื่นให้ใช้ style แบบเดียวกับ Type */
 .material-spec,
 .material-name,
 .time-text,
@@ -309,7 +266,6 @@
   overflow-wrap: anywhere;
 }
 
-/* ให้ข้อความใน cell แตกบรรทัดได้ */
 .material-no,
 .material-name,
 .material-spec,
@@ -321,30 +277,112 @@
   line-height: 1.25;
 }
 
-/* ไม่ได้ใช้แล้ว แต่เก็บไว้เผื่อมี class เดิมใน html */
-.type-badge {
+.transaction-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.filter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+}
+
+.filter-input {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid #dbe3ef;
+  box-shadow: none;
+}
+
+.filter-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.12);
+}
+
+.filter-action-box {
+  justify-content: flex-end;
+}
+
+.filter-label-hidden {
+  visibility: hidden;
+}
+
+.clear-filter-btn {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 10px;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 88px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  border: 1px solid transparent;
+  white-space: nowrap;
 }
 
-.type-material {
-  background: rgba(245, 158, 11, 0.12);
-  color: #b45309;
-  border-color: rgba(245, 158, 11, 0.28);
+.smart-dropdown {
+  position: relative;
+  width: 100%;
 }
 
-.type-chemical {
-  background: rgba(37, 99, 235, 0.12);
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #ffffff;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.dropdown-option {
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background .15s ease, color .15s ease;
+  word-break: break-word;
+}
+
+.dropdown-option:hover {
+  background: #eaf2ff;
   color: #1d4ed8;
-  border-color: rgba(37, 99, 235, 0.28);
+}
+
+.dropdown-option-all {
+  border-bottom: 1px solid #eef2f7;
+  margin-bottom: 4px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.dropdown-empty {
+  padding: 12px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 1400px) {
+  .transaction-filter-grid {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
 }
 
 @media (max-width: 991.98px) {
@@ -372,15 +410,32 @@
     width: 100%;
   }
 
-  .search-box {
+  .action-btn {
     width: 100%;
   }
 
-  .action-btn {
-    width: 100%;
+  .transaction-filter-grid {
+    grid-template-columns: 1fr;
   }
 
   .material-table {
     min-width: 1600px;
   }
+}
+
+
+
+
+
+
+.export-btn {
+  min-width: 150px;
+  font-weight: 800;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.14);
+}
+
+.export-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

@@ -328,7 +328,58 @@
               <td><div class="material-spec">{{ row.unit || '-' }}</div></td>
               <td class="text-end"><div class="material-no">{{ formatNumber(row.totalPrice) }}</div></td>
               <td><div class="account-code">{{ row.area || '-' }}</div></td>
-              <td><div class="time-text">{{ row.stockNote || '-' }}</div></td>
+              <td>
+                <div class="stock-note-cell">
+                  <ng-container *ngIf="!row.isEditingStockNote; else editStockNoteTpl">
+                    <div
+                      class="stock-note-view"
+                      (click)="startEditStockNote(row)"
+                      [title]="row.stockNote || '-'"
+                    >
+                      {{ row.stockNote || '-' }}
+                    </div>
+                  </ng-container>
+              
+                  <ng-template #editStockNoteTpl>
+                    <div class="stock-note-edit-wrap" (click)="$event.stopPropagation()">
+                      <input
+                        type="text"
+                        class="stock-note-input"
+                        [ngModel]="row.stockNoteDraft"
+                        (ngModelChange)="onStockNoteDraftChange(row, $event)"
+                        (blur)="onStockNoteBlur(row)"
+                        [disabled]="!!row.isSavingStockNote"
+                        autofocus
+                      />
+              
+                      <div class="stock-note-actions" *ngIf="hasStockNoteChanged(row)">
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-save"
+                          title="Save"
+                          [disabled]="row.isSavingStockNote"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="saveStockNote(row)"
+                        >
+                          <i class="fa fa-check" *ngIf="!row.isSavingStockNote"></i>
+                          <i class="fa fa-spinner fa-spin" *ngIf="row.isSavingStockNote"></i>
+                        </button>
+              
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-cancel"
+                          title="Cancel"
+                          [disabled]="row.isSavingStockNote"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="cancelEditStockNote(row)"
+                        >
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>
+                </div>
+              </td>
               <td><div class="time-text">{{ formatDateTime(row.timeStmp) }}</div></td>
             </tr>
 
