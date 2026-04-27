@@ -14,8 +14,11 @@ type IssueRequestRow = {
   qty: number;
   destination: string;
   priority: 'Normal' | 'Urgent';
+  requestByUserId: number;
   requestBy: string;
   requestAt: string;
+  inchargeBy?: string;
+  inchargeAt?: string;
   status: 'Waiting' | 'Complete' | 'Denial';
   fifoHint?: string;
   accountCode?: string;
@@ -59,6 +62,7 @@ export class IssueComponent {
   groupId: number | null = null;
   sectionId: number | null = null;
   groupName: string = '';
+  role : string = '' ;
 
   isSubmitting = false;
   isLoadingQueue = false;
@@ -84,6 +88,7 @@ export class IssueComponent {
     this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
     this.groupName = localStorage.getItem('materialStore_groupName')!;
     this.sectionId = Number(localStorage.getItem('materialStore_sectionId')) || null;
+    this.role = localStorage.getItem('materialStore_role')!;
 
     this.fetchMaterials();
     this.fetchIssueQueueFollowFilter();
@@ -302,6 +307,15 @@ export class IssueComponent {
               ? `${r.requestUserEmpNo} - ${r.requestUserName}`
               : r?.requestUserEmpNo || r?.requestUserName || '-';
 
+
+
+          const inchargeByText =
+            r?.inchargeUserEmpNo && r?.inchargeUserName
+              ? `${r.inchargeUserEmpNo} - ${r.inchargeUserName}`
+              : r?.inchargeUserEmpNo || r?.inchargeUserName || '';
+
+
+
           return {
             id: Number(r?.id || 0),
             jobNo: r?.jobNo || '',
@@ -311,8 +325,11 @@ export class IssueComponent {
             qty: Number(r?.qty || 0),
             destination: r?.areaName || '-',
             priority: String(r?.priority || '').trim().toLowerCase() === 'urgent' ? 'Urgent' : 'Normal',
+            requestByUserId: Number(r?.requestByUserId || 0),   
             requestBy: requestByText,
             requestAt: this.formatDateTime(r?.requestTime),
+            inchargeBy: inchargeByText,
+            inchargeAt: this.formatDateTime(r?.inchargeTime),
             status,
             fifoHint: r?.jobNo ? `JOB#${r.jobNo}` : undefined,
             remark: r?.remark || '',
@@ -453,5 +470,115 @@ export class IssueComponent {
       confirmButtonColor: '#2563eb'
     });
   }
+
+
+
+  canDeleteRequest(r: IssueRequestRow): boolean {
+    if (!r) return false;
+  
+    if (this.role === 'admin') {
+      return r.status === 'Waiting';
+    }
+  
+    if (this.role === 'user') {
+      return r.status === 'Waiting' && Number(r.requestByUserId) === Number(this.userId);
+    }
+  
+    return false;
+  }
+  
+  deleteIssueRequest(r: IssueRequestRow) {
+    if (!r?.id) return;
+    if (!this.userId) {
+      Swal.fire('Error', 'User not found', 'error');
+      return;
+    }
+  
+    if (!this.canDeleteRequest(r)) {
+      Swal.fire('Error', 'You have not permitted', 'error');
+      return;
+    }
+  
+    Swal.fire({
+      icon: 'warning',
+      title: 'Delete Request?',
+      html: `
+        <div style="text-align:left; line-height:1.7;">
+          <div><b>Job No:</b> ${r.jobNo || '-'}</div>
+          <div><b>Material No:</b> ${r.materialNo || '-'}</div>
+          <div><b>Material Name:</b> ${r.materialName || '-'}</div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+  
+      this.http.post<any>(config.apiServer + '/api/issue/delete', {
+        jobId: r.id,
+        userId: this.userId,
+        role: this.role
+      }).subscribe({
+        next: (res) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted',
+            text: res?.message || 'delete_jobIssue_success',
+            timer: 1200,
+            showConfirmButton: false
+          });
+  
+          this.fetchIssueQueueFollowFilter();
+        },
+        error: (err) => {
+          Swal.fire(
+            'Error',
+            err?.error?.message || err?.message || 'Delete issue fail',
+            'error'
+          );
+        }
+      });
+    });
+  }
+
+
+
+  showInchargeDetail(row: IssueRequestRow) {
+    const inchargeText = (row.inchargeBy || '').trim();
+    const inchargeAtText = (row.inchargeAt || '').trim();
+  
+    if (!inchargeText) return;
+  
+    Swal.fire({
+      icon: 'info',
+      title: 'Incharge Detail',
+      html: `
+        <div style="text-align:left; line-height:1.7;">
+          <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
+          <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
+  
+          <div style="
+            padding:12px;
+            border-radius:12px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            color:#0f172a;
+            white-space:pre-wrap;
+            word-break:break-word;
+            box-shadow: inset 0 1px 0 rgba(123, 192, 235, 0.35);
+          ">
+            ${inchargeText}
+            ${inchargeAtText}
+        
+          </div>
+        </div>
+      `,
+      confirmButtonText: 'Close',
+      confirmButtonColor: '#2563eb'
+    });
+  }
+
 
 }

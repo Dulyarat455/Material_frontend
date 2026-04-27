@@ -606,3 +606,69 @@ Group Name
   justify-content:flex-end;
   flex-shrink:0;
 }
+
+
+
+/* =============
+Bin  button  
+============= */
+
+
+.btn-delete-job{
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(239,68,68,.18);
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+  color: #dc2626;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .15s ease;
+  box-shadow: 0 4px 10px rgba(239,68,68,.08);
+}
+
+.btn-delete-job:hover{
+  background: linear-gradient(180deg, #ffe4e6 0%, #fecdd3 100%);
+  border-color: rgba(239,68,68,.30);
+  transform: translateY(-1px);
+}
+
+.btn-delete-job:active{
+  transform: translateY(0);
+}
+
+
+
+
+
+/* =================
+Detail Button 
+================= */
+
+
+.btn-detail{
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(2,6,23,.1);
+  background:#fff;
+  color:#f4a734;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .15s ease;
+}
+
+.btn-detail:hover{
+  background:#eff6ff;
+  transform: translateY(-1px);
+}
+
+.btn-detail:active{
+  transform: translateY(0);
+}

@@ -70,12 +70,12 @@
             <th>M/C No</th>
             <th>Request By</th>
             <th>Remark</th>
-            <th>StockOut</th>
+            <th *ngIf="token">StockOut</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="isLoadingIssue">
-            <td colspan="11" class="empty-cell">Loading...</td>
+            <td [attr.colspan]="token ? 11 : 10" class="empty-cell">Loading...</td>
           </tr>
 
           <tr
@@ -119,15 +119,19 @@
               <span *ngIf="!row.remark?.trim()">-</span>
             </td>
 
-            <td class="action-cell">
-              <button class="stockout-btn" type="button" (click)="onClickStockOut(row)">
+            <td *ngIf="token" class="action-cell">
+              <button
+                class="stockout-btn"
+                type="button"
+                (click)="onClickStockOut(row)"
+              >
                 Stock Out
               </button>
             </td>
           </tr>
 
           <tr *ngIf="!isLoadingIssue && !issueJobs.length">
-            <td colspan="11" class="empty-cell">No issue jobs</td>
+            <td [attr.colspan]="token ? 11 : 10" class="empty-cell">No issue jobs</td>
           </tr>
         </tbody>
       </table>
@@ -166,12 +170,12 @@
             <th>M/C No</th>
             <th>Request By</th>
             <th>Remark</th>
-            <th>Return</th>
+            <th *ngIf="token">Return</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="isLoadingReturn">
-            <td colspan="11" class="empty-cell">Loading...</td>
+            <td [attr.colspan]="token ? 11 : 10" class="empty-cell">Loading...</td>
           </tr>
 
           <tr
@@ -213,8 +217,12 @@
               <span *ngIf="!row.remark?.trim()">-</span>
             </td>
 
-            <td class="action-cell">
-              <button class="return-btn" type="button" (click)="onClickReturn(row)">
+            <td  *ngIf="token" class="action-cell">
+              <button
+                class="return-btn"
+                type="button"
+                (click)="onClickReturn(row)"
+              >
                 <i class="fa-solid fa-rotate-left me-1"></i>
                 Return
               </button>
@@ -222,7 +230,7 @@
           </tr>
 
           <tr *ngIf="!isLoadingReturn && !returnJobs.length">
-            <td colspan="11" class="empty-cell">No return jobs</td>
+            <td [attr.colspan]="token ? 11 : 10" class="empty-cell">No return jobs</td>
           </tr>
         </tbody>
       </table>

@@ -1,120 +1,251 @@
 <div class="material-page">
-    <div class="page-shell">
-      <div class="page-header">
-        <div class="page-header-left">
-          <div class="page-header-icon">
-            <i class="fa fa-sign-out"></i>
-          </div>
-  
-          <div class="page-header-text">
-            <div class="page-title">Stock Out Report</div>
-            <div class="page-subtitle">History data from StockOut, Incoming and User</div>
-          </div>
+  <div class="page-shell">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon">
+          <i class="fa fa-sign-out"></i>
         </div>
-  
-        <div class="page-header-right">
-          <div class="stat-chip">
-            <span class="stat-label">Total</span>
-            <span class="stat-value">{{ filteredRows.length }}</span>
-          </div>
+
+        <div class="page-header-text">
+          <div class="page-title">Stock Out Report</div>
+          <div class="page-subtitle">History data from StockOut, Incoming and User</div>
         </div>
       </div>
-  
-      <div class="toolbar-card">
-        <div class="toolbar-left">
-          <button
-            class="btn btn-outline-secondary action-btn"
-            type="button"
-            [disabled]="isLoading"
-            (click)="fetchStockOutList()"
-          >
-            <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
-            Refresh
-          </button>
-        </div>
-  
-        <div class="toolbar-right">
-          <div class="search-box">
-            <i class="fa fa-search search-icon"></i>
-            <input
-              type="text"
-              class="form-control search-input"
-              placeholder="Search incoming job no / incharge / remark"
-              [(ngModel)]="searchText"
-              (input)="onSearchChange()"
-            />
-          </div>
-        </div>
-      </div>
-  
-      <div class="table-card">
-        <div class="table-head">
-          <div class="table-title">Stock Out History</div>
-          <div class="table-subtitle">
-            แสดงข้อมูลจาก StockOut, Incoming และ User
-          </div>
-        </div>
-  
-        <div class="table-wrap">
-          <table class="table table-hover align-middle mb-0 material-table">
-            <thead>
-              <tr>
-                
-                <th style="width: 190px;">Incoming Job No</th>
-                <th style="width: 220px;">Incharge By</th>
-                <th style="width: 320px;">Remark</th>
-                <th style="width: 220px;">Time</th>
-              </tr>
-            </thead>
-  
-            <tbody *ngIf="!isLoading">
-              <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByRow">
-  
-                <td class="cell-job">
-                  <div class="material-no">{{ row.jobNoIncoming || '-' }}</div>
-                </td>
-  
-                <td class="cell-long">
-                  <div class="material-spec">
-                    {{ row.inchargeBy || '-' }}
-                    <div class="time-text" *ngIf="row.inchargeEmpNo">{{ row.inchargeEmpNo }}</div>
-                  </div>
-                </td>
-  
-                <td class="cell-long">
-                  <div class="time-text">{{ row.remark || '-' }}</div>
-                </td>
-  
-                <td class="cell-date">
-                  <div class="time-text">{{ formatDateTime(row.timeStmp) }}</div>
-                </td>
-              </tr>
-  
-              <tr *ngIf="!filteredRows.length">
-                <td colspan="5" class="empty-cell">
-                  <div class="empty-state">
-                    <i class="fa fa-inbox empty-icon"></i>
-                    <div class="empty-title">No stock out data found</div>
-                    <div class="empty-subtitle">
-                      ไม่พบข้อมูลที่ตรงกับคำค้น หรือยังไม่มีข้อมูลในระบบ
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-  
-            <tbody *ngIf="isLoading">
-              <tr>
-                <td colspan="5" class="loading-cell">
-                  <div class="loading-state">
-                    <i class="fa fa-spinner fa-spin me-2"></i>
-                    Loading stock out data...
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+      <div class="page-header-right">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredRows.length }}</span>
         </div>
       </div>
     </div>
+
+    <div class="toolbar-card">
+      <div class="toolbar-left">
+        <button
+          class="btn btn-outline-secondary action-btn"
+          type="button"
+          [disabled]="isLoading || isExporting"
+          (click)="fetchStockOutList()"
+        >
+          <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
+          Refresh
+        </button>
+
+        <button
+          class="btn btn-success action-btn export-btn"
+          type="button"
+          [disabled]="isLoading || isExporting"
+          (click)="exportExcel()"
+        >
+          <i class="fa fa-file-excel-o me-2" *ngIf="!isExporting"></i>
+          <i class="fa fa-spinner fa-spin me-2" *ngIf="isExporting"></i>
+          {{ isExporting ? 'Exporting...' : 'Export Excel' }}
+        </button>
+      </div>
+
+      <div class="toolbar-right stockout-filter-grid">
+        <div class="filter-box">
+          <label class="filter-label">Start Date</label>
+          <input
+            type="date"
+            class="form-control filter-input"
+            [(ngModel)]="startDate"
+            (change)="onFilterChange()"
+          />
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">End Date</label>
+          <input
+            type="date"
+            class="form-control filter-input"
+            [(ngModel)]="endDate"
+            (change)="onFilterChange()"
+          />
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Incoming Job No</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Incoming Job No."
+              [ngModel]="getDisplayedInputValue('jobNoIncoming')"
+              (focus)="onDropdownFocus('jobNoIncoming')"
+              (ngModelChange)="onDropdownInput('jobNoIncoming', $event)"
+              (keydown)="onDropdownKeydown('jobNoIncoming', $event)"
+              (blur)="onDropdownBlur('jobNoIncoming')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.jobNoIncoming">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('jobNoIncoming')">
+                All Incoming Job No
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('jobNoIncoming')"
+                (mousedown)="selectDropdownOption('jobNoIncoming', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('jobNoIncoming').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Section</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Section."
+              [ngModel]="getDisplayedInputValue('sectionName')"
+              (focus)="onDropdownFocus('sectionName')"
+              (ngModelChange)="onDropdownInput('sectionName', $event)"
+              (keydown)="onDropdownKeydown('sectionName', $event)"
+              (blur)="onDropdownBlur('sectionName')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.sectionName">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('sectionName')">
+                All Section
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('sectionName')"
+                (mousedown)="selectDropdownOption('sectionName', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('sectionName').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Incharge By</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Incharge By."
+              [ngModel]="getDisplayedInputValue('inchargeBy')"
+              (focus)="onDropdownFocus('inchargeBy')"
+              (ngModelChange)="onDropdownInput('inchargeBy', $event)"
+              (keydown)="onDropdownKeydown('inchargeBy', $event)"
+              (blur)="onDropdownBlur('inchargeBy')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.inchargeBy">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('inchargeBy')">
+                All Incharge By
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('inchargeBy')"
+                (mousedown)="selectDropdownOption('inchargeBy', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('inchargeBy').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box filter-action-box">
+          <label class="filter-label filter-label-hidden">Action</label>
+          <button
+            class="btn btn-outline-dark action-btn clear-filter-btn"
+            type="button"
+            (click)="clearFilters()"
+          >
+            <i class="fa fa-times me-2"></i>
+            Clear Filter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">
+        <div class="table-title">Stock Out History</div>
+        <div class="table-subtitle">
+          แสดงข้อมูลจาก StockOut, Incoming, User และ Section
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table table-hover align-middle mb-0 material-table">
+          <thead>
+            <tr>
+              <th style="width: 90px;">Index</th>
+              <th style="width: 190px;">Incoming Job No</th>
+              <th style="width: 180px;">Section</th>
+              <th style="width: 220px;">Incharge By</th>
+              <th style="width: 320px;">Remark</th>
+              <th style="width: 220px;">Time</th>
+            </tr>
+          </thead>
+
+          <tbody *ngIf="!isLoading">
+            <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByRow">
+
+              <td><span class="index-badge">{{ i + 1 }}</span></td>
+              <td class="cell-job">
+                <div class="material-no">{{ row.jobNoIncoming || '-' }}</div>
+              </td>
+
+              <td class="cell-long">
+                <div class="material-spec">{{ row.sectionName || '-' }}</div>
+              </td>
+
+              <td class="cell-long">
+                <div class="material-spec">
+                  {{ row.inchargeBy || '-' }}
+                  <div class="time-text" *ngIf="row.inchargeEmpNo">{{ row.inchargeEmpNo }}</div>
+                </div>
+              </td>
+
+              <td class="cell-long">
+                <div class="time-text">{{ row.remark || '-' }}</div>
+              </td>
+
+              <td class="cell-date">
+                <div class="time-text">{{ formatDateTime(row.timeStmp) }}</div>
+              </td>
+            </tr>
+
+            <tr *ngIf="!filteredRows.length">
+              <td colspan="5" class="empty-cell">
+                <div class="empty-state">
+                  <i class="fa fa-inbox empty-icon"></i>
+                  <div class="empty-title">No stock out data found</div>
+                  <div class="empty-subtitle">
+                    ไม่พบข้อมูลที่ตรงกับเงื่อนไข หรือยังไม่มีข้อมูลในระบบ
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+          <tbody *ngIf="isLoading">
+            <tr>
+              <td colspan="5" class="loading-cell">
+                <div class="loading-state">
+                  <i class="fa fa-spinner fa-spin me-2"></i>
+                  Loading stock out data...
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
+</div>

@@ -1,5 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnInit,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import config from '../../config';
 import Swal from 'sweetalert2';
@@ -13,8 +19,8 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.css',
 })
-export class SignInComponent {
-  @ViewChild('rfidInput') rfidInput!: ElementRef;
+export class SignInComponent implements OnInit, AfterViewInit {
+  @ViewChild('rfidInput') rfidInput!: ElementRef<HTMLInputElement>;
 
   token: string | undefined = '';
   username: string = '';
@@ -30,14 +36,7 @@ export class SignInComponent {
   ) {}
 
   ngOnInit() {
-    
-    // this.token = localStorage.getItem('angular_token')!;
-    // this.empNo = localStorage.getItem('angular_empNo')!
-
-    //localstorage ให้เปลี่ยนชื่อ token ทุกจุดตาม Project ที่ทำ
-
-    if (localStorage.getItem('materialStore_token')) 
-      {
+    if (localStorage.getItem('materialStore_token')) {
       this.token = localStorage.getItem('materialStore_token')!;
       this.empNo = localStorage.getItem('materialStore_empNo')!;
     } else {
@@ -50,123 +49,115 @@ export class SignInComponent {
     this.focusRFIDInput();
   }
 
-  // Helper function to focus RFID input
   private focusRFIDInput() {
-    if (this.rfidInput) {
-      this.rfidInput.nativeElement.focus();
-    }
+    setTimeout(() => {
+      if (this.rfidInput?.nativeElement) {
+        this.rfidInput.nativeElement.focus();
+      }
+    }, 0);
   }
 
-  // Reset login state
-  private resetLoginState() {
-    this.isLoading = false;
-    this.focusRFIDInput();
-    if (this.rfidInput) {
+  private clearRFIDInput() {
+    this.rfid = '';
+    if (this.rfidInput?.nativeElement) {
       this.rfidInput.nativeElement.value = '';
     }
   }
 
-  // Handle RFID input
-  onRFIDInput(event: any) {
-    const value = event.target.value;
+  private resetLoginState() {
+    this.isLoading = false;
+    this.clearRFIDInput();
+    this.focusRFIDInput();
+  }
 
-    // ถ้ามีการป้อน RFID ครบ (ปกติ RFID จะมีความยาวแน่นอน เช่น 10 ตัว)
+  onRFIDInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const value = (input?.value || '').trim();
+
+    this.rfid = value;
+
+    if (this.isLoading) return;
+
+    // ปรับเลข 10 ตามความยาว RFID จริงได้
     if (value.length >= 10) {
-      // ปรับตามความยาวจริงของ RFID
       this.signInWithRFID(value);
     }
   }
 
-  // RFID Login
-  async signInWithRFID(rfidValue: string) {
+  signInWithRFID(rfidValue: string) {
     if (this.isLoading) return;
 
-    try {
-      this.isLoading = true;
+    const cleanRfId = String(rfidValue || '').trim();
+    if (!cleanRfId) return;
 
-      const payload = {
-        rfid: rfidValue,
-      };
+    this.isLoading = true;
 
-      this.http
-        .post(config.apiServer + '/api/user/signin-rfid', payload)
-        .subscribe({
-          next: (res: any) => {
-            // ตรวจสอบ unauthorized message
-            if (res.message === 'unauthorized') {
-              this.resetLoginState();
-              Swal.fire({
-                title: 'ไม่สามารถเข้าสู่ระบบได้',
-                text: 'ไม่มีสิทธิ์ในการเข้าถึง',
-                icon: 'error',
-                timer: 2000,
-              });
-              return;
-            }
+    const payload = {
+      rfId: cleanRfId,
+    };
 
-            
-            this.authService.login(res);
-            // Show success message
-            Swal.fire({
-              title: 'เข้าสู่ระบบสำเร็จ',
-              text: `ยินดีต้อนรับ ${res.name}`,
-              icon: 'success',
-              timer: 1500,
-              showConfirmButton: true,
-            }).then(() => {
-              // location.reload();
-              this.router.navigate(['/']);
-              this.token = localStorage.getItem('materialStore_token')!;
-              this.empNo = localStorage.getItem('materialStore_empNo')!;
-            });
-            // }
-          },
-          error: (error) => {
-            console.error('RFID Login Error:', error);
+    this.http.post<any>(`${config.apiServer}/api/user/signInRfId`, payload).subscribe({
+      next: (res) => {
+        this.authService.login(res);
 
-            // ตรวจสอบ error message
-            const errorMessage =
-              error.error?.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
-
-            if (error.error?.message === 'unauthorized') {
-              this.resetLoginState();
-              Swal.fire({
-                title: 'ไม่สามารถเข้าสู่ระบบได้',
-                text: 'ไม่มีสิทธิ์ในการเข้าถึง',
-                icon: 'error',
-                timer: 2000,
-              });
-              return;
-            }
-
-            // แสดง error อื่นๆ
-            Swal.fire({
-              title: 'ไม่สามารถเข้าสู่ระบบได้',
-              text: errorMessage,
-              icon: 'error',
-              timer: 2000,
-            });
-
-            this.resetLoginState();
-          },
-          complete: () => {
-            // ไม่ต้อง reset loading state ที่นี่
-            // เพราะจะถูก handle ใน next หรือ error แล้ว
-          },
+        Swal.fire({
+          title: 'เข้าสู่ระบบสำเร็จ',
+          text: `ยินดีต้อนรับ ${res.name}`,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: true,
+        }).then(() => {
+          this.token = localStorage.getItem('materialStore_token') || '';
+          this.empNo = localStorage.getItem('materialStore_empNo') || '';
+          this.router.navigate(['/']);
         });
-    } catch (error: any) {
-      this.resetLoginState();
-      Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
-        text: error.message,
-        icon: 'error',
-      });
-    }
+      },
+      error: (error) => {
+        console.error('RFID Login Error:', error);
+
+        const errorMessage =
+          error?.error?.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
+
+        if (error?.error?.message === 'unauthorized') {
+          this.resetLoginState();
+          Swal.fire({
+            title: 'ไม่สามารถเข้าสู่ระบบได้',
+            text: 'ไม่มีสิทธิ์ในการเข้าถึง',
+            icon: 'error',
+            timer: 2000,
+          });
+          return;
+        }
+
+        if (error?.error?.message === 'user_has_been_delete') {
+          this.resetLoginState();
+          Swal.fire({
+            title: 'ไม่สามารถเข้าสู่ระบบได้',
+            text: 'ผู้ใช้นี้ถูกลบออกจากระบบแล้ว',
+            icon: 'error',
+            timer: 2000,
+          });
+          return;
+        }
+
+        this.resetLoginState();
+        Swal.fire({
+          title: 'ไม่สามารถเข้าสู่ระบบได้',
+          text: errorMessage,
+          icon: 'error',
+          timer: 2000,
+        });
+      },
+      complete: () => {
+        if (!this.token) {
+          this.isLoading = false;
+        }
+      },
+    });
   }
 
-  // Regular login
   signIn() {
-    if (this.empNo == '' || this.password == '') {
+    if (this.empNo === '' || this.password === '') {
       Swal.fire({
         title: 'ตรวจสอบข้อมูล',
         text: 'โปรดกรอก username หรือ password ด้วย',
@@ -176,86 +167,69 @@ export class SignInComponent {
     }
 
     this.isLoading = true;
+
     const payload = {
       empNo: this.empNo,
       password: this.password,
     };
 
-    try {
-      this.http.post(config.apiServer + '/api/user/signin', payload).subscribe({
-        next: (res: any) => {
-          if (res.message === 'unauthorized') {
-            this.isLoading = false;
-            Swal.fire({
-              title: 'ไม่สามารถเข้าสู่ระบบได้',
-              text: 'ไม่มีสิทธิ์ในการเข้าถึง',
-              icon: 'error',
-              timer: 2000,
-            });
-            return;
-          }
+    this.http.post<any>(`${config.apiServer}/api/user/signin`, payload).subscribe({
+      next: (res) => {
+        this.authService.login(res);
 
-         
+        Swal.fire({
+          title: 'เข้าสู่ระบบสำเร็จ',
+          text: `ยินดีต้อนรับ ${res.name}`,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: true,
+        }).then(() => {
+          this.token = localStorage.getItem('materialStore_token') || '';
+          this.empNo = localStorage.getItem('materialStore_empNo') || '';
+          this.router.navigate(['/']);
+        });
+      },
+      error: (error) => {
+        this.isLoading = false;
 
-          this.authService.login(res);
+        const errorMessage =
+          error?.error?.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
 
+        if (error?.error?.message === 'unauthorized') {
           Swal.fire({
-            title: 'เข้าสู่ระบบสำเร็จ',
-            text: `ยินดีต้อนรับ ${res.name}`,
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: true,
-          }).then(() => {
-            // location.reload();
-           
-            this.token = localStorage.getItem('materialStore_token')!;
-            this.empNo = localStorage.getItem('materialStore_empNo')!;
-            this.router.navigate(['/']);
-
-          });
-        },
-        error: (error) => {
-          this.isLoading = false;
-          const errorMessage =
-            error.error?.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
-
-          if (error.error?.message === 'unauthorized') {
-            Swal.fire({
-              title: 'ไม่สามารถเข้าสู่ระบบได้',
-              text: 'ไม่มีสิทธิ์ในการเข้าถึง',
-              icon: 'error',
-              timer: 2000,
-            });
-            return;
-          }
-
-          Swal.fire({
-            title: 'ตรวจสอบข้อมูล',
-            text: errorMessage,
+            title: 'ไม่สามารถเข้าสู่ระบบได้',
+            text: 'ไม่มีสิทธิ์ในการเข้าถึง',
             icon: 'error',
+            timer: 2000,
           });
-        },
-        complete: () => {
-          this.isLoading = false;
-        },
-      });
-    } catch (e: any) {
-      this.isLoading = false;
-      Swal.fire({
-        title: 'error',
-        text: e.message,
-        icon: 'error',
-      });
-    }
+          return;
+        }
+
+        if (error?.error?.message === 'user_has_been_delete') {
+          Swal.fire({
+            title: 'ไม่สามารถเข้าสู่ระบบได้',
+            text: 'ผู้ใช้นี้ถูกลบออกจากระบบแล้ว',
+            icon: 'error',
+            timer: 2000,
+          });
+          return;
+        }
+
+        Swal.fire({
+          title: 'ตรวจสอบข้อมูล',
+          text: errorMessage,
+          icon: 'error',
+        });
+      },
+      complete: () => {
+        this.isLoading = false;
+      },
+    });
   }
 
-  // Clear all inputs
   clearInputs(type: 'rfid' | 'employee' | 'all' = 'all') {
     if (type === 'rfid' || type === 'all') {
-      if (this.rfidInput) {
-        this.rfidInput.nativeElement.value = '';
-      }
-      this.rfid = '';
+      this.clearRFIDInput();
       this.focusRFIDInput();
     }
 

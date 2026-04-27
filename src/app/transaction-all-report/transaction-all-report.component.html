@@ -25,24 +25,335 @@
         <button
           class="btn btn-outline-secondary action-btn"
           type="button"
-          [disabled]="isLoading"
+          [disabled]="isLoading || isExporting"
           (click)="fetchTransactionAllList()"
         >
           <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
           Refresh
         </button>
+      
+        <button
+          class="btn btn-success action-btn export-btn"
+          type="button"
+          [disabled]="isLoading || isExporting"
+          (click)="exportExcel()"
+        >
+          <i class="fa fa-file-excel-o me-2" *ngIf="!isExporting"></i>
+          <i class="fa fa-spinner fa-spin me-2" *ngIf="isExporting"></i>
+          {{ isExporting ? 'Exporting...' : 'Export Excel' }}
+        </button>
       </div>
 
-      <div class="toolbar-right">
-        <div class="search-box">
-          <i class="fa fa-search search-icon"></i>
+      <div class="toolbar-right transaction-all-filter-grid">
+        <div class="filter-box">
+          <label class="filter-label">Start Date</label>
           <input
-            type="text"
-            class="form-control search-input"
-            placeholder="Search incoming job no / material / spec / lot / area / type / incharge"
-            [(ngModel)]="searchText"
-            (input)="onSearchChange()"
+            type="date"
+            class="form-control filter-input"
+            [(ngModel)]="startDate"
+            (change)="onFilterChange()"
           />
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">End Date</label>
+          <input
+            type="date"
+            class="form-control filter-input"
+            [(ngModel)]="endDate"
+            (change)="onFilterChange()"
+          />
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Incoming Job No</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Incoming Job No."
+              [ngModel]="getDisplayedInputValue('incomingJobNo')"
+              (focus)="onDropdownFocus('incomingJobNo')"
+              (ngModelChange)="onDropdownInput('incomingJobNo', $event)"
+              (keydown)="onDropdownKeydown('incomingJobNo', $event)"
+              (blur)="onDropdownBlur('incomingJobNo')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.incomingJobNo">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('incomingJobNo')">
+                All Incoming Job No
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('incomingJobNo')"
+                (mousedown)="selectDropdownOption('incomingJobNo', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('incomingJobNo').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Material No</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Material No."
+              [ngModel]="getDisplayedInputValue('materialNo')"
+              (focus)="onDropdownFocus('materialNo')"
+              (ngModelChange)="onDropdownInput('materialNo', $event)"
+              (keydown)="onDropdownKeydown('materialNo', $event)"
+              (blur)="onDropdownBlur('materialNo')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.materialNo">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('materialNo')">
+                All Material No
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('materialNo')"
+                (mousedown)="selectDropdownOption('materialNo', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('materialNo').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Material Name</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Material Name."
+              [ngModel]="getDisplayedInputValue('materialName')"
+              (focus)="onDropdownFocus('materialName')"
+              (ngModelChange)="onDropdownInput('materialName', $event)"
+              (keydown)="onDropdownKeydown('materialName', $event)"
+              (blur)="onDropdownBlur('materialName')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.materialName">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('materialName')">
+                All Material Name
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('materialName')"
+                (mousedown)="selectDropdownOption('materialName', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('materialName').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Material Spec</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Material Spec."
+              [ngModel]="getDisplayedInputValue('materialSpec')"
+              (focus)="onDropdownFocus('materialSpec')"
+              (ngModelChange)="onDropdownInput('materialSpec', $event)"
+              (keydown)="onDropdownKeydown('materialSpec', $event)"
+              (blur)="onDropdownBlur('materialSpec')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.materialSpec">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('materialSpec')">
+                All Material Spec
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('materialSpec')"
+                (mousedown)="selectDropdownOption('materialSpec', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('materialSpec').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Lot No</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Lot No."
+              [ngModel]="getDisplayedInputValue('lotNo')"
+              (focus)="onDropdownFocus('lotNo')"
+              (ngModelChange)="onDropdownInput('lotNo', $event)"
+              (keydown)="onDropdownKeydown('lotNo', $event)"
+              (blur)="onDropdownBlur('lotNo')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.lotNo">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('lotNo')">
+                All Lot No
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('lotNo')"
+                (mousedown)="selectDropdownOption('lotNo', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('lotNo').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Area Name</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Area Name."
+              [ngModel]="getDisplayedInputValue('areaName')"
+              (focus)="onDropdownFocus('areaName')"
+              (ngModelChange)="onDropdownInput('areaName', $event)"
+              (keydown)="onDropdownKeydown('areaName', $event)"
+              (blur)="onDropdownBlur('areaName')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.areaName">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('areaName')">
+                All Area Name
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('areaName')"
+                (mousedown)="selectDropdownOption('areaName', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('areaName').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Type</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Type."
+              [ngModel]="getDisplayedInputValue('type')"
+              (focus)="onDropdownFocus('type')"
+              (ngModelChange)="onDropdownInput('type', $event)"
+              (keydown)="onDropdownKeydown('type', $event)"
+              (blur)="onDropdownBlur('type')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.type">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('type')">
+                All Type
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('type')"
+                (mousedown)="selectDropdownOption('type', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('type').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Incharge By</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Incharge By."
+              [ngModel]="getDisplayedInputValue('inchargeBy')"
+              (focus)="onDropdownFocus('inchargeBy')"
+              (ngModelChange)="onDropdownInput('inchargeBy', $event)"
+              (keydown)="onDropdownKeydown('inchargeBy', $event)"
+              (blur)="onDropdownBlur('inchargeBy')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.inchargeBy">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('inchargeBy')">
+                All Incharge By
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('inchargeBy')"
+                (mousedown)="selectDropdownOption('inchargeBy', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('inchargeBy').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label class="filter-label">Remark</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Remark."
+              [ngModel]="getDisplayedInputValue('remark')"
+              (focus)="onDropdownFocus('remark')"
+              (ngModelChange)="onDropdownInput('remark', $event)"
+              (keydown)="onDropdownKeydown('remark', $event)"
+              (blur)="onDropdownBlur('remark')"
+            />
+            <div class="dropdown-panel" *ngIf="dropdownOpen.remark">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('remark')">
+                All Remark
+              </div>
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('remark')"
+                (mousedown)="selectDropdownOption('remark', x)"
+              >
+                {{ x }}
+              </div>
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('remark').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-box filter-action-box">
+          <label class="filter-label filter-label-hidden">Action</label>
+          <button
+            class="btn btn-outline-dark action-btn clear-filter-btn"
+            type="button"
+            (click)="clearFilters()"
+          >
+            <i class="fa fa-times me-2"></i>
+            Clear Filter
+          </button>
         </div>
       </div>
     </div>
@@ -59,6 +370,7 @@
         <table class="table table-hover align-middle mb-0 material-table">
           <thead>
             <tr>
+              <th style="width: 90px;">Index</th>
               <th style="width: 180px;">Incoming Job No</th>
               <th style="width: 180px;">Material No</th>
               <th style="width: 220px;">Material Name</th>
@@ -68,12 +380,15 @@
               <th style="width: 180px;">Area Name</th>
               <th style="width: 150px;">Type</th>
               <th style="width: 240px;">Incharge By</th>
+              <th style="width: 260px;">Remark</th>
               <th style="width: 220px;">Time</th>
             </tr>
           </thead>
 
           <tbody *ngIf="!isLoading">
             <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByRow">
+
+              <td><span class="index-badge">{{ i + 1 }}</span></td>
               <td class="cell-job">
                 <div class="material-no">{{ row.incomingJobNo || '-' }}</div>
               </td>
@@ -110,18 +425,22 @@
                 <div class="material-spec">{{ row.inchargeBy || '-' }}</div>
               </td>
 
+              <td class="cell-long">
+                <div class="time-text">{{ row.remark || '-' }}</div>
+              </td>
+
               <td class="cell-date">
                 <div class="time-text">{{ formatDateTime(row.time) }}</div>
               </td>
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="10" class="empty-cell">
+              <td colspan="11" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No transaction data found</div>
                   <div class="empty-subtitle">
-                    ไม่พบข้อมูลที่ตรงกับคำค้น หรือยังไม่มีข้อมูลในระบบ
+                    ไม่พบข้อมูลที่ตรงกับเงื่อนไข หรือยังไม่มีข้อมูลในระบบ
                   </div>
                 </div>
               </td>
@@ -130,7 +449,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="10" class="loading-cell">
+              <td colspan="11" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading transaction data...

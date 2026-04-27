@@ -39,13 +39,17 @@ export class JobTransactionComponent {
 
   issueJobs: JobRow[] = [];
   returnJobs: JobRow[] = [];
+  token : string = '' ;
 
   isLoadingIssue = false;
   isLoadingReturn = false;
 
   ngOnInit() {
+    this.token = localStorage.getItem('materialStore_token')!;
+    
     this.fetchIssueAll();
     this.fetchReturnAll();
+
 
     setInterval(() => {
       this.issueJobs = [...this.issueJobs];

@@ -46,6 +46,8 @@ export class AuthService {
     localStorage.setItem('materialStore_groupName', userData.groupName);
     localStorage.setItem('materialStore_sectionId', userData.sectionId);
     localStorage.setItem('materialStore_sectionName', userData.sectionName);
+    localStorage.setItem('materialStore_role', userData.role);
+
 
     this.authStatus.next(true);
     this.refreshComponents.next(true);
@@ -60,6 +62,8 @@ export class AuthService {
     localStorage.removeItem('materialStore_groupName');
     localStorage.removeItem('materialStore_sectionId');
     localStorage.removeItem('materialStore_sectionName');
+    localStorage.removeItem('materialStore_role');
+    
 
     this.authStatus.next(false);
     window.location.href = '/MaterialPress';

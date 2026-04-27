@@ -1139,7 +1139,7 @@
 
 
 
-
+/* 
   @media (max-width: 991.98px) {
     .floorplan {
       grid-template-columns: 1fr !important;
@@ -1167,4 +1167,4 @@
       width: 100%;
       flex-wrap: wrap;
     }
-  }
+  } */

@@ -301,6 +301,7 @@
         <table class="table table-hover align-middle mb-0 material-table">
           <thead>
             <tr>
+              <th style="width: 90px;">Index</th>
               <th style="width: 160px;">Job No</th>
               <th style="width: 180px;">Material No</th>
               <th style="width: 220px;">Item Name</th>
@@ -317,7 +318,8 @@
           </thead>
 
           <tbody *ngIf="!isLoading">
-            <tr *ngFor="let row of filteredRows; trackBy: trackByInventory">
+            <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByInventory">
+              <td><span class="index-badge">{{ i + 1 }}</span></td>
               <td><div class="material-no">{{ row.jobNo || '-' }}</div></td>
               <td><div class="material-no">{{ row.materialNo || '-' }}</div></td>
               <td><div class="material-name">{{ row.itemName || '-' }}</div></td>

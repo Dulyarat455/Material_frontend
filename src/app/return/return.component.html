@@ -176,6 +176,16 @@
                 </div>
               }
 
+              <button
+              *ngIf="canDeleteRequest(r)"
+              type="button"
+              class="btn-delete-job"
+              (click)="deleteReturnRequest(r)"
+              title="Delete request"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+
             </div>
 
 
@@ -219,6 +229,18 @@
                 >
                   <i class="fas fa-comment-dots"></i>
                 </button>
+
+
+                <button
+                *ngIf="(r.status === 'Complete' || r.status === 'Denial') && r.inchargeBy?.trim()"
+                type="button"
+                class="btn-detail ms-auto"
+                (click)="showInchargeDetail(r)"
+                title="Incharge detail"
+              >
+                <i class="fas fa-bars"></i>
+              </button>
+
 
                 <button
                 *ngIf="r.remarkMC?.trim()"

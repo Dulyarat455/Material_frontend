@@ -425,6 +425,19 @@
 
 
 
+.index-badge {
+  display: inline-flex;
+  min-width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.10);
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 13px;
+}
+
 
 
 
