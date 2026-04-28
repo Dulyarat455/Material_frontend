@@ -17,7 +17,9 @@
         </div>
 
         <div class="card-body">
-          <div class="floorplan">
+          <div class="floorplan"
+          [class.mobile-hide-area-store]="panelMode === 'MOVE_AREA_SCAN'"
+          >
             <!-- LEFT SIDE FIXED STACK -->
             <div class="fp-left-stack">
               <div
@@ -702,7 +704,7 @@
 
               <ng-container *ngIf="panelMode === 'STOCK_OUT'">
                 <div class="move-panel">
-                  <div class="move-search-row">
+                  <div class="move-search-row stockout-readonly-yellow">
                     <label>Request Job No</label>
                     <div class="move-search-group">
                       <input
@@ -714,7 +716,7 @@
                     </div>
                   </div>
               
-                  <div class="move-search-row">
+                  <div class="move-search-row stockout-readonly-yellow">
                     <label>Material No</label>
                     <div class="move-search-group">
                       <input
@@ -826,23 +828,25 @@
 
 
 
-                  <div class="panel-footer mt-3 d-flex align-items-center">
-                    <button
-                      class="btn btn-primary"
-                      (click)="confirmStockOut(false)"
-                      [disabled]="isSavingStock"
-                    >
-                      {{ isSavingStock ? 'Saving...' : 'Confirm Stock Out' }}
-                    </button>
+                  <div class="panel-footer panel-footer-stockout mt-3 d-flex align-items-center">
+                   
                   
                     <button
                       type="button"
-                      class="btn btn-danger ms-auto"
+                      class="btn btn-danger"
                       (click)="confirmStockOut(true)"
                       [disabled]="isSavingStock"
                     >
                       {{ isSavingStock ? 'Saving...' : 'Deny' }}
                     </button>
+
+                    <button
+                    class="btn btn-primary"
+                    (click)="confirmStockOut(false)"
+                    [disabled]="isSavingStock"
+                  >
+                    {{ isSavingStock ? 'Saving...' : 'Confirm Stock Out' }}
+                  </button>
                   </div>
 
                 </div>
@@ -1332,6 +1336,7 @@
               
                   <div class="stock-row">
                     <label>Store Code</label>
+                    <div class="move-search-group">
                     <input
                       #moveAreaScanStoreCode
                       type="text"
@@ -1339,6 +1344,18 @@
                       (keydown.enter)="onMoveAreaScanEnter('storeCode', $event)"
                       (blur)="onMoveAreaScanBlur('storeCode', $event)"
                     />
+
+                    <button
+                    type="button"
+                    class="btn-search"
+                    (click)="searchMoveAreaScanStoreCode()"
+                    
+                  >
+                    Search
+                  </button>
+
+                  </div>
+
                   </div>
               
                   <div class="move-form-grid stockout-form-grid">

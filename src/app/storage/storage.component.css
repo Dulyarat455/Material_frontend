@@ -440,14 +440,14 @@
 .stock-row textarea,
 .storage-area-select {
   width: 100%;
-  border: none;
+  border: 1px solid rgba(2, 6, 23, 0.10);
   outline: none;
-  background: #dfe4ec;
+  background: #ffffff;
   border-radius: 10px;
   padding: 7px 10px;
   font-size: 12px;
   color: #0f172a;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
 }
 
 .stock-row input,
@@ -458,7 +458,8 @@
 .stock-row input:focus,
 .stock-row textarea:focus,
 .storage-area-select:focus {
-  background: #d7dee8;
+  background: #ffffff;
+  border-color: rgba(37, 99, 235, 0.35);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, .12);
 }
 
@@ -575,11 +576,22 @@
     
     .move-select {
       width: 100%;
-      border: 1px solid rgba(2, 6, 23, .12);
-      border-radius: 8px;
-      padding: 5px 7px;
-      background: #fff;
-      font-size: 12px;
+      min-height: 44px;
+      border: 1px solid rgba(2, 6, 23, 0.10);
+      border-radius: 10px;
+      padding: 7px 12px;
+      background: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    
+    .move-select:focus {
+      background: #ffffff;
+      border-color: rgba(37, 99, 235, 0.35);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, .12);
+      outline: none;
     }
     
     .move-search-row .btn-main {
@@ -734,18 +746,19 @@
   
   .storage-area-select {
     width: 100%;
-    border: none;
+    border: 1px solid rgba(2, 6, 23, 0.10);
     outline: none;
-    background: #dfe4ec;
+    background: #ffffff;
     border-radius: 14px;
     padding: 12px 16px;
     font-size: 15px;
     color: #0f172a;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
   }
   
   .storage-area-select:focus {
-    background: #d7dee8;
+    background: #ffffff;
+    border-color: rgba(37, 99, 235, 0.35);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
   }
 
@@ -1133,6 +1146,18 @@
 
 
 
+
+   /* =============
+  mobile version
+  ============= */
+
+
+
+
+ 
+
+
+
   /* =============
   mobile version
   ============= */
@@ -1168,3 +1193,180 @@
       flex-wrap: wrap;
     }
   } */
+
+
+
+
+  @media (max-width: 991.98px) {
+    .floorplan {
+      column-gap: 0;
+      row-gap: 0;
+    }
+  
+    /* ซ่อน area store เฉพาะตอน MOVE_AREA_SCAN */
+    .floorplan.mobile-hide-area-store {
+      grid-template-columns: 1fr !important;
+    }
+  
+    .floorplan.mobile-hide-area-store .fp-left-stack,
+    .floorplan.mobile-hide-area-store .fp-right-stack {
+      display: none !important;
+    }
+  
+    .floorplan.mobile-hide-area-store .fp-table {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-width: 0;
+    }
+  
+    /* panel อื่นยังแสดงปกติ */
+    .panel-topbar {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  
+    .panel-actions {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+  }
+
+
+
+
+
+
+
+  .stockout-readonly-yellow input[readonly] {
+    background: #eceb8a !important;
+    color: #0f172a;
+    font-weight: 700;
+    border: 1px solid rgba(202, 179, 30, 0.28);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  
+  .stockout-readonly-yellow input[readonly]:focus {
+    background: #eceb8a !important;
+    box-shadow: 0 0 0 2px rgba(217, 191, 55, 0.18);
+  }
+
+
+
+
+
+
+  .move-panel .move-search-autocomplete input {
+    background: #ffffff !important;
+    border: 1px solid rgba(2, 6, 23, 0.10);
+    color: #0f172a;
+  }
+  
+  .move-panel .move-search-autocomplete input:focus {
+    background: #ffffff !important;
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+  }
+
+
+
+
+
+
+
+  /* MOVE_AREA_SCAN - Search button */
+.stock-panel .btn-search {
+  min-width: 100px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #1d4ed8;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.18);
+  transition: 0.15s ease;
+}
+
+.stock-panel .btn-search:hover:not(:disabled) {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
+}
+
+.stock-panel .btn-search:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+.stock-panel .btn-search:disabled {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 100%);
+  border-color: #93c5fd;
+  color: #eff6ff;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+
+
+
+ 
+.stock-row .move-search-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.stock-row .move-search-group input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.stock-row .move-search-group .btn-search {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+
+
+/* =======================
+Effect for panel table
+======================= */
+
+.fp-table .wms-table td button {
+  min-width: 72px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #1d4ed8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.16);
+  transition: 0.15s ease;
+}
+
+.fp-table .wms-table td button:hover {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+}
+
+.fp-table .wms-table td button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+
+
+.panel-footer-stockout {
+  justify-content: space-between;
+  gap: 12px;
+}
