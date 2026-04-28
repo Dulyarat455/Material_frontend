@@ -646,6 +646,9 @@ export class StorageComponent {
 
 oldestStockOutReceivedDate = '';
 oldestReturnReceivedDate = '';
+oldestMoveReceivedDate = '';
+
+
 
 private toSortableTime(value?: string): number {
   const v = (value || '').trim();
@@ -1165,7 +1168,7 @@ private isTableOccupiedHighlight(s: SlotRow): boolean {
   return s.status !== 'REJECTED' && this.hasAnyMaterialInSlot(s);
 }
 
-private isMoveAreaGreen(slotId: string): boolean {
+ isMoveAreaGreen(slotId: string): boolean {
   if (this.panelMode !== 'MOVE_AREA' && this.panelMode !== 'MOVE_AREA_SCAN') {
     return false;
   }
@@ -1184,7 +1187,7 @@ private isMoveAreaGreen(slotId: string): boolean {
 }
 
 
-private isMoveAreaOrange(slotId: string): boolean {
+ isMoveAreaOrange(slotId: string): boolean {
   if (this.panelMode !== 'MOVE_AREA' && this.panelMode !== 'MOVE_AREA_SCAN') {
     return false;
   }
@@ -1209,7 +1212,7 @@ private isMoveAreaOrange(slotId: string): boolean {
   return allAreas.has(slotId) && !oldestAreas.has(slotId);
 }
 
-private isStockOutGreen(slotId: string): boolean {
+ isStockOutGreen(slotId: string): boolean {
   if (this.panelMode !== 'STOCK_OUT') return false;
   if (!this.stockOutRows.length) return false;
 
@@ -1217,7 +1220,7 @@ private isStockOutGreen(slotId: string): boolean {
   return oldestAreas.has(slotId);
 }
 
-private isStockOutOrange(slotId: string): boolean {
+ isStockOutOrange(slotId: string): boolean {
   if (this.panelMode !== 'STOCK_OUT') return false;
   if (!this.stockOutRows.length) return false;
 
@@ -1240,6 +1243,16 @@ isOldestStockOutRow(row: StockOutRow): boolean {
     this.toSortableTime(this.oldestStockOutReceivedDate)
   );
 }
+
+
+
+
+
+isOldestMoveRow(row: MoveRow): boolean {
+  if (!row || !this.oldestMoveReceivedDate) return false;
+  return this.toSortableTime(row.receivedDate) === this.toSortableTime(this.oldestMoveReceivedDate);
+}
+
 
 
 
@@ -1953,32 +1966,115 @@ searchStockOutItem() {
     };
 
     if (this.panelMode === 'STOCK_IN') {
+      const formRows = [
+        { label: 'Job No', value: orderedPayload.jobNo, tone: 'warn' },
+        { label: 'Year / Month', value: orderedPayload.yearMonth },
+        { label: 'Received Date', value: orderedPayload.recivedDate },
+        { label: 'Inspector', value: orderedPayload.inspector },
+        { label: 'Unload By', value: orderedPayload.unloadBy },
+        { label: 'Invoice One', value: orderedPayload.invoiceOne },
+        { label: 'Tax Invoice No', value: orderedPayload.taxInvNo },
+    
+        { label: 'Material No', value: orderedPayload.itemNo, tone: 'warn' },
+        { label: 'Unit Price', value: orderedPayload.unitPrice },
+        { label: 'Qty Of Pallet / Pack', value: orderedPayload.qtyOfPalletPack },
+        { label: 'Coil', value: orderedPayload.coil, tone: 'warn' },
+        { label: 'Qty Kgs/Pcs', value: orderedPayload.qtyKgsPcs, tone: 'warn' },
+        { label: 'Unit', value: orderedPayload.unit },
+        { label: 'Kgs / Coil', value: orderedPayload.kgsCoil },
+        { label: 'OD Coil', value: orderedPayload.odCoil },
+        { label: 'Remark', value: orderedPayload.remark },
+        { label: 'Mill Sheet', value: orderedPayload.millSheet },
+    
+        { label: 'Item Name', value: orderedPayload.itemName, tone: 'warn' },
+        { label: 'Spec / Dwg', value: orderedPayload.specDwg, tone: 'warn' },
+        { label: 'Lot No', value: orderedPayload.lotNo },
+        { label: 'Quantity', value: orderedPayload.quantity },
+        { label: 'ROSH', value: orderedPayload.rosh },
+        { label: 'Result', value: orderedPayload.result },
+        { label: 'Supplier', value: orderedPayload.supplier },
+        { label: 'Amount', value: orderedPayload.amount },
+    
+        { label: 'Storage Area', value: orderedPayload.storageArea, tone: 'primary' },
+        { label: 'Stock Note', value: orderedPayload.stockNote, multiline: true }
+       
+      ];
+    
+      const htmlRows = formRows.map((row) => {
+        const safeValue = this.escapeHtml((row.value ?? '').toString().trim() || '-');
+    
+        let valueStyle = `
+          background:#f8fafc;
+          border:1px solid #e2e8f0;
+          border-radius:10px;
+          padding:10px 12px;
+          color:#0f172a;
+        `;
+    
+        if (row.tone === 'warn') {
+          valueStyle = `
+            background:#fefce8;
+            border:1px solid #fde68a;
+            border-radius:10px;
+            padding:10px 12px;
+            color:#854d0e;
+            font-weight:700;
+          `;
+        }
+    
+        if (row.tone === 'primary') {
+          valueStyle = `
+            background:#eff6ff;
+            border:1px solid #bfdbfe;
+            border-radius:10px;
+            padding:10px 12px;
+            color:#1d4ed8;
+            font-weight:700;
+          `;
+        }
+    
+        if (row.multiline) {
+          valueStyle += `
+            min-height:44px;
+            white-space:pre-wrap;
+            word-break:break-word;
+          `;
+        }
+    
+        return `
+          <div style="font-weight:800; color:#334155;">${this.escapeHtml(row.label)}</div>
+          <div style="${valueStyle}">${safeValue}</div>
+        `;
+      }).join('');
+    
       Swal.fire({
         title: 'Confirm Stock In Data',
         html: `
-          <div style="text-align:left; max-height: 420px; overflow:auto;">
-            <pre style="
-              margin:0;
-              white-space:pre-wrap;
-              word-break:break-word;
-              font-size:13px;
-              line-height:1.45;
-              background:#f8fafc;
-              border:1px solid #e2e8f0;
-              border-radius:10px;
-              padding:12px;
-              color:#0f172a;
-            ">${this.escapeHtml(JSON.stringify(orderedPayload, null, 2))}</pre>
+          <div style="text-align:left;">
+            <div style="
+              display:grid;
+              grid-template-columns: 180px 1fr;
+              gap:10px 12px;
+              align-items:start;
+              max-height:420px;
+              overflow:auto;
+              padding:4px 2px;
+            ">
+              ${htmlRows}
+            </div>
           </div>
         `,
-        width: '720px',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#2563eb'
+        width: '780px',
+        showCancelButton: true,
+        confirmButtonText: 'Confirm Stock In',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#94a3b8'
       }).then((result) => {
         if (!result.isConfirmed) return;
         this.submitStockIn();
       });
-
+    
       return;
     } else if (this.panelMode === 'STOCK_OUT') {
       console.log('CONFIRM STOCK OUT DATA = ', payload);
@@ -2281,147 +2377,148 @@ searchStockOutItem() {
     });
   }
 
-  // ใช้ในโหมด Move Area
-  searchMoveItem() {
-    const key = (this.moveSearchItemNo || '').trim().toLowerCase();
+// ใช้ในโหมด Move Area
+searchMoveItem() {
+  const key = (this.moveSearchItemNo || '').trim().toLowerCase();
 
-    this.showMaterialSuggestions = false;
-    this.materialSuggestions = [];
-    this.moveRows = [];
-    this.moveDestinationArea = '';
+  this.showMaterialSuggestions = false;
+  this.materialSuggestions = [];
+  this.moveRows = [];
+  this.moveDestinationArea = '';
+  this.oldestMoveReceivedDate = '';
+  this.moveForm = {
+    itemNo: '',
+    itemName: '',
+    itemSpec: ''
+  };
+
+  if (!key) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Missing Material No',
+      text: 'กรุณากรอก Material No'
+    });
+    return;
+  }
+
+  const rows: MoveRow[] = [];
+
+  this.slots.forEach(slot => {
+    (slot.materials || []).forEach((m, index) => {
+      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+
+      if (materialNo === key) {
+        rows.push({
+          uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
+          checked: false,
+          area: slot.storeCode,
+          receivedDate: m.receivedAt || '',
+          invoice: m.invNo || '',
+          qty: Number(m.qty || 0),
+          remark: m.remark || '',
+          toArea: '',
+
+          itemNo: m.materialNo || m.itemNo || '',
+          itemName: m.itemName || '',
+          itemSpec: m.itemSpec || '',
+          coil: m.coil != null ? Number(m.coil) : undefined,
+          unit: m.uom || '',
+
+          sourceStoreCode: slot.storeCode,
+          sourceInvNo: m.invNo || '',
+
+          jobNo: m.jobNo || '',
+          incomingId: Number(m.incomingId || 0),
+          storeId: Number(slot.storeId || m.storeId || 0),
+          stockNote: m.stockNote || ''
+        });
+      }
+    });
+  });
+
+  this.pendingItems.forEach((m, index) => {
+    const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+
+    if (materialNo === key) {
+      rows.push({
+        uid: `Pending_${m.incomingId || index}_${m.invNo}`,
+        checked: false,
+        area: 'Pending',
+        receivedDate: m.receivedAt || '',
+        invoice: m.invNo || '',
+        qty: Number(m.qty || 0),
+        remark: m.remark || '',
+        toArea: '',
+
+        itemNo: m.materialNo || m.itemNo || '',
+        itemName: m.itemName || m.description || '',
+        itemSpec: m.itemSpec || '',
+        coil: m.coil != null ? Number(m.coil) : undefined,
+        unit: m.uom || '',
+
+        sourceStoreCode: 'Pending',
+        sourceInvNo: m.invNo || '',
+
+        jobNo: m.jobNo || '',
+        incomingId: Number(m.incomingId || 0),
+        storeId: Number(m.storeId || 0),
+        stockNote: m.stockNote || ''
+      });
+    }
+  });
+
+  this.chemicalItems.forEach((m, index) => {
+    const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
+
+    if (materialNo === key) {
+      rows.push({
+        uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
+        checked: false,
+        area: 'Chemical',
+        receivedDate: m.receivedAt || '',
+        invoice: m.invNo || '',
+        qty: Number(m.qty || 0),
+        remark: m.remark || '',
+        toArea: '',
+
+        itemNo: m.materialNo || m.itemNo || '',
+        itemName: m.itemName || m.description || '',
+        itemSpec: m.itemSpec || '',
+        coil: m.coil != null ? Number(m.coil) : undefined,
+        unit: m.uom || '',
+
+        sourceStoreCode: 'Chemical',
+        sourceInvNo: m.invNo || '',
+
+        jobNo: m.jobNo || '',
+        incomingId: Number(m.incomingId || 0),
+        storeId: Number(m.storeId || 0),
+        stockNote: m.stockNote || ''
+      });
+    }
+  });
+
+  rows.sort((a, b) => this.toSortableTime(a.receivedDate) - this.toSortableTime(b.receivedDate));
+
+  this.moveRows = rows;
+
+  if (rows.length) {
     this.moveForm = {
-      itemNo: '',
-      itemName: '',
-      itemSpec: ''
+      itemNo: rows[0].itemNo,
+      itemName: rows[0].itemName,
+      itemSpec: rows[0].itemSpec
     };
 
-    if (!key) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Missing Material No',
-        text: 'กรุณากรอก Material No'
-      });
-      return;
-    }
-
-    const rows: MoveRow[] = [];
-
-    this.slots.forEach(slot => {
-      (slot.materials || []).forEach((m, index) => {
-        const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-
-        if (materialNo === key) {
-          rows.push({
-            uid: `${slot.storeCode}_${m.incomingId || index}_${m.invNo}`,
-            checked: false,
-            area: slot.storeCode,
-            receivedDate: m.receivedAt || '',
-            invoice: m.invNo || '',
-            qty: Number(m.qty || 0),
-            remark: m.remark || '',
-            toArea: '',
-
-            itemNo: m.materialNo || m.itemNo || '',
-            itemName: m.itemName  || '',
-            itemSpec: m.itemSpec || '',
-            coil: m.coil != null ? Number(m.coil) : undefined,
-            unit: m.uom || '',
-
-            sourceStoreCode: slot.storeCode,
-            sourceInvNo: m.invNo || '',
-
-            jobNo: m.jobNo || '',
-            incomingId: Number(m.incomingId || 0),
-            storeId: Number(slot.storeId || m.storeId || 0),
-            stockNote: m.stockNote || ''
-          });
-        }
-      });
-    });
-
-    this.pendingItems.forEach((m, index) => {
-      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-
-      if (materialNo === key) {
-        rows.push({
-          uid: `Pending_${m.incomingId || index}_${m.invNo}`,
-          checked: false,
-          area: 'Pending',
-          receivedDate: m.receivedAt || '',
-          invoice: m.invNo || '',
-          qty: Number(m.qty || 0),
-          remark: m.remark || '',
-          toArea: '',
-
-          itemNo: m.materialNo || m.itemNo || '',
-          itemName: m.itemName || m.description || '',
-          itemSpec: m.itemSpec || '',
-          coil: m.coil != null ? Number(m.coil) : undefined,
-          unit: m.uom || '',
-
-          sourceStoreCode: 'Pending',
-          sourceInvNo: m.invNo || '',
-
-          jobNo: m.jobNo || '',
-          incomingId: Number(m.incomingId || 0),
-          storeId: Number(m.storeId || 0),
-          stockNote: m.stockNote || ''
-        });
-      }
-    });
-
-
-
-    this.chemicalItems.forEach((m, index) => {
-      const materialNo = (m.materialNo || m.itemNo || '').trim().toLowerCase();
-  
-      if (materialNo === key) {
-        rows.push({
-          uid: `Chemical_${m.incomingId || index}_${m.invNo}`,
-          checked: false,
-          area: 'Chemical',
-          receivedDate: m.receivedAt || '',
-          invoice: m.invNo || '',
-          qty: Number(m.qty || 0),
-          remark: m.remark || '',
-          toArea: '',
-  
-          itemNo: m.materialNo || m.itemNo || '',
-          itemName: m.itemName || m.description || '',
-          itemSpec: m.itemSpec || '',
-          coil: m.coil != null ? Number(m.coil) : undefined,
-          unit: m.uom || '',
-  
-          sourceStoreCode: 'Chemical',
-          sourceInvNo: m.invNo || '',
-  
-          jobNo: m.jobNo || '',
-          incomingId: Number(m.incomingId || 0),
-          storeId: Number(m.storeId || 0),
-          stockNote: m.stockNote || ''
-        });
-      }
-    });
-
-
-
-    this.moveRows = rows;
-
-    if (rows.length) {
-      this.moveForm = {
-        itemNo: rows[0].itemNo,
-        itemName: rows[0].itemName,
-        itemSpec: rows[0].itemSpec
-      };
-      return;
-    }
-
-    Swal.fire({
-      icon: 'info',
-      title: 'No item found',
-      text: `ไม่พบ Material No : ${this.moveSearchItemNo}`
-    });
+    this.oldestMoveReceivedDate = rows[0].receivedDate || '';
+    return;
   }
+
+  Swal.fire({
+    icon: 'info',
+    title: 'No item found',
+    text: `ไม่พบ Material No : ${this.moveSearchItemNo}`
+  });
+}
 
   // ใช้ในโหมด Move Area
   confirmMoveArea() {
@@ -3393,26 +3490,121 @@ searchStockOutItem() {
     };
   
     Swal.fire({
-      title: 'Confirm Return Stock In Data',
+      title: 'Confirm Return Stock In',
       html: `
-        <div style="text-align:left; max-height:420px; overflow:auto;">
-          <pre style="
-            margin:0;
-            white-space:pre-wrap;
-            word-break:break-word;
-            font-size:13px;
-            line-height:1.45;
-            background:#f8fafc;
-            border:1px solid #e2e8f0;
-            border-radius:10px;
-            padding:12px;
-            color:#0f172a;
-          ">${this.escapeHtml(JSON.stringify(orderedPayload, null, 2))}</pre>
+        <div style="text-align:left;">
+          <div style="
+            display:grid;
+            grid-template-columns: 180px 1fr;
+            gap:10px 12px;
+            align-items:start;
+            max-height: 420px;
+            overflow:auto;
+            padding: 4px 2px;
+          ">
+            <div style="font-weight:800; color:#334155;">Request Job No</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml(orderedPayload.requestJobNo || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Job No Incoming</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml(orderedPayload.jobNoIncoming || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Material No</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml(orderedPayload.itemNo || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Scanned Material No</div>
+            <div style="
+              background:#fefce8;
+              border:1px solid #fde68a;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#854d0e;
+              font-weight:700;
+            ">${this.escapeHtml(orderedPayload.scannedMaterialNo || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Material Name</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml(orderedPayload.itemName || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Material Spec</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml(orderedPayload.itemSpec || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Return Coil</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml((orderedPayload.coil ?? '').toString() || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Return Qty</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+            ">${this.escapeHtml((orderedPayload.qty ?? '').toString() || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Storage Area</div>
+            <div style="
+              background:#eff6ff;
+              border:1px solid #bfdbfe;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#1d4ed8;
+              font-weight:700;
+            ">${this.escapeHtml(orderedPayload.storageArea || '-')}</div>
+    
+            <div style="font-weight:800; color:#334155;">Stock Note</div>
+            <div style="
+              background:#f8fafc;
+              border:1px solid #e2e8f0;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#0f172a;
+              min-height:44px;
+              white-space:pre-wrap;
+              word-break:break-word;
+            ">${this.escapeHtml(orderedPayload.stockNote || '-')}</div>
+          </div>
         </div>
       `,
-      width: '720px',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#2563eb'
+      width: '760px',
+      showCancelButton: true,
+      confirmButtonText: 'Confirm Return Stock In',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#94a3b8'
     }).then((result) => {
       if (!result.isConfirmed) return;
       this.submitReturnStockIn(false);

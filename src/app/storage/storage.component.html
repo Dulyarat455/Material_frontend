@@ -25,6 +25,10 @@
               <div
                 class="fp-pending fp-pending-compact"
                 [class.is-selected]="viewMode === 'PENDING'"
+                [class.is-stockout-green]="isStockOutGreen('Pending')"
+                [class.is-stockout-orange]="isStockOutOrange('Pending')"
+                [class.is-move-green]="isMoveAreaGreen('Pending')"
+                [class.is-move-orange]="isMoveAreaOrange('Pending')"
                 (click)="onClickPendingArea()"
                 role="button"
                 tabindex="0"
@@ -212,6 +216,10 @@
 
             <div class="chemical-area-card"
             [class.is-selected]="viewMode === 'CHEMICAL'"
+            [class.is-stockout-green]="isStockOutGreen('Chemical')"
+            [class.is-stockout-orange]="isStockOutOrange('Chemical')"
+            [class.is-move-green]="isMoveAreaGreen('Chemical')"
+            [class.is-move-orange]="isMoveAreaOrange('Chemical')"
             (click)="onClickChemicalArea()"
             role="button"
             tabindex="0">
@@ -260,6 +268,9 @@
                       <ng-container *ngIf="selectedSlot; else noneTitle">
                         Slot <b>{{ selectedSlot.storeCode }}</b> materials
                         <span class="badge badge-secondary ms-2">{{ selectedSlot.status }}</span>
+                        <span class="badge badge-secondary ms-2">
+                          {{ selectedSlot.materials.length || 0 }} items
+                        </span>
                       </ng-container>
                   
                       <ng-template #noneTitle>
@@ -683,16 +694,15 @@
                   <div class="stock-footer">
                     <button class="btn-soft" type="button" (click)="resetStockForm()">Clear</button>
                     <button
-                      class="btn-main"
-                      type="button"
-                      (click)="confirmStockAction()"
-                      [disabled]="isSavingStock"
-                    >
-                      <span *ngIf="panelMode === 'STOCK_IN'">
-                        {{ isSavingStock ? 'Saving...' : 'Confirm Stock In' }}
-                      </span>
-                    
-                    </button>
+                    class="btn-main"
+                    type="button"
+                    (click)="confirmStockAction()"
+                    [disabled]="isSavingStock || !(stockForm.amount || '').toString().trim()"
+                  >
+                    <span *ngIf="panelMode === 'STOCK_IN'">
+                      {{ isSavingStock ? 'Saving...' : 'Confirm Stock In' }}
+                    </span>
+                  </button>
                   </div>
 
                 </div>
@@ -935,7 +945,8 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let row of moveRows">
+                        <tr *ngFor="let row of moveRows" 
+                        [class.move-oldest-row]="isOldestMoveRow(row)">
                           <td class="text-center">
                             <input type="checkbox" [(ngModel)]="row.checked" />
                           </td>
@@ -1748,15 +1759,14 @@
                       <button class="btn-soft" type="button" (click)="resetReturnStockForm()">
                         Clear
                       </button>
-                  
                       <button
-                        class="btn-main"
-                        type="button"
-                        (click)="confirmReturnStockAction(false)"
-                        [disabled]="isSavingStock"
-                      >
-                        {{ isSavingStock ? 'Saving...' : 'Confirm Return Stock In' }}
-                      </button>
+                      class="btn-main"
+                      type="button"
+                      (click)="confirmReturnStockAction(false)"
+                      [disabled]="isSavingStock || !(returnStockForm.amount || '').toString().trim()"
+                    >
+                      {{ isSavingStock ? 'Saving...' : 'Confirm Return Stock In' }}
+                    </button>
                     </div>
                   </div>
 

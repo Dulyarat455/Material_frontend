@@ -1370,3 +1370,59 @@ Effect for panel table
   justify-content: space-between;
   gap: 12px;
 }
+
+
+
+
+
+
+
+
+
+
+.move-oldest-row td {
+  background: #dcfce7 !important;
+}
+
+.move-oldest-row:hover td {
+  background: #bbf7d0 !important;
+}
+
+.move-oldest-row td:first-child {
+  border-left: 4px solid #22c55e;
+}
+
+
+
+
+
+.btn-main:disabled {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 100%) !important;
+  color: #eff6ff !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  opacity: 0.9;
+  filter: none !important;
+}
+
+.btn-main:disabled:hover {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 100%) !important;
+  transform: none;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+
+
+
+
+/* ============================================
+Highlight Color Area =>  Pending, Chemical Area
+=============================================== */
+
+.is-move-orange,
+.is-stockout-orange,
+.is-return-orange {
+  border-color: rgba(245, 158, 11, 0.70) !important;
+  background: rgba(245, 158, 11, 0.14) !important;
+}
