@@ -533,6 +533,7 @@ export class StorageComponent {
     this.fetchStorageMap();
 
     this.applyTransactionState();
+    this.applyDefaultPanelForMobile();
   }
 
 
@@ -4324,6 +4325,23 @@ searchMoveItem() {
   }
 
 
+
+
+
+  private applyDefaultPanelForMobile() {
+    if (typeof window === 'undefined') return;
+  
+    const isMobile = window.innerWidth <= 991.98;
+  
+    // ถ้ายังเป็นค่า default เดิมค่อยเปลี่ยน
+    if (isMobile && this.panelMode === 'TABLE' && !this.selectedTransactionJob) {
+      this.panelMode = 'MOVE_AREA_SCAN';
+  
+      setTimeout(() => {
+        this.focusEl(this.moveAreaScanJobNo);
+      }, 0);
+    }
+  }
 
 
 

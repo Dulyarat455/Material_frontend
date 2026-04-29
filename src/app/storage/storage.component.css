@@ -1233,6 +1233,14 @@
 
 
 
+  @media (max-width: 991.98px) {
+    .storage-map-mobile-hide {
+      display: none !important;
+    }
+  }
+
+
+
 
 
 
