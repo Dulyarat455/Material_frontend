@@ -19,25 +19,45 @@
   <div class="sidebar">
     <!-- User Panel -->
     @if (name != undefined) {
-    <div class="user-panel mt-3 pb-3 mb-3">
-      <div class="d-flex align-items-center p-3 mb-3 bg-dark rounded">
-        <div class="image">
-          <img
-            src="dist/img/employee.png"
-            class="img-circle elevation-2"
-            alt="User Image"
-            style="width: 45px; height: 45px; object-fit: cover"
-          />
+      <div class="user-panel mt-3 pb-3 mb-3">
+        <div class="user-card">
+          <div class="user-card-top">
+            <div class="image">
+              <img
+                src="dist/img/employee.png"
+                class="img-circle elevation-2 user-avatar"
+                alt="User Image"
+              />
+            </div>
+      
+            <div class="user-main-info">
+              <div class="user-empno">{{ empNo || '-' }}</div>
+              <div class="user-name" [title]="name || '-'">{{ name || '-' }}</div>
+            </div>
+          </div>
+      
+          <div class="user-meta-grid">
+            <div class="user-meta-item">
+              <div class="user-meta-label">Role</div>
+              <div class="user-meta-value">{{ role || '-' }}</div>
+            </div>
+      
+            <div class="user-meta-item">
+              <div class="user-meta-label">Group</div>
+              <div class="user-meta-value">{{ group || '-' }}</div>
+            </div>
+      
+            <div class="user-meta-item full">
+              <div class="user-meta-label">Section</div>
+              <div class="user-meta-value">{{ section || '-' }}</div>
+            </div>
+          </div>
         </div>
-        <div class="info ms-3">
-          <h5 class="text-white mb-1">{{ empNo }}</h5>
-          <small class="text-light opacity-75">{{ level }}</small>
-        </div>
+      
+        <button class="btn btn-danger w-100 sidebar-signout-btn" (click)="signout()">
+          <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+        </button>
       </div>
-      <button class="btn btn-danger w-100" (click)="signout()">
-        <i class="fas fa-sign-out-alt me-2"></i>Sign Out
-      </button>
-    </div>
     }
 
     <!-- Menu -->

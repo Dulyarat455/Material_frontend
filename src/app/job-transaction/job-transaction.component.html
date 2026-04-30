@@ -70,7 +70,7 @@
             <th>M/C No</th>
             <th>Request By</th>
             <th>Remark</th>
-            <th *ngIf="token">StockOut</th>
+            <th *ngIf="token && (section === 'MC' || role === 'admin')">StockOut</th>
           </tr>
         </thead>
         <tbody>
@@ -119,7 +119,7 @@
               <span *ngIf="!row.remark?.trim()">-</span>
             </td>
 
-            <td *ngIf="token" class="action-cell">
+            <td *ngIf="token && (section === 'MC' || role === 'admin')" class="action-cell">
               <button
                 class="stockout-btn"
                 type="button"
@@ -170,7 +170,7 @@
             <th>M/C No</th>
             <th>Request By</th>
             <th>Remark</th>
-            <th *ngIf="token">Return</th>
+            <th *ngIf="token && (section === 'MC' || role === 'admin')">Return</th>
           </tr>
         </thead>
         <tbody>
@@ -217,7 +217,7 @@
               <span *ngIf="!row.remark?.trim()">-</span>
             </td>
 
-            <td  *ngIf="token" class="action-cell">
+            <td  *ngIf="token && (section === 'MC' || role === 'admin')" class="action-cell">
               <button
                 class="return-btn"
                 type="button"

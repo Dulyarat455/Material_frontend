@@ -349,7 +349,7 @@
                           <td class="text-center">{{ p.coil | number }}</td>
                           <td class="text-center">{{ p.qty | number }}</td>
                           <td class="muted">{{ p.uom }}</td>
-                          <td class="muted">
+                          <td class="text-center">
                             <button (click)="openMaterialDetailSwal(p)"> Detail </button>
                           </td>
                           <td class="text-center">
@@ -372,7 +372,7 @@
                           <td class="text-center">{{ c.coil | number }}</td>
                           <td class="text-center">{{ c.qty | number }}</td>
                           <td class="muted">{{ c.uom }}</td>
-                          <td class="muted">
+                          <td class="text-center">
                             <button (click)="openMaterialDetailSwal(c)">Detail</button>
                           </td>
                           <td class="text-center">
@@ -396,7 +396,7 @@
                           <td class="text-center">{{ m.coil | number }}</td>
                           <td class="text-center">{{ m.qty }}</td>
                           <td class="muted">{{ m.uom }}</td>
-                          <td class="muted"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
+                          <td class="text-center"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
                           <td class="text-center">
                             <button type="button" (click)="openTableOutRemarkModal(m)">out</button>
                           </td>
@@ -771,7 +771,7 @@
                           <th class="text-center">Coil</th>
                           <th class="text-end">Qty</th>
                           <th>Unit</th>
-                          <th>Remark</th>
+                          <th class="text-center">Remark</th>
                         </tr>
                       </thead>
               
@@ -798,13 +798,14 @@
                           @if (row.stockNote) {
                             <td class="text-center">
                               <button
-                                type="button"
-                                class="btn btn-sm btn-outline-secondary"
-                                (click)="openRemarkSwal(row.stockNote)"
-                                [disabled]="!(row.stockNote || '').trim()"
-                              >
-                                Remark
-                              </button>
+                              type="button"
+                              class="remark-icon-btn"
+                              (click)="openRemarkSwal(row.stockNote)"
+                              [disabled]="!(row.stockNote || '').trim()"
+                              title="Remark"
+                            >
+                              <i class="fas fa-comment-dots"></i>
+                            </button>
                             </td>
                           }
                           @if(!row.stockNote){
@@ -941,7 +942,7 @@
                           <th class="text-center">Coil</th>
                           <th class="text-center">Qty</th>
                           <th>Unit</th>
-                          <th>Remark</th>
+                          <th class="text-center">Remark</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -961,11 +962,11 @@
                             <td class="text-center">
                               <button
                                 type="button"
-                                class="btn btn-sm btn-outline-secondary"
+                                class="remark-icon-btn"
                                 (click)="openRemarkSwal(row.stockNote)"
                                 [disabled]="!(row.stockNote || '').trim()"
                               >
-                                Remark
+                                <i class="fas fa-comment-dots"></i>
                               </button>
                             </td>
                           }

@@ -2,6 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { CallSocketService } from '../services/call-socket.service';
+
+
 import Swal from 'sweetalert2';
 import config from '../../config';
 
@@ -47,7 +51,12 @@ type AreaRow = {
   styleUrl: './return.component.css'
 })
 export class ReturnComponent {
-  constructor(private http: HttpClient) {}
+  wsSub?: Subscription;
+
+  constructor(
+    private http: HttpClient,
+    private callSocket: CallSocketService,
+  ) {}
 
   materialNo = '';
   materialName = '';
@@ -85,6 +94,7 @@ export class ReturnComponent {
 
   q = '';
   statusFilter: ReturnRequestRow['status'] = 'Waiting';
+  refreshTimer: any = null;
 
   ngOnInit() {
     this.userId = this.toNumber(localStorage.getItem('materialStore_userId'));
@@ -96,6 +106,26 @@ export class ReturnComponent {
 
     this.fetchMaterials();
     this.fetchReturnQueueFollowFilter();
+
+
+
+     // ✅ ฟัง event จาก websocket
+     this.wsSub = this.callSocket.onJobChanged().subscribe((payload: any) => {
+      console.log('lot:changed payload =', payload);
+      const type = payload?.type as 'materialIssue' | 'materialReturn' | undefined;
+      console.log("type = ",type )
+
+      if(type === 'materialReturn'){
+        this.fetchReturnQueueFollowFilter();
+      }
+
+    })
+
+    this.refreshTimer = setInterval(() => {
+      this.requestsAll = [...this.requestsAll];
+      this.requestsView = [...this.requestsView];
+    }, 60000);
+
   }
 
   private toNumber(value: any): number | null {
@@ -610,5 +640,42 @@ export class ReturnComponent {
 
 
 
+
+    isOver20MinWaiting(row: ReturnRequestRow): boolean {
+      if (!row) return false;
+      if (row.status !== 'Waiting') return false;
+      if (!row.requestAt || row.requestAt === '-') return false;
+    
+      const d = this.parseDateTime(row.requestAt);
+      if (!d) return false;
+    
+      const now = new Date();
+      const diffMs = now.getTime() - d.getTime();
+      const diffMin = diffMs / (1000 * 60);
+    
+      return diffMin >= 20;
+    }
+    
+    parseDateTime(value: string): Date | null {
+      try {
+        const [datePart, timePart] = value.split(' ');
+        const [yyyy, mm, dd] = datePart.split('-').map(Number);
+        const [hh, min, sec] = timePart.split(':').map(Number);
+    
+        return new Date(yyyy, (mm || 1) - 1, dd || 1, hh || 0, min || 0, sec || 0);
+      } catch {
+        return null;
+      }
+    }
+
+
+    ngOnDestroy() {
+      this.wsSub?.unsubscribe();
+
+      if (this.refreshTimer) {
+        clearInterval(this.refreshTimer);
+        this.refreshTimer = null;
+      }
+    }
 
 }

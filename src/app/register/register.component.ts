@@ -2,6 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { CallSocketService } from '../services/call-socket.service';
+
+
 import Swal from 'sweetalert2';
 import config from '../../config';
 
@@ -44,7 +48,11 @@ type SectionRow = {
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
-  constructor(private http: HttpClient) {}
+  wsSub?: Subscription;
+  constructor(
+    private http: HttpClient,
+    private callSocket: CallSocketService,
+  ) {}
 
   isLoading = false;
   searchText = '';
@@ -59,6 +67,23 @@ export class RegisterComponent {
   sections: SectionRow[] = [];
 
   ngOnInit() {
+
+       // ✅ ฟัง event จาก websocket
+       this.wsSub = this.callSocket.onJobChanged().subscribe((payload: any) => {
+        console.log('lot:changed payload =', payload);
+        const type = payload?.type as 'materialIssue' | 'materialReturn' | undefined;
+        console.log("type = ",type )
+  
+        if(type === 'materialIssue'){
+          this.fetchUserList();
+        }
+  
+        if(type === 'materialReturn'){
+          this.fetchUserList();
+        }
+  
+      })
+
     this.fetchUserList();
     this.fetchGroup();
     this.fetchSection();
@@ -706,10 +731,6 @@ export class RegisterComponent {
 
 
 
-
-
-
-
   private escapeHtml(value: string) {
     return String(value || '')
       .replace(/&/g, '&amp;')
@@ -718,4 +739,11 @@ export class RegisterComponent {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
+
+
+
+  ngOnDestroy() {
+    this.wsSub?.unsubscribe();
+  }
+  
 }

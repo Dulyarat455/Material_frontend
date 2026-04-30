@@ -146,7 +146,10 @@
         <div class="queue-empty" *ngIf="isLoadingQueue">Loading...</div>
 
         <ng-container *ngIf="!isLoadingQueue">
-          <div class="req-card" *ngFor="let r of requestsView">
+          <div class="req-card" 
+          *ngFor="let r of requestsView"
+          [class.req-card-urgent]="isOver20MinWaiting(r)"
+          >
             <div class="req-top">
               <div class="req-main">
                 <div class="req-material">{{ r.materialNo }}</div>

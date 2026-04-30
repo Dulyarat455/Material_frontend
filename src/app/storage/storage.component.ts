@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 
+import { Subscription } from 'rxjs';
+import { CallSocketService } from '../services/call-socket.service';
+
 import Swal from 'sweetalert2';
 import config from '../../config';
 
@@ -217,10 +220,13 @@ type StockScanField =
   styleUrl: './storage.component.css'
 })
 export class StorageComponent {
+   wsSub?: Subscription;
+
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+     private callSocket: CallSocketService,
   ) {}
 
   @ViewChild('scanJobNo') scanJobNo?: ElementRef<HTMLInputElement>;
@@ -529,11 +535,28 @@ export class StorageComponent {
 
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
+
+
     this.fetchStoreMaster();
     this.fetchStorageMap();
 
     this.applyTransactionState();
     this.applyDefaultPanelForMobile();
+
+
+
+     // ✅ ฟัง event จาก websocket
+     this.wsSub = this.callSocket.onStoreChange().subscribe((payload: any) => {
+      console.log('materialStore:changed  payload =', payload);
+      const type = payload?.type as 'materialStoreMove' | undefined;
+      console.log("type = ",type )
+
+      if(type === 'materialStoreMove'){
+        this.fetchStoreMaster();
+        this.fetchStorageMap();
+      }
+
+    })
   }
 
 

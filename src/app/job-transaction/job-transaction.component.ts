@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-
+import { Subscription } from 'rxjs';
+import { CallSocketService } from '../services/call-socket.service';
 
 import Swal from 'sweetalert2';
 import config from '../../config';
@@ -32,23 +33,53 @@ type JobRow = {
   styleUrl: './job-transaction.component.css'
 })
 export class JobTransactionComponent {
+  wsSub?: Subscription;
+  
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private callSocket: CallSocketService,
   ) {}
 
   issueJobs: JobRow[] = [];
   returnJobs: JobRow[] = [];
-  token : string = '' ;
+  token: string = '';
+  role: string = '';
+  section: string = '';
+
+
 
   isLoadingIssue = false;
   isLoadingReturn = false;
 
   ngOnInit() {
     this.token = localStorage.getItem('materialStore_token')!;
-    
+    this.section = localStorage.getItem('materialStore_sectionName')!;
+    this.role = localStorage.getItem('materialStore_role')!;
+
+
     this.fetchIssueAll();
     this.fetchReturnAll();
+
+
+      // ✅ ฟัง event จาก websocket
+      this.wsSub = this.callSocket.onJobChanged().subscribe((payload: any) => {
+        console.log('lot:changed payload =', payload);
+        const type = payload?.type as 'materialIssue' | 'materialReturn' | undefined;
+        console.log("type = ",type )
+  
+        if(type === 'materialIssue'){
+          this.fetchIssueAll();
+          this.fetchReturnAll();
+        }
+  
+        if(type === 'materialReturn'){
+          this.fetchIssueAll();
+          this.fetchReturnAll();
+        }
+  
+      })
+  
 
 
     setInterval(() => {
@@ -223,7 +254,7 @@ export class JobTransactionComponent {
     const diffMs = now.getTime() - d.getTime();
     const diffMin = diffMs / (1000 * 60);
 
-    return diffMin >= 10;
+    return diffMin >= 20;
   }
 
   parseDateTime(value: string): Date | null {
@@ -257,4 +288,13 @@ export class JobTransactionComponent {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
+
+
+
+  ngOnDestroy() {
+    this.wsSub?.unsubscribe();
+  }
+
+
+  
 }

@@ -59,7 +59,7 @@
 
   
         <!-- Storage (มี icon + active highlight) -->
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="token && (section === 'MC' || section === 'QC' || role === 'admin' )">
           <a
             [routerLink]="['/storage']"
             class="nav-link nav-tab"
@@ -72,7 +72,7 @@
         </li>
 
         <!-- Issue -->
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="token && (section === 'PD' || role === 'admin' )">
           <a class="nav-link nav-center-item" [routerLink]="['/issue']" routerLinkActive="active">
             <i class="fas fa-truck-loading"></i>
             <span>Request Issue</span>
@@ -80,7 +80,7 @@
         </li>
 
         <!-- Receive -->
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="token && (section === 'PD' || role === 'admin' )">
           <a class="nav-link nav-center-item" [routerLink]="['/return']" routerLinkActive="active">
             <i class="fas fa-undo"></i>
             <span>Request Return </span>

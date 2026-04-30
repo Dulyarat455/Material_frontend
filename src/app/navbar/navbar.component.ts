@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule,CommonModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
@@ -14,11 +14,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
   formattedTime: string = '';
   private timeInterval: any;
   token: string | undefined = '';
+  role: string ='';
+  section: string = '';
+
+
+
 
   ngOnInit() {
     // Initial update
     this.updateDateTime();
     this.token = localStorage.getItem('materialStore_token')!;
+    this.role = localStorage.getItem('materialStore_role')!;
+    this.section = localStorage.getItem('materialStore_sectionName')!;
+
     // Update time every second
     this.timeInterval = setInterval(() => {
       this.updateDateTime();

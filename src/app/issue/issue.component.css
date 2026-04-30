@@ -713,3 +713,38 @@ Detail Button
 .btn-detail:active{
   transform: translateY(0);
 }
+
+
+
+
+/* 
+=====================
+time over 20 
+===================== */
+
+
+
+.req-card-urgent {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.24) !important;
+}
+
+.req-card-urgent:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+}
+
+.req-card-urgent::before {
+  content: '';
+  display: block;
+  width: 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+}
+
+.req-card {
+  position: relative;
+}

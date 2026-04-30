@@ -2,6 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { CallSocketService } from '../services/call-socket.service';
+
+
 import Swal from 'sweetalert2';
 import config from '../../config';
 
@@ -46,7 +50,12 @@ type AreaRow = {
   styleUrl: './issue.component.css'
 })
 export class IssueComponent {
-  constructor(private http: HttpClient) {}
+  wsSub?: Subscription;
+
+  constructor(
+    private http: HttpClient,
+    private callSocket: CallSocketService,
+  ) {}
 
   materialNo = '';
   materialName = '';
@@ -83,6 +92,8 @@ export class IssueComponent {
   q = '';
   statusFilter: 'all' | IssueRequestRow['status'] = 'Waiting';
 
+  refreshTimer: any = null;
+
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
@@ -92,6 +103,27 @@ export class IssueComponent {
 
     this.fetchMaterials();
     this.fetchIssueQueueFollowFilter();
+
+
+
+    // ✅ ฟัง event จาก websocket
+    this.wsSub = this.callSocket.onJobChanged().subscribe((payload: any) => {
+      console.log('onJobChanged payload =', payload);
+    
+      const type = payload?.type as 'materialIssue' | 'materialReturn' | undefined;
+      console.log('socket type =', type);
+    
+      if (type === 'materialIssue') {
+        console.log('fetchIssueQueueFollowFilter from socket');
+        this.fetchIssueQueueFollowFilter();
+      }
+    });
+
+
+    this.refreshTimer = setInterval(() => {
+      this.requestsAll = [...this.requestsAll];
+      this.requestsView = [...this.requestsView];
+    }, 60000);
   }
 
   fetchMaterials() {
@@ -579,6 +611,48 @@ export class IssueComponent {
       confirmButtonColor: '#2563eb'
     });
   }
+
+
+
+
+  isOver20MinWaiting(row: IssueRequestRow): boolean {
+    if (!row) return false;
+    if (row.status !== 'Waiting') return false;
+    if (!row.requestAt || row.requestAt === '-') return false;
+  
+    const d = this.parseDateTime(row.requestAt);
+    if (!d) return false;
+  
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = diffMs / (1000 * 60);
+  
+    return diffMin >= 20;
+  }
+  
+  parseDateTime(value: string): Date | null {
+    try {
+      const [datePart, timePart] = value.split(' ');
+      const [dd, mm, yyyy] = datePart.split('-').map(Number);
+      const [hh, min, sec] = timePart.split(':').map(Number);
+  
+      return new Date(yyyy, mm - 1, dd, hh || 0, min || 0, sec || 0);
+    } catch {
+      return null;
+    }
+  }
+
+
+  ngOnDestroy() {
+    this.wsSub?.unsubscribe();
+
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+  }
+
+
 
 
 }
