@@ -748,3 +748,121 @@ time over 20
 .req-card {
   position: relative;
 }
+
+
+
+/* ===================
+  button Search  
+=================== */
+
+
+.material-search-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.material-search-box input {
+  min-width: 0;
+  width: 100%;
+}
+
+.btn-material-search {
+  height: 42px;
+  min-width: 110px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+  transition: all 0.18s ease;
+}
+
+.btn-material-search:hover {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28);
+}
+
+.btn-material-search:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.2);
+}
+
+.btn-material-search:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.22);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .material-search-box {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .btn-material-search {
+    min-width: 96px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
+
+
+
+/* ==============
+  Clear Button  
+============== */
+
+
+.form-action-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.btn-clear-form {
+  align-self: flex-start;
+  min-width: 140px;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: #475569;
+  font-size: 14px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(148, 163, 184, 0.10);
+  transition: all 0.18s ease;
+}
+
+.btn-clear-form:hover:not(:disabled) {
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: rgba(37, 99, 235, 0.24);
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-clear-form:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-clear-form:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}

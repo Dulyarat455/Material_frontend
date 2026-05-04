@@ -27,15 +27,29 @@
       <div class="return-form">
         <div class="form-row material-search">
           <label>Material No</label>
-          <input
-            [(ngModel)]="materialNo"
-            (input)="onSearchMaterial()"
-            (blur)="hideMaterialDropdown()"
-            placeholder="Search Material..."
-            autocomplete="off"
-          />
-
-          <div class="dropdown-material" *ngIf="showMaterialDropdown">
+        
+          <div class="material-search-box">
+            <input
+              [(ngModel)]="materialNo"
+              (input)="onMaterialNoInput()"
+              (keydown.enter)="onMaterialNoEnter($event)"
+              (blur)="onMaterialNoBlur()"
+              placeholder="Search Material..."
+              autocomplete="off"
+            />
+        
+            <button
+              type="button"
+              class="btn-material-search"
+              (click)="onClickSearchMaterial()"
+              title="Search material"
+            >
+            <i class="fas fa-search me-2"></i>
+               Search
+            </button>
+          </div>
+        
+          <div class="dropdown-material" *ngIf="canUseMaterialDropdown() && showMaterialDropdown">
             <div
               class="dropdown-item"
               *ngFor="let m of materialDropdown"
@@ -46,6 +60,12 @@
             </div>
           </div>
         </div>
+
+
+
+
+
+
 
         <div class="form-row">
           <label>Material Name</label>
@@ -94,10 +114,27 @@
           <input [(ngModel)]="remark" placeholder="Returning unused material" />
         </div>
 
-        <button class="btn-main return-btn" (click)="submitReturnRequest()" [disabled]="isSubmitting">
-          <i class="fas fa-undo me-2"></i>
-          {{ isSubmitting ? 'Submitting...' : 'Submit Return Request' }}
-        </button>
+        <div class="form-action-col">
+          <button
+            type="button"
+            class="btn-clear-form"
+            (click)="resetForm()"
+            [disabled]="isSubmitting"
+          >
+            <i class="fas fa-eraser me-2"></i>
+            Clear Form
+          </button>
+        
+          <button
+            type="button"
+            class="btn-main return-btn"
+            (click)="submitReturnRequest()"
+            [disabled]="isSubmitting"
+          >
+            <i class="fas fa-undo me-2"></i>
+            {{ isSubmitting ? 'Submitting...' : 'Submit Return Request' }}
+          </button>
+        </div>
       </div>
     </div>
 

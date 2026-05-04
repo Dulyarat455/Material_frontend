@@ -27,15 +27,29 @@
       <div class="issue-form">
         <div class="form-row material-search">
           <label>Material No</label>
-          <input
-            [(ngModel)]="materialNo"
-            (input)="onSearchMaterial()"
-            (blur)="hideMaterialDropdown()"
-            placeholder="Search Material..."
-            autocomplete="off"
-          />
-
-          <div class="dropdown-material" *ngIf="showMaterialDropdown">
+        
+          <div class="material-search-box">
+            <input
+              [(ngModel)]="materialNo"
+              (input)="onMaterialNoInput()"
+              (keydown.enter)="onMaterialNoEnter($event)"
+              (blur)="onMaterialNoBlur()"
+              placeholder="Search Material..."
+              autocomplete="off"
+            />
+        
+            <button
+              type="button"
+              class="btn-material-search"
+              (click)="onClickSearchMaterial()"
+              title="Search material"
+            >
+              <i class="fas fa-search"></i>
+                Search
+            </button>
+          </div>
+        
+          <div class="dropdown-material" *ngIf="canUseMaterialDropdown() && showMaterialDropdown">
             <div
               class="dropdown-item"
               *ngFor="let m of materialDropdown"
@@ -46,6 +60,9 @@
             </div>
           </div>
         </div>
+
+
+
 
         <div class="form-row">
           <label>Material Name</label>
@@ -98,10 +115,28 @@
           <input [(ngModel)]="remark" placeholder="Optional..." />
         </div>
 
-        <button class="btn-main" (click)="submitIssueRequest()" [disabled]="isSubmitting">
-          <i class="fas fa-paper-plane me-2"></i>
-          {{ isSubmitting ? 'Submitting...' : 'Submit Issue Request' }}
-        </button>
+        <div class="form-action-col">
+          <button
+            type="button"
+            class="btn-clear-form"
+            (click)="resetForm()"
+            [disabled]="isSubmitting"
+          >
+            <i class="fas fa-eraser me-2"></i>
+            Clear Form
+          </button>
+        
+          <button
+            type="button"
+            class="btn-main"
+            (click)="submitIssueRequest()"
+            [disabled]="isSubmitting"
+          >
+            <i class="fas fa-paper-plane me-2"></i>
+            {{ isSubmitting ? 'Submitting...' : 'Submit Issue Request' }}
+          </button>
+        </div>
+        
       </div>
     </div>
 

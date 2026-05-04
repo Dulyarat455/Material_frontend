@@ -60,6 +60,7 @@ export class StockOutReportComponent {
 
   ngOnInit() {
     this.fetchStockOutList();
+    this.setDefaultDateRange();
   }
 
   fetchStockOutList() {
@@ -86,8 +87,7 @@ export class StockOutReportComponent {
   }
 
   clearFilters() {
-    this.startDate = '';
-    this.endDate = '';
+    this.setDefaultDateRange();
 
     this.jobNoIncomingFilter = 'all';
     this.sectionNameFilter = 'all';
@@ -396,5 +396,23 @@ export class StockOutReportComponent {
 
   trackByRow(_index: number, row: StockOutReportRow) {
     return row.stockOutId;
+  }
+
+
+
+  private setDefaultDateRange() {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+  
+    this.startDate = this.formatDateInput(yesterday);
+    this.endDate = this.formatDateInput(today);
+  }
+  
+  private formatDateInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 }

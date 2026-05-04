@@ -138,6 +138,7 @@ export class TransactionJobReportComponent {
 
   ngOnInit() {
     this.fetchTransactionJobList();
+    this.setDefaultRequestDateRange();
   }
 
   fetchTransactionJobList() {
@@ -230,8 +231,7 @@ export class TransactionJobReportComponent {
   }
 
   clearFilters() {
-    this.startDateRequest = '';
-    this.endDateRequest = '';
+    this.setDefaultRequestDateRange();
     this.startDateIncharge = '';
     this.endDateIncharge = '';
 
@@ -749,6 +749,28 @@ export class TransactionJobReportComponent {
 
   trackByRow(_index: number, row: TransactionJobReportRow) {
     return row.jobId;
+  }
+
+
+
+
+
+
+
+  private setDefaultRequestDateRange() {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+  
+    this.startDateRequest = this.formatDateInput(yesterday);
+    this.endDateRequest = this.formatDateInput(today);
+  }
+  
+  private formatDateInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
 

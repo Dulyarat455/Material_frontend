@@ -2969,8 +2969,10 @@ searchMoveItem() {
   
         Swal.fire({
           icon: 'success',
-          title: 'Stock Out Success',
-          text: res?.message || 'ทำรายการ Stock Out สำเร็จ'
+          title: denial ? 'Deny Issue Material Success' : 'Stock Out Success',
+          text:  denial
+          ? ( 'ยกเลิก การ Issue Material สำเร็จ')
+          : ( 'ทำรายการ Stock Out สำเร็จ')
         }).then(() => {
           this.stockOutRows = [];
           
@@ -3414,8 +3416,9 @@ searchMoveItem() {
   
         Swal.fire({
           icon: 'success',
-          title: 'Return Stock In Success',
-          text: res?.message || 'รับคืน Material สำเร็จ'
+          title: denial ? 'Deny Return Material Success' : 'Return Stock In Success',
+          text:  denial  ? ('ยกเลิก การรับคืน Material สำเร็จ') 
+          : ('รับคืน Material สำเร็จ')
         }).then(() => {
           this.resetReturnStockForm();
           this.fetchStorageMap();
@@ -3535,16 +3538,8 @@ searchMoveItem() {
               color:#0f172a;
             ">${this.escapeHtml(orderedPayload.requestJobNo || '-')}</div>
     
-            <div style="font-weight:800; color:#334155;">Job No Incoming</div>
-            <div style="
-              background:#f8fafc;
-              border:1px solid #e2e8f0;
-              border-radius:10px;
-              padding:10px 12px;
-              color:#0f172a;
-            ">${this.escapeHtml(orderedPayload.jobNoIncoming || '-')}</div>
     
-            <div style="font-weight:800; color:#334155;">Material No</div>
+            <div style="font-weight:800; color:#334155;">Request Material No</div>
             <div style="
               background:#f8fafc;
               border:1px solid #e2e8f0;
@@ -3552,8 +3547,18 @@ searchMoveItem() {
               padding:10px 12px;
               color:#0f172a;
             ">${this.escapeHtml(orderedPayload.itemNo || '-')}</div>
+
+            <div style="font-weight:800; color:#334155;">Job No Incoming</div>
+            <div style="
+              background:#fefce8;
+              border:1px solid #fde68a;
+              border-radius:10px;
+              padding:10px 12px;
+              color:#854d0e;
+              font-weight:700;
+            ">${this.escapeHtml(orderedPayload.jobNoIncoming || '-')}</div>
     
-            <div style="font-weight:800; color:#334155;">Scanned Material No</div>
+            <div style="font-weight:800; color:#334155;">Material No</div>
             <div style="
               background:#fefce8;
               border:1px solid #fde68a;

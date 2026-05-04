@@ -95,6 +95,7 @@ export class TransactionAllReportComponent {
 
   ngOnInit() {
     this.fetchTransactionAllList();
+    this.setDefaultDateRange();
   }
 
   fetchTransactionAllList() {
@@ -127,8 +128,7 @@ export class TransactionAllReportComponent {
   }
 
   clearFilters() {
-    this.startDate = '';
-    this.endDate = '';
+    this.setDefaultDateRange();
 
     this.incomingJobNoFilter = 'all';
     this.materialNoFilter = 'all';
@@ -564,4 +564,24 @@ export class TransactionAllReportComponent {
   trackByRow(index: number, row: TransactionAllReportRow) {
     return `${row.type}_${row.incomingJobNo}_${row.time}_${index}`;
   }
+
+
+
+  private setDefaultDateRange() {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+  
+    this.startDate = this.formatDateInput(yesterday);
+    this.endDate = this.formatDateInput(today);
+  }
+  
+  private formatDateInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+
 }

@@ -143,7 +143,7 @@ export class IssueComponent {
 
   onSearchMaterial() {
     const keyword = (this.materialNo || '').trim().toLowerCase();
-
+  
     if (!keyword) {
       this.materialDropdown = [];
       this.showMaterialDropdown = false;
@@ -152,14 +152,20 @@ export class IssueComponent {
       this.materialSpec = '';
       return;
     }
-
+  
+    if (!this.canUseMaterialDropdown()) {
+      this.materialDropdown = [];
+      this.showMaterialDropdown = false;
+      return;
+    }
+  
     this.materialDropdown = this.materials
       .filter(m =>
-        m.materialNo.toLowerCase().includes(keyword) ||
-        m.materialName.toLowerCase().includes(keyword)
+        (m.materialNo || '').toLowerCase().includes(keyword) ||
+        (m.materialName || '').toLowerCase().includes(keyword)
       )
       .slice(0, 10);
-
+  
     this.showMaterialDropdown = this.materialDropdown.length > 0;
   }
 
@@ -172,6 +178,11 @@ export class IssueComponent {
   }
 
   hideMaterialDropdown() {
+    if (!this.canUseMaterialDropdown()) {
+      this.showMaterialDropdown = false;
+      return;
+    }
+  
     setTimeout(() => {
       this.showMaterialDropdown = false;
     }, 150);
@@ -641,6 +652,76 @@ export class IssueComponent {
       return null;
     }
   }
+
+
+
+
+
+  canUseMaterialDropdown(): boolean {
+    return this.role === 'admin';
+  }
+  
+  onMaterialNoInput() {
+    if (this.canUseMaterialDropdown()) {
+      this.onSearchMaterial();
+      return;
+    }
+  
+    this.showMaterialDropdown = false;
+    this.materialDropdown = [];
+    this.selectedMaterialId = null;
+    this.materialName = '';
+    this.materialSpec = '';
+  }
+  
+  onMaterialNoEnter(event?: Event) {
+    if (event) event.preventDefault();
+    this.searchMaterialByExactInput();
+  }
+  
+  onMaterialNoBlur() {
+    setTimeout(() => {
+      this.searchMaterialByExactInput();
+    }, 150);
+  }
+  
+  searchMaterialByExactInput() {
+    const keyword = (this.materialNo || '').trim().toLowerCase();
+  
+    if (!keyword) {
+      this.selectedMaterialId = null;
+      this.materialName = '';
+      this.materialSpec = '';
+      this.materialDropdown = [];
+      this.showMaterialDropdown = false;
+      return;
+    }
+  
+    const exact = this.materials.find(m =>
+      (m.materialNo || '').trim().toLowerCase() === keyword
+    );
+  
+    if (!exact) {
+      this.selectedMaterialId = null;
+      this.materialName = '';
+      this.materialSpec = '';
+      this.materialDropdown = [];
+      this.showMaterialDropdown = false;
+      this.materialNo = '';
+      return;
+    }
+  
+    this.selectMaterial(exact);
+  }
+  
+  onClickSearchMaterial() {
+    this.searchMaterialByExactInput();
+  }
+
+
+
+
+
 
 
   ngOnDestroy() {
