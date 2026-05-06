@@ -1473,3 +1473,372 @@ Highlight Color Area =>  Pending, Chemical Area
   cursor: not-allowed;
   box-shadow: none;
 }
+
+
+
+
+
+
+
+
+
+/* =========================
+   STOCK IN MODE SWITCH
+   ========================= */
+   .stockin-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+  
+  .stockin-mode-btn {
+    border: none;
+    outline: none;
+    min-width: 138px;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 12px;
+    background: transparent;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 800;
+    transition: all 0.2s ease;
+  }
+  
+  .stockin-mode-btn:hover {
+    background: rgba(37, 99, 235, 0.08);
+  }
+  
+  .stockin-mode-btn.active {
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
+  }
+  
+  /* =========================
+     PBASS PANEL
+     ========================= */
+  .pbass-sync-panel {
+    margin-top: 8px;
+    border: 1px solid rgba(2, 6, 23, 0.06);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    padding: 18px;
+  }
+  
+  .pbass-sync-head {
+    margin-bottom: 16px;
+  }
+  
+  .pbass-sync-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+  }
+  
+  .pbass-sync-subtitle {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #64748b;
+  }
+  
+  .pbass-sync-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .pbass-info-card {
+    border: 1px solid rgba(2, 6, 23, 0.08);
+    border-radius: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  }
+  
+  .pbass-info-card.success {
+    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+    border-color: rgba(34, 197, 94, 0.18);
+  }
+  
+  .pbass-info-card.danger {
+    background: linear-gradient(180deg, #fff1f2 0%, #ffffff 100%);
+    border-color: rgba(239, 68, 68, 0.18);
+  }
+  
+  .pbass-info-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  
+  .pbass-info-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+  
+  .pbass-sync-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(59, 130, 246, 0.14);
+    background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+    color: #1d4ed8;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .pbass-sync-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  
+  .btn-pbass {
+    border: none;
+    border-radius: 12px;
+    min-height: 42px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 800;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-pbass-main {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+  }
+  
+  .btn-pbass-main:hover {
+    transform: translateY(-1px);
+  }
+  
+  .btn-pbass-preview {
+    background: #fff;
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+  }
+  
+  .btn-pbass-clear {
+    background: #f8fafc;
+    color: #334155;
+    border: 1px solid rgba(2, 6, 23, 0.08);
+  }
+  
+  .pbass-empty-state {
+    border: 1px dashed rgba(148, 163, 184, 0.5);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    color: #64748b;
+    background: #fcfdff;
+  }
+  
+  .pbass-empty-state i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  /* mobile */
+  @media (max-width: 991.98px) {
+    .stockin-mode-switch {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .stockin-mode-btn {
+      min-width: 0;
+      width: 100%;
+    }
+  
+    .pbass-sync-info-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .pbass-sync-actions {
+      flex-direction: column;
+    }
+  
+    .btn-pbass {
+      width: 100%;
+    }
+  }
+
+
+
+
+
+  .pbass-sync-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 220px));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .pbass-filter-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .pbass-filter-box label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #475569;
+  }
+  
+  .pbass-filter-box input {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid rgba(2, 6, 23, 0.10);
+    border-radius: 12px;
+    padding: 0 12px;
+    background: #fff;
+    color: #0f172a;
+    outline: none;
+  }
+  
+  .pbass-filter-box input:focus {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+  }
+  
+  @media (max-width: 991.98px) {
+    .pbass-sync-filter-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+/* 
+  ==================
+  Pbass Count
+  ================== */
+
+  .pbass-preview-count {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+    vertical-align: middle;
+  }
+
+
+  /* ==============================
+   stockIn SyncPBASS part Submit
+  ============================== */
+
+
+  .pbass-result-table th,
+.pbass-result-table td {
+  white-space: nowrap;
+}
+
+.pbass-row-success {
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.pbass-row-skipped {
+  background: rgba(239, 68, 68, 0.045);
+}
+
+.pbass-status-pill,
+.pbass-reason-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: #f8fafc;
+  color: #475569;
+}
+
+.pbass-status-pill.success,
+.pbass-reason-pill.success {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.24);
+}
+
+.pbass-status-pill.skipped,
+.pbass-reason-pill.warning {
+  background: rgba(239, 68, 68, 0.10);
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.22);
+}
+
+
+/* 
+======================
+kind column sync Pbass
+====================== */
+
+
+.kind-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: #f8fafc;
+  color: #475569;
+}
+
+.kind-pill.material {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+.kind-pill.chemical {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.kind-pill.notfound {
+  background: rgba(239, 68, 68, 0.10);
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.24);
+}
+
+
+.pbass-info-sub {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  line-height: 1.35;
+}

@@ -121,6 +121,29 @@ type StockOutRow = {
 };
 
 
+type PbassLastSyncResult = {
+  id: number;
+  remark: string;
+  userId?: number | null;
+  timeStmp: string;
+  status: string;
+  user?: {
+    id: number;
+    empNo: string;
+    name: string;
+    role?: string;
+  } | null;
+  group?: {
+    id: number;
+    name: string;
+  } | null;
+  section?: {
+    id: number;
+    name: string;
+  } | null;
+};
+
+
 
 
 type StockScanField =
@@ -511,6 +534,85 @@ export class StorageComponent {
 
   selectedSlot: SlotRow | null = null;
 
+
+  // panel stockIn
+  stockInMode: 'MANUAL' | 'SYNC_PBASS' = 'MANUAL';
+
+  pbassSyncForm = {
+    fromDate: '',
+    toDate: ''
+  };
+  
+  pbassLastSync: PbassLastSyncResult | null = null;
+
+  pbassSyncSummary = {
+    lastSyncTime: '',
+    pendingCount: 0,
+    successCount: 0,
+    failCount: 0
+  };
+
+  isSyncingPbass = false;
+  isPreviewingPbass = false;
+
+
+  pbassPreviewRows: Array<{
+    index?: number;
+    jobNo: string;
+    recivedDate: string;
+    itemNo: string;
+    itemName: string;
+    itemSpec: string;
+    lotNo: string;
+    coil?: number;
+    qtyKgsPcs: number;
+    supplier: string;
+    unit?: string;
+    invoiceNo?: string;
+    taxInvoiceNo?: string;
+    amount?: number;
+    seq?: string;
+    unloadBy?: string;
+    remark?: string;
+    accountCode?: string;
+    materialKind?: string;
+
+  }> = [];
+
+
+  pbassSubmitRows: Array<{
+    index?: number;
+    jobNo: string;
+    recivedDate: string;
+    itemNo: string;
+    itemName: string;
+    itemSpec: string;
+    lotNo: string;
+    coil?: number;
+    qtyKgsPcs: number;
+    supplier: string;
+    unit?: string;
+    invoiceNo?: string;
+    taxInvoiceNo?: string;
+    amount?: number;
+    seq?: string;
+    unloadBy?: string;
+    remark?: string;
+  
+    reason?: string;
+    syncStatus: 'success' | 'skipped';
+    incomingId?: number;
+    storeId?: number;
+    accountCode?: string;
+    materialKind?: string;
+  }> = [];
+
+
+  
+  pbassSyncLogs: string[] = [];
+
+
+
   get totalSlots() {
     return this.slots.length;
   }
@@ -542,8 +644,8 @@ export class StorageComponent {
 
     this.applyTransactionState();
     this.applyDefaultPanelForMobile();
-
-
+    this.setDefaultPbassDateRange();
+    this.fetchPbassLastSyncTime();
 
      // ✅ ฟัง event จาก websocket
      this.wsSub = this.callSocket.onStoreChange().subscribe((payload: any) => {
@@ -1140,6 +1242,9 @@ clearMoveAreaScanForm() {
     targetStoreCode: '',
     stockNote: ''
   };
+
+
+
 
 
   this.isMoveAreaScanReady = false;
@@ -3957,7 +4062,6 @@ searchMoveItem() {
 
 
 
-
   openTableOutScanModal(item: MaterialItem, remark: string) {
     const expectedJobNo = this.normalizeValue(item.jobNo);
   
@@ -4372,5 +4476,296 @@ searchMoveItem() {
   }
 
 
+  previewPbassSync() {
+    if (this.isPreviewingPbass || this.isSyncingPbass) return;
+    if (!this.validatePbassPreviewDateRange()) return;
+  
+    this.isPreviewingPbass = true;
+    this.pbassPreviewRows = [];
+    this.pbassSubmitRows = [];
+  
+    const startDate = this.toPbassCompactDate(this.pbassSyncForm.fromDate);
+    const toDate = this.toPbassCompactDate(this.pbassSyncForm.toDate);
+  
+    const body = {
+      startDate,
+      toDate
+    };
+  
+    console.log('PBASS preview body =', body);
+  
+    this.http.post<any>(`${config.apiServer}/api/mc/stockInPbassPreview`, body).subscribe({
+      next: (res) => {
+        this.isPreviewingPbass = false;
+        this.pbassPreviewRows = Array.isArray(res?.results) ? res.results : [];
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Preview Loaded',
+          text: `โหลดข้อมูล Preview สำเร็จ ${this.pbassPreviewRows.length} รายการ`,
+          timer: 1200,
+          showConfirmButton: false
+        });
+      },
+      error: (err) => {
+        this.isPreviewingPbass = false;
+  
+        Swal.fire({
+          icon: 'error',
+          title: 'Preview Failed',
+          text: err?.error?.message || err?.error?.error || 'ไม่สามารถโหลดข้อมูล Preview จาก PBASS ได้'
+        });
+      }
+    });
+  }
+  
+  async submitPbassSync() {
+    if (this.isSyncingPbass || this.isPreviewingPbass) return;
+    if (!this.validatePbassPreviewDateRange()) return;
+
+    this.pbassPreviewRows = [];
+  
+    if (!this.userId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing User',
+        text: 'ไม่พบ userId กรุณา Login ใหม่'
+      });
+      return;
+    }
+  
+    const confirm = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Sync PBASS?',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div>ระบบจะดึงข้อมูลจาก PBASS และทำ Stock In อัตโนมัติ</div>
+          <hr>
+          <div><b>From:</b> ${this.escapeHtml(this.pbassSyncForm.fromDate || '-')}</div>
+          <div><b>To:</b> ${this.escapeHtml(this.pbassSyncForm.toDate || '-')}</div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Sync Stock In',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2563eb'
+    });
+  
+    if (!confirm.isConfirmed) return;
+  
+    this.isSyncingPbass = true;
+  
+    // ✅ clear เฉพาะ Submit Result ไม่ไปยุ่ง Preview
+    this.pbassSubmitRows = [];
+  
+    const startDate = this.toPbassCompactDate(this.pbassSyncForm.fromDate);
+    const toDate = this.toPbassCompactDate(this.pbassSyncForm.toDate);
+  
+    const body = {
+      startDate,
+      toDate,
+      userId: this.userId
+    };
+  
+    this.http.post<any>(`${config.apiServer}/api/mc/stockInPbassSubmit`, body).subscribe({
+      next: async (res) => {
+        this.isSyncingPbass = false;
+  
+        const createdRows = Array.isArray(res?.createdRows) ? res.createdRows : [];
+        const skippedRows = Array.isArray(res?.skippedRows) ? res.skippedRows : [];
+  
+        const successRows = createdRows.map((x: any, index: number) => ({
+          ...x,
+          index: x.index || (index + 1),
+          syncStatus: 'success' as const,
+          reason: x.reason || 'success'
+        }));
+  
+        const failRows = skippedRows.map((x: any, index: number) => ({
+          ...x,
+          index: x.index || (successRows.length + index + 1),
+          syncStatus: 'skipped' as const,
+          reason: x.reason || 'skipped'
+        }));
+  
+        // ✅ ผลหลัง Sync แยกจาก Preview
+        this.pbassSubmitRows = [...successRows, ...failRows];
+  
+        this.pbassSyncSummary = {
+          ...this.pbassSyncSummary,
+          pendingCount: Number(res?.totalFromPbass || this.pbassSubmitRows.length || 0),
+          successCount: Number(res?.successCount || successRows.length || 0),
+          failCount: Number(res?.skippedCount || failRows.length || 0)
+        };
+
+        
+        this.fetchStoreMaster();
+        this.fetchStorageMap();
+         // ✅ ดึง Last Sync จาก API หลัง submit สำเร็จ
+        this.fetchPbassLastSyncTime();
+  
+        await Swal.fire({
+          icon: 'success',
+          title: 'PBASS Sync Completed',
+          html: `
+            <div style="text-align:left; line-height:1.9;">
+              <div><b>Total From PBASS:</b> ${this.pbassSyncSummary.pendingCount}</div>
+              <div style="color:#16a34a;"><b>Success:</b> ${this.pbassSyncSummary.successCount}</div>
+              <div style="color:#dc2626;"><b>Skipped:</b> ${this.pbassSyncSummary.failCount}</div>
+            </div>
+          `
+        });
+      },
+      error: async (err) => {
+        this.isSyncingPbass = false;
+  
+        await Swal.fire({
+          icon: 'error',
+          title: 'PBASS Sync Failed',
+          text: err?.error?.message || err?.error?.error || 'ไม่สามารถ Sync Stock In จาก PBASS ได้'
+        });
+      }
+    });
+  }
+  
+  private formatDateInput(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  
+  private setDefaultPbassDateRange() {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+  
+    this.pbassSyncForm.fromDate = this.formatDateInput(today);
+    this.pbassSyncForm.toDate = this.formatDateInput(today);
+  }
+  
+  private validatePbassPreviewDateRange(): boolean {
+    const { fromDate, toDate } = this.pbassSyncForm;
+  
+    if (!fromDate || !toDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Date Range',
+        text: 'กรุณาเลือก From Date และ To Date'
+      });
+      return false;
+    }
+  
+    if (fromDate > toDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Date Range',
+        text: 'From Date ต้องน้อยกว่าหรือเท่ากับ To Date'
+      });
+      return false;
+    }
+  
+    return true;
+  }
+  
+  clearPbassSyncState() {
+    this.pbassPreviewRows = [];
+    this.pbassSubmitRows = [];
+    this.pbassSyncSummary = {
+      ...this.pbassSyncSummary,
+      pendingCount: 0,
+      successCount: 0,
+      failCount: 0
+    };
+    this.fetchPbassLastSyncTime();
+    this.setDefaultPbassDateRange();
+  }
+  
+  private toPbassCompactDate(value: string): string {
+    const raw = String(value || '').trim();
+  
+    // รองรับ input type="date" ปกติ เช่น 2026-04-08
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      return raw.replace(/-/g, '');
+    }
+  
+    // ถ้าเป็น 20260408 อยู่แล้วก็ส่งกลับตรง ๆ
+    if (/^\d{8}$/.test(raw)) {
+      return raw;
+    }
+  
+    return raw.replace(/-/g, '').replace(/\s+/g, '');
+  }
+
+
+
+  private formatDateTimeDisplay(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+  
+    return `${d}/${m}/${y} ${hh}:${mm}:${ss}`;
+  }
+  
+  getPbassReasonText(reason?: string): string {
+    switch ((reason || '').trim()) {
+      case 'success':
+        return 'Import Success';
+  
+      case 'incoming_already':
+        return 'มี Incoming นี้อยู่แล้ว';
+  
+      case 'not_found_this_Material_in_Master':
+        return 'ไม่พบ Material No ใน Master';
+  
+      case 'missing_jobNo':
+        return 'ไม่มี Job No';
+  
+      case 'missing_materialNo':
+        return 'ไม่มี Material No';
+  
+      case 'duplicate_jobNo_in_pbass_batch':
+        return 'Job No ซ้ำในข้อมูล PBASS รอบนี้';
+  
+      case 'skipped':
+        return 'Skipped';
+  
+      default:
+        return reason || '-';
+    }
+  }
+
+
+
+  fetchPbassLastSyncTime() {
+    this.http.get<any>(`${config.apiServer}/api/mc/getSyncTimeStmp`).subscribe({
+      next: (res) => {
+        const data = res?.results || null;
+        this.pbassLastSync = data;
+  
+        const lastSyncTime = data?.timeStmp
+          ? this.formatDateTimeDisplay(new Date(data.timeStmp))
+          : '';
+  
+        this.pbassSyncSummary = {
+          ...this.pbassSyncSummary,
+          lastSyncTime
+        };
+      },
+      error: (err) => {
+        console.error('fetchPbassLastSyncTime error:', err);
+  
+        this.pbassLastSync = null;
+  
+        this.pbassSyncSummary = {
+          ...this.pbassSyncSummary,
+          lastSyncTime: ''
+        };
+      }
+    });
+  }
 
 }
