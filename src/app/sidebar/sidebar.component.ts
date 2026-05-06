@@ -30,6 +30,7 @@ export class SidebarComponent {
   role: string = '';
   section: string ='';
   group: string ='';
+  token: string ='';  
 
   ngOnInit() {
     this.authService.refreshComponents$.subscribe(() => {
@@ -40,6 +41,7 @@ export class SidebarComponent {
     this.role = localStorage.getItem('materialStore_role')!;
     this.section = localStorage.getItem('materialStore_sectionName')!;
     this.group = localStorage.getItem('materialStore_groupName')!;
+    this.token = localStorage.getItem('materialStore_token')!;
 
 
     if (!this.name) {

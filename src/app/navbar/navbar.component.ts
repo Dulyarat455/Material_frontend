@@ -1,33 +1,44 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule,CommonModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   formattedDate: string = '';
   formattedTime: string = '';
+
   private timeInterval: any;
+  private routerSub?: Subscription;
+
   token: string | undefined = '';
-  role: string ='';
+  role: string = '';
   section: string = '';
 
-
-
+  constructor(private router: Router) {}
 
   ngOnInit() {
-    // Initial update
     this.updateDateTime();
-    this.token = localStorage.getItem('materialStore_token')!;
-    this.role = localStorage.getItem('materialStore_role')!;
-    this.section = localStorage.getItem('materialStore_sectionName')!;
 
-    // Update time every second
+    this.loadUserFromLocalStorage();
+
+    // ✅ check ตอนเปิด component ครั้งแรก
+    this.checkLoginAndRedirect();
+
+    // ✅ check ทุกครั้งที่เปลี่ยน route
+    this.routerSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.loadUserFromLocalStorage();
+        this.checkLoginAndRedirect();
+      });
+
     this.timeInterval = setInterval(() => {
       this.updateDateTime();
     }, 1000);
@@ -36,6 +47,37 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
+    }
+
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
+    }
+  }
+
+  private loadUserFromLocalStorage() {
+    this.token = localStorage.getItem('materialStore_token') || '';
+    this.role = localStorage.getItem('materialStore_role') || '';
+    this.section = localStorage.getItem('materialStore_sectionName') || '';
+  }
+
+  private checkLoginAndRedirect() {
+    const token = (this.token || '').trim();
+
+    if (token) return;
+
+    const currentPath = this.router.url
+      .split('?')[0]
+      .split('#')[0]
+      .replace(/^\/+/, '');
+
+    const allowPaths = [
+      '',
+      'jobTransaction',
+      'signin'
+    ];
+
+    if (!allowPaths.includes(currentPath)) {
+      this.router.navigate(['/signin']);
     }
   }
 

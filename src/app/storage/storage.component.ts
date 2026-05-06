@@ -607,7 +607,9 @@ export class StorageComponent {
     materialKind?: string;
   }> = [];
 
-
+  pbassSubmitStatusFilter: 'all' | 'success' | 'skipped' = 'all';
+  pbassSubmitReasonFilter = 'all';
+  pbassSubmitKindFilter: 'all' | 'Material' | 'Chemical' | 'Not Found' = 'all';
   
   pbassSyncLogs: string[] = [];
 
@@ -4671,6 +4673,8 @@ searchMoveItem() {
   clearPbassSyncState() {
     this.pbassPreviewRows = [];
     this.pbassSubmitRows = [];
+    this.clearPbassSubmitFilters();
+    
     this.pbassSyncSummary = {
       ...this.pbassSyncSummary,
       pendingCount: 0,
@@ -4767,5 +4771,132 @@ searchMoveItem() {
       }
     });
   }
+
+
+  private getPbassRowKind(row: any): 'Material' | 'Chemical' | 'Not Found' {
+    const materialKind = String(row?.materialKind || '').trim();
+  
+    if (materialKind === 'Material') return 'Material';
+    if (materialKind === 'Chemical') return 'Chemical';
+    if (materialKind === 'Not Found') return 'Not Found';
+  
+    if (row?.accountCode === '4520') return 'Material';
+    if (row?.accountCode) return 'Chemical';
+  
+    return 'Not Found';
+  }
+  
+  get pbassSubmitStatusOptions(): Array<'success' | 'skipped'> {
+    const rows = this.pbassSubmitRows.filter(row => {
+      const reasonOk =
+        this.pbassSubmitReasonFilter === 'all' ||
+        row.reason === this.pbassSubmitReasonFilter;
+  
+      const kindOk =
+        this.pbassSubmitKindFilter === 'all' ||
+        this.getPbassRowKind(row) === this.pbassSubmitKindFilter;
+  
+      return reasonOk && kindOk;
+    });
+  
+    return Array.from(
+      new Set(
+        rows
+          .map(row => row.syncStatus)
+          .filter((x): x is 'success' | 'skipped' => x === 'success' || x === 'skipped')
+      )
+    );
+  }
+  
+  get pbassSubmitReasonOptions(): string[] {
+    const rows = this.pbassSubmitRows.filter(row => {
+      const statusOk =
+        this.pbassSubmitStatusFilter === 'all' ||
+        row.syncStatus === this.pbassSubmitStatusFilter;
+  
+      const kindOk =
+        this.pbassSubmitKindFilter === 'all' ||
+        this.getPbassRowKind(row) === this.pbassSubmitKindFilter;
+  
+      return statusOk && kindOk;
+    });
+  
+    return Array.from(
+      new Set(
+        rows
+          .map(row => String(row.reason || '').trim())
+          .filter(Boolean)
+      )
+    );
+  }
+  
+  get pbassSubmitKindOptions(): Array<'Material' | 'Chemical' | 'Not Found'> {
+    const rows = this.pbassSubmitRows.filter(row => {
+      const statusOk =
+        this.pbassSubmitStatusFilter === 'all' ||
+        row.syncStatus === this.pbassSubmitStatusFilter;
+  
+      const reasonOk =
+        this.pbassSubmitReasonFilter === 'all' ||
+        row.reason === this.pbassSubmitReasonFilter;
+  
+      return statusOk && reasonOk;
+    });
+  
+    return Array.from(
+      new Set(
+        rows.map(row => this.getPbassRowKind(row))
+      )
+    );
+  }
+  
+  get pbassSubmitRowsView() {
+    return this.pbassSubmitRows.filter(row => {
+      const statusOk =
+        this.pbassSubmitStatusFilter === 'all' ||
+        row.syncStatus === this.pbassSubmitStatusFilter;
+  
+      const reasonOk =
+        this.pbassSubmitReasonFilter === 'all' ||
+        row.reason === this.pbassSubmitReasonFilter;
+  
+      const kindOk =
+        this.pbassSubmitKindFilter === 'all' ||
+        this.getPbassRowKind(row) === this.pbassSubmitKindFilter;
+  
+      return statusOk && reasonOk && kindOk;
+    });
+  }
+  
+  onPbassSubmitFilterChange() {
+    if (
+      this.pbassSubmitStatusFilter !== 'all' &&
+      !this.pbassSubmitStatusOptions.includes(this.pbassSubmitStatusFilter)
+    ) {
+      this.pbassSubmitStatusFilter = 'all';
+    }
+  
+    if (
+      this.pbassSubmitReasonFilter !== 'all' &&
+      !this.pbassSubmitReasonOptions.includes(this.pbassSubmitReasonFilter)
+    ) {
+      this.pbassSubmitReasonFilter = 'all';
+    }
+  
+    if (
+      this.pbassSubmitKindFilter !== 'all' &&
+      !this.pbassSubmitKindOptions.includes(this.pbassSubmitKindFilter)
+    ) {
+      this.pbassSubmitKindFilter = 'all';
+    }
+  }
+  
+  clearPbassSubmitFilters() {
+    this.pbassSubmitStatusFilter = 'all';
+    this.pbassSubmitReasonFilter = 'all';
+    this.pbassSubmitKindFilter = 'all';
+  }
+
+
 
 }

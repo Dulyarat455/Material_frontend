@@ -920,9 +920,72 @@
                       <span>
                         Sync Result
                         <small class="pbass-preview-count ms-2">
-                          {{ pbassSubmitRows.length }} rows
+                          {{ pbassSubmitRowsView.length }} / {{ pbassSubmitRows.length }} rows
                         </small>
                       </span>
+                    </div>
+                    
+                    <div class="pbass-result-filter-bar" *ngIf="pbassSubmitRows.length">
+                      <div class="pbass-filter-item">
+                        <label>Status</label>
+                        <select
+                          [(ngModel)]="pbassSubmitStatusFilter"
+                          (ngModelChange)="onPbassSubmitFilterChange()"
+                        >
+                          <option value="all">All Status</option>
+                          <option
+                            *ngFor="let status of pbassSubmitStatusOptions"
+                            [value]="status"
+                          >
+                            {{ status === 'success' ? 'SUCCESS' : 'SKIPPED' }}
+                          </option>
+                        </select>
+                      </div>
+                    
+                      <div class="pbass-filter-item">
+                        <label>Reason</label>
+                        <select
+                          [(ngModel)]="pbassSubmitReasonFilter"
+                          (ngModelChange)="onPbassSubmitFilterChange()"
+                        >
+                          <option value="all">All Reason</option>
+                          <option
+                            *ngFor="let reason of pbassSubmitReasonOptions"
+                            [value]="reason"
+                          >
+                            {{ getPbassReasonText(reason) }}
+                          </option>
+                        </select>
+                      </div>
+                    
+                      <div class="pbass-filter-item">
+                        <label>Kind</label>
+                        <select
+                          [(ngModel)]="pbassSubmitKindFilter"
+                          (ngModelChange)="onPbassSubmitFilterChange()"
+                        >
+                          <option value="all">All Kind</option>
+                          <option
+                            *ngFor="let kind of pbassSubmitKindOptions"
+                            [value]="kind"
+                          >
+                            {{ kind }}
+                          </option>
+                        </select>
+                      </div>
+                    
+                      <button
+                        type="button"
+                        class="pbass-filter-clear-btn"
+                        (click)="clearPbassSubmitFilters()"
+                      >
+                        <i class="fas fa-eraser me-1"></i>
+                        Clear Filter
+                      </button>
+                    
+                      <div class="pbass-filter-count">
+                        Showing {{ pbassSubmitRowsView.length }} / {{ pbassSubmitRows.length }}
+                      </div>
                     </div>
                     
                     <div class="table-wrap mt-3" *ngIf="pbassSubmitRows.length">
@@ -943,13 +1006,12 @@
                             <th class="text-end">Qty Kgs/Pcs</th>
                             <th>Supplier</th>
                             <th>Account</th>
-                            
                           </tr>
                         </thead>
                     
                         <tbody>
                           <tr
-                            *ngFor="let row of pbassSubmitRows; let i = index"
+                            *ngFor="let row of pbassSubmitRowsView; let i = index"
                             [class.pbass-row-success]="row.syncStatus === 'success'"
                             [class.pbass-row-skipped]="row.syncStatus === 'skipped'"
                           >
@@ -974,6 +1036,7 @@
                                 {{ getPbassReasonText(row.reason) }}
                               </span>
                             </td>
+                    
                             <td>
                               <span
                                 class="kind-pill"
@@ -981,9 +1044,15 @@
                                 [class.chemical]="row.accountCode && row.accountCode !== '4520'"
                                 [class.notfound]="!row.accountCode"
                               >
-                                {{ row.materialKind || (row.accountCode === '4520' ? 'Material' : (row.accountCode ? 'Chemical' : 'Not Found')) }}
+                                {{
+                                  row.materialKind ||
+                                  (row.accountCode === '4520'
+                                    ? 'Material'
+                                    : (row.accountCode ? 'Chemical' : 'Not Found'))
+                                }}
                               </span>
                             </td>
+                    
                             <td><b>{{ row.jobNo || '-' }}</b></td>
                             <td>{{ row.recivedDate || '-' }}</td>
                             <td>{{ row.itemNo || '-' }}</td>
@@ -994,7 +1063,12 @@
                             <td class="text-end">{{ row.qtyKgsPcs | number }}</td>
                             <td>{{ row.supplier || '-' }}</td>
                             <td>{{ row.accountCode || '-' }}</td>
-                           
+                          </tr>
+                    
+                          <tr *ngIf="!pbassSubmitRowsView.length">
+                            <td colspan="14" class="text-center muted py-4">
+                              No data match filter
+                            </td>
                           </tr>
                         </tbody>
                       </table>
