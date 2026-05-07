@@ -1952,3 +1952,25 @@ kind column sync Pbass
   color: #94a3b8;
   font-weight: 700;
 }
+
+
+
+/* ==============
+slot Reject
+============== */
+
+
+
+.reject-title {
+  color: #dc2626;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.slot-sub-id {
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #13171c;
+  line-height: 1;
+}

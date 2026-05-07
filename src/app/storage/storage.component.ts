@@ -637,6 +637,8 @@ export class StorageComponent {
     return this.slots.filter(s => s.status === 'REJECTED').length;
   }
 
+  
+
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
 
@@ -976,15 +978,34 @@ private buildMaterialRowsByJobNo(jobNo: string): StockOutRow[] {
 
 
 private findSlotByStoreCode(storeCode: string): SlotRow | null {
-  const key = (storeCode || '').trim();
+  const key = (storeCode || '').trim().toLowerCase();
   if (!key) return null;
-  return this.slots.find(s => s.storeCode === key) || null;
+
+  return this.slots.find(s =>
+    String(s.storeCode || '').trim().toLowerCase() === key
+  ) || null;
 }
 
+
+
 private findStoreMasterByCode(storeCode: string): storeMasterRow | null {
-  const key = (storeCode || '').trim();
+  const key = (storeCode || '').trim().toLowerCase();
   if (!key) return null;
-  return this.storeMasters.find(x => x.name === key) || null;
+
+  return this.storeMasters.find(x =>
+    String(x.name || '').trim().toLowerCase() === key
+  ) || null;
+}
+
+
+
+private normalizeSpecialStoreCode(value: string): 'Pending' | 'Chemical' | '' {
+  const key = (value || '').trim().toLowerCase();
+
+  if (key === 'pending') return 'Pending';
+  if (key === 'chemical') return 'Chemical';
+
+  return '';
 }
 
 
@@ -1171,15 +1192,56 @@ searchMoveAreaScanStoreCode() {
     return;
   }
 
+  const specialArea = this.normalizeSpecialStoreCode(key);
+  const store = this.findStoreMasterByCode(specialArea || key);
+
+  // =============================
+  // CASE 1: Pending / Chemical
+  // =============================
+  if (specialArea) {
+    if (!store?.id) {
+      this.resetMoveAreaScanDestination();
+      this.selectedSlot = null;
+
+      this.ignoreMoveAreaScanBlur = true;
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Store Code',
+        text: `ไม่พบ Store Code : ${key} ใน Store Master`
+      }).then(() => {
+        setTimeout(() => {
+          this.focusEl(this.moveAreaScanStoreCode);
+
+          setTimeout(() => {
+            this.ignoreMoveAreaScanBlur = false;
+          }, 100);
+        }, 0);
+      });
+
+      return;
+    }
+
+    this.selectedSlot = null;
+    this.viewMode = specialArea === 'Pending' ? 'PENDING' : 'CHEMICAL';
+
+    this.moveAreaScanForm.targetStoreId = Number(store.id || 0);
+    this.moveAreaScanForm.targetStoreCode = store.name || specialArea;
+
+    return;
+  }
+
+  // =============================
+  // CASE 2: Normal slot เช่น 1101, 1102, 2201
+  // =============================
   const slot = this.findSlotByStoreCode(key);
-  const store = this.findStoreMasterByCode(key);
 
   if (!slot || !store?.id) {
     this.resetMoveAreaScanDestination();
     this.selectedSlot = null;
-  
+
     this.ignoreMoveAreaScanBlur = true;
-  
+
     Swal.fire({
       icon: 'warning',
       title: 'Invalid Store Code',
@@ -1187,20 +1249,20 @@ searchMoveAreaScanStoreCode() {
     }).then(() => {
       setTimeout(() => {
         this.focusEl(this.moveAreaScanStoreCode);
-  
+
         setTimeout(() => {
           this.ignoreMoveAreaScanBlur = false;
         }, 100);
       }, 0);
     });
-  
+
     return;
   }
 
   this.selectedSlot = slot;
   this.viewMode = 'SLOT';
   this.moveAreaScanForm.targetStoreId = Number(store.id || 0);
-  this.moveAreaScanForm.targetStoreCode = store.name || '';
+  this.moveAreaScanForm.targetStoreCode = store.name || slot.storeCode;
 }
 
 

@@ -104,7 +104,8 @@
                         (click)="onClickSlot(s)"
                       >
                         @if (s.storeCode === "2201") {
-                          <div class="slot-id">{{ "Reject" }}</div>
+                          <div class="slot-id reject-title">{{ "Reject" }}</div>
+                          <div class="slot-sub-id">{{ s.storeCode }}</div>
                         }
                         @else {
                           <div class="slot-id">{{ s.storeCode }}</div>
