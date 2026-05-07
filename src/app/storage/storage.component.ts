@@ -3269,17 +3269,104 @@ searchMoveItem() {
             pointer-events: none;
           }
 
+
+
+
+          .swal-scan-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0 12px;
+            padding: 9px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: #f8fafc;
+            text-align: left;
+          }
+
+          .swal-scan-status.scanning {
+            background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+            border-color: rgba(37, 99, 235, 0.28);
+          }
+
+          .swal-scan-status.complete {
+            background: linear-gradient(180deg, #ecfdf5 0%, #dcfce7 100%);
+            border-color: rgba(22, 163, 74, 0.28);
+          }
+
+          .swal-scan-status-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 15px;
+            background: rgba(100, 116, 139, 0.12);
+            color: #64748b;
+          }
+
+          .swal-scan-status.scanning .swal-scan-status-icon {
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+          }
+
+          .swal-scan-status.scanning .swal-scan-status-icon i {
+            animation: incomingScanSpin 1s linear infinite;
+          }
+
+          .swal-scan-status.complete .swal-scan-status-icon {
+            background: rgba(22, 163, 74, 0.14);
+            color: #15803d;
+          }
+
+          .swal-scan-status-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.2;
+          }
+
+          .swal-scan-status-subtitle {
+            margin-top: 2px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            line-height: 1.3;
+          }
+
+          @keyframes incomingScanSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+
         </style>
   
         <div class="stock-panel">
           <div style="text-align:left; margin-bottom:12px;">
             กรุณาสแกนใบ <b>Material Incoming</b><br>
-            ระบบจะตรวจสอบเฉพาะ <b>Job No.</b> ว่าตรงกับรายการที่เลือกหรือไม่
+            ระบบจะตรวจสอบ <b>Job No.</b> ว่าตรงกับรายการที่เลือกหรือไม่
           </div>
   
           <div style="text-align:left; margin-bottom:12px;">
             <b>Selected Incoming Job No:</b> ${this.escapeHtml(picked.jobNo || '-')}
           </div>
+
+          <div id="incomingScanStatus" class="swal-scan-status">
+          <div class="swal-scan-status-icon">
+            <i id="incomingScanStatusIcon" class="fas fa-qrcode"></i>
+          </div>
+
+          <div>
+            <div id="incomingScanStatusTitle" class="swal-scan-status-title">
+              Ready to scan
+            </div>
+            <div id="incomingScanStatusSubtitle" class="swal-scan-status-subtitle">
+              Please scan Job No. to start incoming verification.
+            </div>
+          </div>
+        </div>
   
           <div class="stock-row">
             <label>Job No.</label>
@@ -3323,14 +3410,54 @@ searchMoveItem() {
         const jobNoInput = popup.querySelector('#swal-scan-jobno') as HTMLInputElement | null;
         const amountInput = popup.querySelector('#swal-scan-amount') as HTMLInputElement | null;
         const confirmBtn = Swal.getConfirmButton();
+
+        const statusBox = popup.querySelector('#incomingScanStatus') as HTMLElement | null;
+        const statusIcon = popup.querySelector('#incomingScanStatusIcon') as HTMLElement | null;
+        const statusTitle = popup.querySelector('#incomingScanStatusTitle') as HTMLElement | null;
+        const statusSubtitle = popup.querySelector('#incomingScanStatusSubtitle') as HTMLElement | null;
+
+
+        const updateScanStatus = () => {
+          const hasJobNo = !!(jobNoInput?.value || '').trim();
+          const hasAmount = !!(amountInput?.value || '').trim();
+        
+          if (!statusBox || !statusIcon || !statusTitle || !statusSubtitle) return;
+        
+          statusBox.classList.remove('scanning', 'complete');
+        
+          if (!hasJobNo) {
+            statusIcon.className = 'fas fa-qrcode';
+            statusTitle.textContent = 'Ready to scan';
+            statusSubtitle.textContent = 'Please scan Job No. to start incoming verification.';
+            return;
+          }
+        
+          if (hasJobNo && !hasAmount) {
+            statusBox.classList.add('scanning');
+            statusIcon.className = 'fas fa-sync-alt';
+            statusTitle.textContent = 'Incoming scan in progress...';
+            statusSubtitle.textContent = 'Please continue scanning tags until Amount is completed.';
+            return;
+          }
+        
+          statusBox.classList.add('complete');
+          statusIcon.className = 'fas fa-check-circle';
+          statusTitle.textContent = 'Incoming scan complete';
+          statusSubtitle.textContent = 'All scan tags have been completed. You can verify now.';
+        };
   
         if (confirmBtn) {
           confirmBtn.disabled = true;
         }
   
+       
         const toggleVerifyButton = () => {
           if (!confirmBtn || !amountInput) return;
-          confirmBtn.disabled = !(amountInput.value || '').trim();
+
+          const hasAmount = !!(amountInput.value || '').trim();
+          confirmBtn.disabled = !hasAmount;
+
+          updateScanStatus();
         };
   
         if (jobNoInput) {
@@ -3338,7 +3465,11 @@ searchMoveItem() {
             jobNoInput.focus();
             jobNoInput.select();
           }, 0);
-  
+        
+          jobNoInput.addEventListener('input', toggleVerifyButton);
+          jobNoInput.addEventListener('change', toggleVerifyButton);
+          jobNoInput.addEventListener('keyup', toggleVerifyButton);
+        
           jobNoInput.addEventListener('keydown', (ev) => {
             if (ev.key === 'Enter') {
               ev.preventDefault();
@@ -4211,6 +4342,77 @@ searchMoveItem() {
             margin-bottom: 12px;
             line-height: 1.7;
           }
+
+
+
+          .table-out-scan-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0 12px;
+            padding: 9px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: #f8fafc;
+            text-align: left;
+          }
+
+          .table-out-scan-status.scanning {
+            background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+            border-color: rgba(37, 99, 235, 0.28);
+          }
+
+          .table-out-scan-status.complete {
+            background: linear-gradient(180deg, #ecfdf5 0%, #dcfce7 100%);
+            border-color: rgba(22, 163, 74, 0.28);
+          }
+
+          .table-out-status-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 15px;
+            background: rgba(100, 116, 139, 0.12);
+            color: #64748b;
+          }
+
+          .table-out-scan-status.scanning .table-out-status-icon {
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+          }
+
+          .table-out-scan-status.scanning .table-out-status-icon i {
+            animation: tableOutScanSpin 1s linear infinite;
+          }
+
+          .table-out-scan-status.complete .table-out-status-icon {
+            background: rgba(22, 163, 74, 0.14);
+            color: #15803d;
+          }
+
+          .table-out-status-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.2;
+          }
+
+          .table-out-status-subtitle {
+            margin-top: 2px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            line-height: 1.3;
+          }
+
+          @keyframes tableOutScanSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
         </style>
   
         <div class="table-out-note">
@@ -4218,6 +4420,22 @@ searchMoveItem() {
           <div><b>Material No:</b> ${this.escapeHtml(item.materialNo || item.itemNo || '-')}</div>
           <div><b>Item Name:</b> ${this.escapeHtml(item.itemName || item.description || '-')}</div>
           <div><b>Remark:</b> ${this.escapeHtml(remark || '-')}</div>
+        </div>
+
+
+        <div id="tblOutScanStatus" class="table-out-scan-status">
+          <div class="table-out-status-icon">
+            <i id="tblOutStatusIcon" class="fas fa-qrcode"></i>
+          </div>
+
+          <div>
+            <div id="tblOutStatusTitle" class="table-out-status-title">
+              Ready to scan
+            </div>
+            <div id="tblOutStatusSubtitle" class="table-out-status-subtitle">
+              Please scan Job No. to start the stock out verification.
+            </div>
+          </div>
         </div>
   
         <div class="table-out-panel">
@@ -4393,12 +4611,48 @@ searchMoveItem() {
         const jobNoInput = popup.querySelector('#tblOutJobNo') as HTMLInputElement | null;
         const amountInput = popup.querySelector('#tblOutAmount') as HTMLInputElement | null;
         const confirmBtn = Swal.getConfirmButton();
+        const statusBox = popup.querySelector('#tblOutScanStatus') as HTMLElement | null;
+        const statusIcon = popup.querySelector('#tblOutStatusIcon') as HTMLElement | null;
+        const statusTitle = popup.querySelector('#tblOutStatusTitle') as HTMLElement | null;
+        const statusSubtitle = popup.querySelector('#tblOutStatusSubtitle') as HTMLElement | null;
   
         const toggleVerifyButton = () => {
           if (!confirmBtn) return;
           const hasJobNo = !!(jobNoInput?.value || '').trim();
           const hasAmount = !!(amountInput?.value || '').trim();
           confirmBtn.disabled = !(hasJobNo && hasAmount);
+          updateScanStatus();
+        };
+
+
+
+        const updateScanStatus = () => {
+          const hasJobNo = !!(jobNoInput?.value || '').trim();
+          const hasAmount = !!(amountInput?.value || '').trim();
+        
+          if (!statusBox || !statusIcon || !statusTitle || !statusSubtitle) return;
+        
+          statusBox.classList.remove('scanning', 'complete');
+        
+          if (!hasJobNo) {
+            statusIcon.className = 'fas fa-qrcode';
+            statusTitle.textContent = 'Ready to scan';
+            statusSubtitle.textContent = 'Please scan Job No. to start the stock out verification.';
+            return;
+          }
+        
+          if (hasJobNo && !hasAmount) {
+            statusBox.classList.add('scanning');
+            statusIcon.className = 'fas fa-sync-alt';
+            statusTitle.textContent = 'Stock out scan in progress...';
+            statusSubtitle.textContent = 'Please continue scanning tags until Amount is completed.';
+            return;
+          }
+        
+          statusBox.classList.add('complete');
+          statusIcon.className = 'fas fa-check-circle';
+          statusTitle.textContent = 'Stock out scan complete';
+          statusSubtitle.textContent = 'All scan tags have been completed. You can verify now.';
         };
   
         if (confirmBtn) {
