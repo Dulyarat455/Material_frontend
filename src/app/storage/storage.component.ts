@@ -638,6 +638,41 @@ export class StorageComponent {
   }
 
   
+  get isStockManualScanning(): boolean {
+    return (
+      this.panelMode === 'STOCK_IN' &&
+      this.stockInMode === 'MANUAL' &&
+      !!this.stockForm.jobNo?.toString().trim() &&
+      !this.stockForm.amount?.toString().trim()
+    );
+  }
+
+  get isStockManualScanComplete(): boolean {
+    return (
+      this.panelMode === 'STOCK_IN' &&
+      this.stockInMode === 'MANUAL' &&
+      !!this.stockForm.jobNo?.toString().trim() &&
+      !!this.stockForm.amount?.toString().trim()
+    );
+  }
+
+
+  get isReturnStockScanning(): boolean {
+    return (
+      this.panelMode === 'RETURN_STOCK_IN' &&
+      !!this.returnStockForm.jobNoIncoming?.toString().trim() &&
+      !this.returnStockForm.amount?.toString().trim()
+    );
+  }
+  
+  get isReturnStockScanComplete(): boolean {
+    return (
+      this.panelMode === 'RETURN_STOCK_IN' &&
+      !!this.returnStockForm.jobNoIncoming?.toString().trim() &&
+      !!this.returnStockForm.amount?.toString().trim()
+    );
+  }
+
 
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;

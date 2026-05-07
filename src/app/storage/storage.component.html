@@ -442,6 +442,31 @@
 
 
                 <ng-container *ngIf="stockInMode === 'MANUAL'">
+                  <div
+                    class="scan-status-banner"
+                    *ngIf="isStockManualScanning || isStockManualScanComplete"
+                    [class.scanning]="isStockManualScanning"
+                    [class.complete]="isStockManualScanComplete"
+                  >
+                    <div class="scan-status-icon">
+                      <i class="fas fa-sync-alt" *ngIf="isStockManualScanning"></i>
+                      <i class="fas fa-check-circle" *ngIf="isStockManualScanComplete"></i>
+                    </div>
+
+                    <div class="scan-status-text">
+                      <div class="scan-status-title">
+                        {{ isStockManualScanning ? 'Scanning in progress...' : 'Scan complete' }}
+                      </div>
+                      <div class="scan-status-subtitle">
+                        {{
+                          isStockManualScanning
+                            ? 'Please continue scanning tags until Amount is completed.'
+                            : 'All scan tags have been completed.'
+                        }}
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="stock-row">
                     <label>Job No.</label>
                     <div class="scan-input-wrap">
@@ -1816,6 +1841,32 @@
                     <input type="text" [(ngModel)]="returnStockForm.itemSpec" disabled />
                   </div>
                   
+
+                  <div
+                    class="scan-status-banner"
+                    *ngIf="isReturnStockScanning || isReturnStockScanComplete"
+                    [class.scanning]="isReturnStockScanning"
+                    [class.complete]="isReturnStockScanComplete"
+                  >
+                    <div class="scan-status-icon">
+                      <i class="fas fa-sync-alt" *ngIf="isReturnStockScanning"></i>
+                      <i class="fas fa-check-circle" *ngIf="isReturnStockScanComplete"></i>
+                    </div>
+
+                    <div class="scan-status-text">
+                      <div class="scan-status-title">
+                        {{ isReturnStockScanning ? 'Return scan in progress...' : 'Return scan complete' }}
+                      </div>
+                      <div class="scan-status-subtitle">
+                        {{
+                          isReturnStockScanning
+                            ? 'Please continue scanning return tags until Amount is completed.'
+                            : 'All return scan tags have been completed.'
+                        }}
+                      </div>
+                    </div>
+                  </div>
+
 
                   <!-- scanner fields -->
 
