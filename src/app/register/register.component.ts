@@ -53,8 +53,9 @@ export class RegisterComponent {
     private http: HttpClient,
     private callSocket: CallSocketService,
   ) {}
-
+  
   isLoading = false;
+  isExporting = false;
   searchText = '';
   roleFilter = 'all';
   groupFilter = 'all';
@@ -589,6 +590,10 @@ export class RegisterComponent {
 
 
   exportExcel() {
+    if (this.isExporting) return;
+  
+    this.isExporting = true;
+  
     const body = {
       searchText: this.searchText || '',
       roleFilter: this.roleFilter || 'all',
@@ -600,12 +605,24 @@ export class RegisterComponent {
       responseType: 'blob'
     }).subscribe({
       next: async (blob) => {
-        const url = window.URL.createObjectURL(blob);
+        const file = new Blob([blob], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+  
+        const url = window.URL.createObjectURL(file);
         const a = document.createElement('a');
+  
+        const now = new Date();
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const filename =
+          `user_master_report_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.xlsx`;
+  
         a.href = url;
-        a.download = 'user-master-report.xlsx';
+        a.download = filename;
         a.click();
+  
         window.URL.revokeObjectURL(url);
+        this.isExporting = false;
   
         await Swal.fire({
           icon: 'success',
@@ -616,6 +633,8 @@ export class RegisterComponent {
         });
       },
       error: async (err) => {
+        this.isExporting = false;
+  
         await Swal.fire({
           icon: 'error',
           title: 'Export Failed',
@@ -624,7 +643,6 @@ export class RegisterComponent {
       }
     });
   }
-
 
 
 

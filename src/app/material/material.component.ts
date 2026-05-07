@@ -27,13 +27,23 @@ export class MaterialComponent implements OnInit {
   filteredMaterials: MaterialRow[] = [];
 
   searchText = '';
+  fromDate = '';
+  toDate = '';
 
   isLoading = false;
   isSyncing = false;
 
+  role: string = '';
+  isAddingMaterial = false;
+  isDeletingMaterial = false;
+  isExporting = false;
+
+
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.role = localStorage.getItem('materialStore_role') || '';
     this.fetchMaterialList();
   }
 
@@ -70,22 +80,42 @@ export class MaterialComponent implements OnInit {
     });
   }
 
+
+
+  private toDateOnly(value?: string): Date | null {
+    if (!value) return null;
+  
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return null;
+  
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+
   applyFilter() {
     const key = (this.searchText || '').trim().toLowerCase();
-
-    if (!key) {
-      this.filteredMaterials = [...this.materials];
-      return;
-    }
-
+  
+    const start = this.fromDate ? this.toDateOnly(this.fromDate) : null;
+    const end = this.toDate ? this.toDateOnly(this.toDate) : null;
+  
     this.filteredMaterials = this.materials.filter((row) => {
-      return (
+      const matchSearch =
+        !key ||
         (row.materialNo || '').toLowerCase().includes(key) ||
         (row.materialName || '').toLowerCase().includes(key) ||
         (row.materialSpec || '').toLowerCase().includes(key) ||
-        (row.accountCode || '').toLowerCase().includes(key) 
-
-      );
+        (row.accountCode || '').toLowerCase().includes(key);
+  
+      const rowDate = this.toDateOnly(row.timeStamp);
+  
+      const matchFrom =
+        !start || (!!rowDate && rowDate >= start);
+  
+      const matchTo =
+        !end || (!!rowDate && rowDate <= end);
+  
+      return matchSearch && matchFrom && matchTo;
     });
   }
 
@@ -93,11 +123,170 @@ export class MaterialComponent implements OnInit {
     this.applyFilter();
   }
 
-  onClickAddMaterial() {
-    Swal.fire({
-      icon: 'info',
+  async onClickAddMaterial() {
+    if (this.isAddingMaterial) return;
+  
+    const result = await Swal.fire({
       title: 'Add Material',
-      text: 'ตอนนี้หน้านี้เตรียมไว้สำหรับดูข้อมูลและ Sync Material ก่อน'
+      width: 720,
+      html: `
+        <div class="add-material-swal">
+          <div class="add-material-row">
+            <label>Material No <span>*</span></label>
+            <input id="swalMaterialNo" class="swal2-input add-material-input" placeholder="กรอก Material No" />
+          </div>
+  
+          <div class="add-material-row">
+            <label>Material Name <span>*</span></label>
+            <input id="swalMaterialName" class="swal2-input add-material-input" placeholder="กรอก Material Name" />
+          </div>
+  
+          <div class="add-material-row">
+            <label>Material Spec <span>*</span></label>
+            <input id="swalMaterialSpec" class="swal2-input add-material-input" placeholder="กรอก Spec" />
+          </div>
+  
+          <div class="add-material-row">
+            <label>Account Code</label>
+            <input id="swalAccountCode" class="swal2-input add-material-input" placeholder="เช่น 4520" />
+            <div class="add-material-help">
+              accountCode = 4520 จะแสดงเป็น Material, ค่าอื่นจะแสดงเป็น Chemical
+            </div>
+          </div>
+        </div>
+  
+        <style>
+          .add-material-swal {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left;
+            padding: 4px 2px;
+          }
+  
+          .add-material-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+  
+          .add-material-row label {
+            font-size: 13px;
+            font-weight: 900;
+            color: #0f172a;
+            margin: 0;
+          }
+  
+          .add-material-row label span {
+            color: #dc2626;
+          }
+  
+          .add-material-input {
+            width: 100% !important;
+            margin: 0 !important;
+            min-height: 42px;
+            border-radius: 12px !important;
+            border: 1px solid #dbe3ef !important;
+            font-size: 14px !important;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: none !important;
+          }
+  
+          .add-material-input:focus {
+            border-color: #93c5fd !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+          }
+  
+          .add-material-help {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+          }
+        </style>
+      `,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Save Material',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2563eb',
+      focusConfirm: false,
+      didOpen: () => {
+        const input = document.getElementById('swalMaterialNo') as HTMLInputElement | null;
+        input?.focus();
+      },
+      preConfirm: () => {
+        const materialNo = (document.getElementById('swalMaterialNo') as HTMLInputElement)?.value?.trim() || '';
+        const materialName = (document.getElementById('swalMaterialName') as HTMLInputElement)?.value?.trim() || '';
+        const materialSpec = (document.getElementById('swalMaterialSpec') as HTMLInputElement)?.value?.trim() || '';
+        const accountCode = (document.getElementById('swalAccountCode') as HTMLInputElement)?.value?.trim() || '';
+  
+        const missing: string[] = [];
+  
+        if (!materialNo) missing.push('Material No');
+        if (!materialName) missing.push('Material Name');
+        if (!materialSpec) missing.push('Material Spec');
+  
+        if (missing.length) {
+          Swal.showValidationMessage(`กรุณากรอกข้อมูล: ${missing.join(', ')}`);
+          return false;
+        }
+  
+        return {
+          materialNo,
+          materialName,
+          materialSpec,
+          accountCode
+        };
+      }
+    });
+  
+    if (!result.isConfirmed || !result.value) return;
+  
+    this.isAddingMaterial = true;
+  
+    const body = {
+      materialNo: result.value.materialNo,
+      materialName: result.value.materialName,
+      materialSpec: result.value.materialSpec,
+      accountCode: result.value.accountCode
+    };
+  
+    this.http.post<any>(`${config.apiServer}/api/material/create`, body).subscribe({
+      next: async () => {
+        this.isAddingMaterial = false;
+  
+        await Swal.fire({
+          icon: 'success',
+          title: 'Add Material Success',
+          text: 'เพิ่ม Material เรียบร้อยแล้ว',
+          timer: 1200,
+          showConfirmButton: false
+        });
+  
+        this.fetchMaterialList();
+      },
+      error: async (err) => {
+        this.isAddingMaterial = false;
+  
+        const message = err?.error?.message || err?.error?.error || err?.message || '';
+  
+        let text = 'ไม่สามารถเพิ่ม Material ได้';
+  
+        if (message === 'missing_required_fields') {
+          text = 'กรุณากรอก Material No, Material Name และ Material Spec';
+        } else if (message === 'Material_already') {
+          text = 'Material นี้มีอยู่ในระบบแล้ว';
+        } else if (message) {
+          text = message;
+        }
+  
+        await Swal.fire({
+          icon: 'error',
+          title: 'Add Material Failed',
+          text
+        });
+      }
     });
   }
 
@@ -170,9 +359,6 @@ export class MaterialComponent implements OnInit {
                   <div><b>Created</b></div><div style="color:#16a34a;font-weight:700">${createdCount}</div>
                   <div><b>Updated</b></div><div style="color:#d97706;font-weight:700">${updatedCount}</div>
                   <div><b>Duplicate In DB</b></div><div style="color:#dc2626;font-weight:700">${duplicateCount}</div>
-                  <div><b>Duplicate In Payload</b></div><div>${duplicateInPayloadCount}</div>
-                  <div><b>Total Chunks</b></div><div>${totalCreateChunks}</div>
-                  <div><b>Chunk Size</b></div><div>${chunkSize}</div>
                 </div>
   
                 ${
@@ -275,6 +461,145 @@ export class MaterialComponent implements OnInit {
     });
   }
 
+
+
+
+
+  async deleteMaterial(row: MaterialRow) {
+    if (this.isDeletingMaterial) return;
+  
+    if (this.role !== 'admin') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Permission denied',
+        text: 'เฉพาะ Admin เท่านั้นที่สามารถลบ Material ได้'
+      });
+      return;
+    }
+  
+    const confirm = await Swal.fire({
+      icon: 'warning',
+      title: 'Delete Material?',
+      html: `
+        <div style="text-align:left; line-height:1.8;">
+          <div>ต้องการลบ Material นี้หรือไม่?</div>
+          <hr>
+          <div><b>Material No:</b> ${row.materialNo || '-'}</div>
+          <div><b>Name:</b> ${row.materialName || '-'}</div>
+          <div><b>Spec:</b> ${row.materialSpec || '-'}</div>
+          <div><b>Account Code:</b> ${row.accountCode || '-'}</div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626'
+    });
+  
+    if (!confirm.isConfirmed) return;
+  
+    this.isDeletingMaterial = true;
+  
+    const body = {
+      materialId: row.id
+    };
+  
+    this.http.post<any>(`${config.apiServer}/api/material/delete`, body).subscribe({
+      next: async () => {
+        this.isDeletingMaterial = false;
+  
+        await Swal.fire({
+          icon: 'success',
+          title: 'Deleted',
+          text: 'ลบ Material เรียบร้อยแล้ว',
+          timer: 1000,
+          showConfirmButton: false
+        });
+  
+        this.fetchMaterialList();
+      },
+      error: async (err) => {
+        this.isDeletingMaterial = false;
+  
+        const message = err?.error?.message || err?.error?.error || err?.message || '';
+  
+        let text = 'ไม่สามารถลบ Material ได้';
+  
+        if (message === 'missing_required_fields') {
+          text = 'ไม่พบ materialId';
+        } else if (message === 'Material_not_found') {
+          text = 'ไม่พบ Material นี้ หรือถูกลบไปแล้ว';
+        } else if (message) {
+          text = message;
+        }
+  
+        await Swal.fire({
+          icon: 'error',
+          title: 'Delete Failed',
+          text
+        });
+      }
+    });
+  }
+
+
+
+  private getExportPayload() {
+    return {
+      searchText: this.searchText || '',
+      fromDate: this.fromDate || '',
+      toDate: this.toDate || ''
+    };
+  }
+  
+  exportExcel() {
+    if (this.isExporting) return;
+  
+    this.isExporting = true;
+  
+    this.http.post(
+      `${config.apiServer}/api/material/exportExcel`,
+      this.getExportPayload(),
+      { responseType: 'blob' }
+    ).subscribe({
+      next: (blob: Blob) => {
+        const file = new Blob([blob], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+  
+        const url = window.URL.createObjectURL(file);
+        const a = document.createElement('a');
+  
+        const now = new Date();
+        const pad = (n: number) => String(n).padStart(2, '0');
+  
+        const filename =
+          `material_master_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.xlsx`;
+  
+        a.href = url;
+        a.download = filename;
+        a.click();
+  
+        window.URL.revokeObjectURL(url);
+        this.isExporting = false;
+      },
+      error: async (err) => {
+        console.error('exportExcel error:', err);
+        this.isExporting = false;
+  
+        await Swal.fire({
+          icon: 'error',
+          title: 'Export Failed',
+          text: err?.error?.message || err?.error?.error || 'ไม่สามารถ export excel ได้'
+        });
+      }
+    });
+  }
+
+
+
+
+
   formatDateTime(value?: string): string {
     if (!value) return '-';
 
@@ -293,4 +618,33 @@ export class MaterialComponent implements OnInit {
   trackByMaterial(index: number, row: MaterialRow) {
     return row.id || index;
   }
+
+
+
+
+  onDateFilterChange() {
+    if (this.fromDate && this.toDate && this.fromDate > this.toDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Date Range',
+        text: 'From Date ต้องน้อยกว่าหรือเท่ากับ To Date'
+      });
+  
+      this.toDate = '';
+      this.applyFilter();
+      return;
+    }
+  
+    this.applyFilter();
+  }
+
+
+  clearMaterialFilters() {
+    this.searchText = '';
+    this.fromDate = '';
+    this.toDate = '';
+    this.applyFilter();
+  }
+
+
 }

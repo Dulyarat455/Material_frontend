@@ -176,7 +176,7 @@
 
 .material-table {
   width: 100%;
-  min-width: 980px;
+  min-width: 1080px;
   margin: 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -382,3 +382,138 @@
     min-width: 900px;
   }
 }
+
+
+/* ============
+delete Icon
+============ */
+
+
+.material-delete-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.10);
+  color: #dc2626;
+  font-size: 14px;
+  transition: 0.15s ease;
+}
+
+.material-delete-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(220, 38, 38, 0.20);
+}
+
+.material-delete-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+
+/* ==================
+export Button  
+================== */
+
+
+
+.export-btn {
+  min-width: 150px;
+  font-weight: 800;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.14);
+}
+
+.export-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
+
+
+
+/* ========================
+   Material Filters
+   ======================== */
+
+   .material-filter-bar {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .date-filter-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 160px;
+  }
+  
+  .date-filter-box label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #475569;
+    margin: 0;
+  }
+  
+  .date-filter-input {
+    min-height: 42px;
+    border-radius: 12px;
+    border: 1px solid #dbe3ef;
+    box-shadow: none;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  
+  .date-filter-input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.12);
+  }
+  
+  .clear-filter-btn {
+    min-height: 42px;
+    border-radius: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  
+  .export-btn {
+    min-width: 150px;
+    font-weight: 800;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(22, 163, 74, 0.14);
+  }
+  
+  .export-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 991.98px) {
+    .material-filter-bar {
+      width: 100%;
+    }
+  
+    .date-filter-box,
+    .clear-filter-btn {
+      width: 100%;
+    }
+  }
+
+
+
+
+
+
+  
+  

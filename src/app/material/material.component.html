@@ -25,21 +25,44 @@
           <button
             class="btn btn-primary action-btn"
             type="button"
+            [disabled]="isAddingMaterial || isLoading || isSyncing"
             (click)="onClickAddMaterial()"
           >
-            <i class="fa fa-plus me-2"></i>
-            Add Material
+            <i class="fa fa-plus me-2" *ngIf="!isAddingMaterial"></i>
+            <i class="fa fa-spinner fa-spin me-2" *ngIf="isAddingMaterial"></i>
+            {{ isAddingMaterial ? 'Adding...' : 'Add Material' }}
           </button>
-  
           <button
             class="btn btn-success action-btn"
             type="button"
             [disabled]="isSyncing"
             (click)="syncMaterialFromPbass()"
           >
-            <i class="fa fa-rotate me-2" [class.spin]="isSyncing"></i>
+          <i
+          class="fa me-2"
+          [class.fa-database]="!isSyncing"
+          [class.fa-spinner]="isSyncing"
+          [class.fa-spin]="isSyncing"
+        ></i>
             {{ isSyncing ? 'Syncing...' : 'Sync PBASS' }}
           </button>
+
+
+
+          <button
+            class="btn btn-success action-btn export-btn"
+            type="button"
+            [disabled]="isLoading || isSyncing || isExporting"
+            (click)="exportExcel()"
+          >
+              <i
+              class="fa me-2"
+              [class.fa-download]="!isExporting"
+              [class.fa-spinner]="isExporting"
+              [class.fa-spin]="isExporting"
+            ></i>
+            {{ isExporting ? 'Exporting...' : 'Export Excel' }}
+        </button>
   
           <button
             class="btn btn-outline-secondary action-btn"
@@ -58,12 +81,43 @@
             <input
               type="text"
               class="form-control search-input"
-              placeholder="Search material no / name / spec"
+              placeholder="Search material no / name / spec / Account Code"
               [(ngModel)]="searchText"
               (input)="onSearchChange()"
             />
           </div>
         </div>
+
+        <div class="date-filter-box">
+          <label>From Date</label>
+          <input
+            type="date"
+            class="form-control date-filter-input"
+            [(ngModel)]="fromDate"
+            (change)="onDateFilterChange()"
+          />
+        </div>
+      
+        <div class="date-filter-box">
+          <label>To Date</label>
+          <input
+            type="date"
+            class="form-control date-filter-input"
+            [(ngModel)]="toDate"
+            (change)="onDateFilterChange()"
+          />
+        </div>
+      
+        <button
+          type="button"
+          class="btn btn-outline-dark action-btn clear-filter-btn"
+          (click)="clearMaterialFilters()"
+        >
+          <i class="fa fa-times me-2"></i>
+          Clear Filter
+        </button>
+
+
       </div>
   
       <div class="table-card">
@@ -85,6 +139,7 @@
                 <th style="width: 140px;">Account Code</th>
                 <th style="width: 140px;">Type</th>
                 <th style="width: 180px;">Created At</th>
+                <th style="width: 90px;" *ngIf="role === 'admin'">Action</th>
               </tr>
             </thead>
   
@@ -121,10 +176,22 @@
                 <td>
                   <div class="time-text">{{ formatDateTime(row.timeStamp) }}</div>
                 </td>
+                <td class="text-center" *ngIf="role === 'admin'">
+                  <button
+                    type="button"
+                    class="material-delete-btn"
+                    title="Delete Material"
+                    [disabled]="isDeletingMaterial"
+                    (click)="deleteMaterial(row)"
+                  >
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+
               </tr>
   
               <tr *ngIf="!filteredMaterials.length">
-                <td colspan="5" class="empty-cell">
+                <td [attr.colspan]="role === 'admin' ? 8 : 7" class="empty-cell">
                   <div class="empty-state">
                     <i class="fa fa-inbox empty-icon"></i>
                     <div class="empty-title">No material data found</div>
@@ -138,7 +205,7 @@
   
             <tbody *ngIf="isLoading">
               <tr>
-                <td colspan="7" class="loading-cell">
+                <td [attr.colspan]="role === 'admin' ? 8 : 7" class="loading-cell">
                   <div class="loading-state">
                     <i class="fa fa-spinner fa-spin me-2"></i>
                     Loading material data...

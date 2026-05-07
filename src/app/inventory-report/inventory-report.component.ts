@@ -9,6 +9,7 @@ type InventoryReportRow = {
   transactionStoreId: number;
   incomingId: number;
   jobNo: string;
+  recivedDate: string;
   materialNo: string;
   itemName: string;
   itemSpec: string;
@@ -16,6 +17,7 @@ type InventoryReportRow = {
   coil: number;
   qtyKgsPcs: number;
   unit: string;
+  unitPrice: number;
   totalPrice: number;
   area: string;
   stockNote: string;
@@ -31,6 +33,7 @@ type InventoryReportRow = {
 
 type FilterKey =
   | 'jobNo'
+  | 'recivedDate'
   | 'materialNo'
   | 'itemName'
   | 'spec'
@@ -59,6 +62,8 @@ export class InventoryReportComponent {
   specFilter = 'all';
   lotNoFilter = 'all';
   areaFilter = 'all';
+  recivedDateFilter = 'all';
+
 
   inventoryRows: InventoryReportRow[] = [];
   filteredRows: InventoryReportRow[] = [];
@@ -69,12 +74,14 @@ export class InventoryReportComponent {
   specOptions: string[] = [];
   lotNoOptions: string[] = [];
   areaOptions: string[] = [];
+  recivedDateOptions: string[] = [];
 
 
   userId: number | null = null;
 
   dropdownOpen: Record<FilterKey, boolean> = {
     jobNo: false,
+    recivedDate: false,
     materialNo: false,
     itemName: false,
     spec: false,
@@ -84,6 +91,7 @@ export class InventoryReportComponent {
 
   dropdownSearch: Record<FilterKey, string> = {
     jobNo: '',
+    recivedDate: '',
     materialNo: '',
     itemName: '',
     spec: '',
@@ -134,6 +142,7 @@ export class InventoryReportComponent {
     this.specFilter = 'all';
     this.lotNoFilter = 'all';
     this.areaFilter = 'all';
+    this.recivedDateFilter = 'all';
 
     this.dropdownSearch.jobNo = '';
     this.dropdownSearch.materialNo = '';
@@ -141,6 +150,7 @@ export class InventoryReportComponent {
     this.dropdownSearch.spec = '';
     this.dropdownSearch.lotNo = '';
     this.dropdownSearch.area = '';
+    this.dropdownSearch.recivedDate = '';
 
     this.closeAllDropdowns();
     this.applyFilter();
@@ -153,6 +163,7 @@ export class InventoryReportComponent {
     this.specOptions = [];
     this.lotNoOptions = [];
     this.areaOptions = [];
+    this.recivedDateOptions = [];
   }
 
   private buildUniqueOptions(values: any[]): string[] {
@@ -194,6 +205,11 @@ export class InventoryReportComponent {
       this.jobNoFilter === 'all' ||
       (row.jobNo || '') === this.jobNoFilter;
 
+    const matchRecivedDate =
+      excludeKey === 'recivedDate' ||
+      this.recivedDateFilter === 'all' ||
+      (row.recivedDate || '') === this.recivedDateFilter;
+
     const matchMaterialNo =
       excludeKey === 'materialNo' ||
       this.materialNoFilter === 'all' ||
@@ -221,6 +237,7 @@ export class InventoryReportComponent {
 
     return (
       matchJobNo &&
+      matchRecivedDate &&
       matchMaterialNo &&
       matchItemName &&
       matchSpec &&
@@ -234,6 +251,12 @@ export class InventoryReportComponent {
       this.inventoryRows
         .filter(row => this.rowMatchesFilter(row, 'jobNo'))
         .map(x => x.jobNo)
+    );
+
+    this.recivedDateOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'recivedDate'))
+        .map(x => x.recivedDate)
     );
 
     this.materialNoOptions = this.buildUniqueOptions(
@@ -273,6 +296,11 @@ export class InventoryReportComponent {
       this.dropdownSearch.jobNo = '';
     }
 
+    if (this.recivedDateFilter !== 'all' && !this.recivedDateOptions.includes(this.recivedDateFilter)) {
+      this.recivedDateFilter = 'all';
+      this.dropdownSearch.recivedDate = '';
+    }
+
     if (this.materialNoFilter !== 'all' && !this.materialNoOptions.includes(this.materialNoFilter)) {
       this.materialNoFilter = 'all';
       this.dropdownSearch.materialNo = '';
@@ -310,6 +338,7 @@ export class InventoryReportComponent {
   getOptions(key: FilterKey): string[] {
     switch (key) {
       case 'jobNo': return this.jobNoOptions;
+      case 'recivedDate': return this.recivedDateOptions;
       case 'materialNo': return this.materialNoOptions;
       case 'itemName': return this.itemNameOptions;
       case 'spec': return this.specOptions;
@@ -321,6 +350,7 @@ export class InventoryReportComponent {
   getFilterValue(key: FilterKey): string {
     switch (key) {
       case 'jobNo': return this.jobNoFilter;
+      case 'recivedDate': return this.recivedDateFilter;
       case 'materialNo': return this.materialNoFilter;
       case 'itemName': return this.itemNameFilter;
       case 'spec': return this.specFilter;
@@ -332,6 +362,7 @@ export class InventoryReportComponent {
   setFilterValue(key: FilterKey, value: string) {
     switch (key) {
       case 'jobNo': this.jobNoFilter = value; break;
+      case 'recivedDate': this.recivedDateFilter = value; break;
       case 'materialNo': this.materialNoFilter = value; break;
       case 'itemName': this.itemNameFilter = value; break;
       case 'spec': this.specFilter = value; break;
@@ -454,6 +485,7 @@ export class InventoryReportComponent {
       startDate: this.startDate || '',
       endDate: this.endDate || '',
       jobNo: this.jobNoFilter || 'all',
+      recivedDate: this.recivedDateFilter || 'all',
       materialNo: this.materialNoFilter || 'all',
       itemName: this.itemNameFilter || 'all',
       spec: this.specFilter || 'all',

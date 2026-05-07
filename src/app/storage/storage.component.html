@@ -443,12 +443,19 @@
                 <ng-container *ngIf="stockInMode === 'MANUAL'">
                   <div class="stock-row">
                     <label>Job No.</label>
-                    <input
-                      #scanJobNo
-                      type="text"
-                      [(ngModel)]="stockForm.jobNo"
-                      (keydown.enter)="onStockScanEnter('jobNo', $event)"
-                    />
+                    <div class="scan-input-wrap">
+                      <i class="fas fa-qrcode scan-input-icon"></i>
+                  
+                      <input
+                        #scanJobNo
+                        type="text"
+                        class="scan-input"
+                        placeholder="Start scanning here."
+                        [(ngModel)]="stockForm.jobNo"
+                        (keydown.enter)="onStockScanEnter('jobNo', $event)"
+                      />
+                    </div>
+                  
                   </div>
 
                   <div class="stock-row stock-row-hidden">
@@ -461,7 +468,7 @@
                     />
                   </div>
 
-                  <div class="stock-row stock-row-hidden">
+                  <div class="stock-row">
                     <label>recivedDate</label>
                     <input
                       #scanRecivedDate
@@ -1400,14 +1407,18 @@
                   <div class="stock-row">
                     <label>Job No.</label>
                     <div class="move-search-group">
-                      <input
-                        #moveAreaScanJobNo
-                        type="text"
-                        [(ngModel)]="moveAreaScanForm.jobNo"
-                        (input)="onMoveAreaScanInputChange()"
-                        (keydown.enter)="onMoveAreaScanEnter('jobNo', $event)"
-                        (blur)="onMoveAreaScanBlur('jobNo', $event)"
-                      />
+                      
+                       
+                        <input
+                          #moveAreaScanJobNo
+                          type="text"
+                          placeholder="...▦ Start scanning here..."
+                          [(ngModel)]="moveAreaScanForm.jobNo"
+                          (input)="onMoveAreaScanInputChange()"
+                          (keydown.enter)="onMoveAreaScanEnter('jobNo', $event)"
+                          (blur)="onMoveAreaScanBlur('jobNo', $event)"
+                        />
+                   
                   
                       <button
                         type="button"
@@ -1809,12 +1820,14 @@
 
                   <div class="stock-row">
                     <label>Job No.</label>
-                    <input
-                      #returnScanJobNo
-                      type="text"
-                      [(ngModel)]="returnStockForm.jobNoIncoming"
-                      (keydown.enter)="onReturnStockEnter('jobNoIncoming', $event)"
-                    />
+                      <input
+                        #returnScanJobNo
+                        type="text"
+                        placeholder="...▦ Start scanning here..."
+                        [(ngModel)]="returnStockForm.jobNoIncoming"
+                        (keydown.enter)="onReturnStockEnter('jobNoIncoming', $event)"
+                      />
+                
                   </div>
               
                   <div class="stock-row stock-row-hidden">

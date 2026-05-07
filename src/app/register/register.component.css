@@ -489,3 +489,19 @@
     width: 100%;
   }
 }
+
+/* =====================
+exportExcel Button
+===================== */
+
+.export-btn {
+  min-width: 150px;
+  font-weight: 800;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.14);
+}
+
+.export-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

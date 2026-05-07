@@ -42,15 +42,16 @@
         </button>
 
 
-          <button
-            class="btn btn-success action-btn"
-            type="button"
-            [disabled]="isLoading"
-            (click)="exportExcel()"
-          >
-            <i class="fa fa-file-excel-o me-2"></i>
-            Export Excel
-          </button>
+        <button
+          class="btn btn-success action-btn export-btn"
+          type="button"
+          [disabled]="isLoading || isExporting"
+          (click)="exportExcel()"
+        >
+          <i class="fa fa-download me-2" *ngIf="!isExporting"></i>
+          <i class="fa fa-spinner fa-spin me-2" *ngIf="isExporting"></i>
+          {{ isExporting ? 'Exporting...' : 'Export Excel' }}
+       </button>
 
         <button
         class="btn btn-outline-secondary action-btn"

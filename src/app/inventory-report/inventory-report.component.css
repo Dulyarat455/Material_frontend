@@ -172,7 +172,7 @@
 
 .material-table {
   width: 100%;
-  min-width: 1750px;
+  min-width: 2050px;
   margin: 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -361,7 +361,7 @@
   }
 
   .material-table {
-    min-width: 1400px;
+    min-width: 1700px;
   }
 }
 

@@ -100,6 +100,46 @@
           </div>
         </div>
 
+
+
+        <!-- Received Date -->
+        <div class="filter-box">
+          <label class="filter-label">Received Date</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Received Date."
+              [ngModel]="getDisplayedInputValue('recivedDate')"
+              (focus)="onDropdownFocus('recivedDate')"
+              (ngModelChange)="onDropdownInput('recivedDate', $event)"
+              (keydown)="onDropdownKeydown('recivedDate', $event)"
+              (blur)="onDropdownBlur('recivedDate')"
+            />
+
+            <div class="dropdown-panel" *ngIf="dropdownOpen.recivedDate">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('recivedDate')">
+                All Received Date
+              </div>
+
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('recivedDate')"
+                (mousedown)="selectDropdownOption('recivedDate', x)"
+              >
+                {{ x }}
+              </div>
+
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('recivedDate').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
         <!-- Material No -->
         <div class="filter-box">
           <label class="filter-label">Material No</label>
@@ -293,7 +333,7 @@
       <div class="table-head">
         <div class="table-title">Inventory List</div>
         <div class="table-subtitle">
-          แสดงข้อมูล Inventory จาก TransactionStore ที่ status = use
+          แสดงข้อมูล Inventory จาก TransactionStore 
         </div>
       </div>
 
@@ -303,6 +343,7 @@
             <tr>
               <th style="width: 90px;">Index</th>
               <th style="width: 160px;">Job No</th>
+              <th style="width: 150px;">Received Date</th>
               <th style="width: 180px;">Material No</th>
               <th style="width: 220px;">Item Name</th>
               <th style="width: 180px;">Spec</th>
@@ -310,6 +351,7 @@
               <th style="width: 110px;">Coil</th>
               <th style="width: 140px;">Qty Kgs/Pcs</th>
               <th style="width: 100px;">Unit</th>
+              <th style="width: 130px;">Unit Price</th>
               <th style="width: 140px;">Total Price</th>
               <th style="width: 140px;">Area</th>
               <th style="width: 220px;">Stock Note</th>
@@ -321,6 +363,7 @@
             <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByInventory">
               <td><span class="index-badge">{{ i + 1 }}</span></td>
               <td><div class="material-no">{{ row.jobNo || '-' }}</div></td>
+              <td><div class="material-spec">{{ row.recivedDate || '-' }}</div></td>
               <td><div class="material-no">{{ row.materialNo || '-' }}</div></td>
               <td><div class="material-name">{{ row.itemName || '-' }}</div></td>
               <td><div class="material-spec">{{ row.itemSpec || '-' }}</div></td>
@@ -328,6 +371,9 @@
               <td class="text-center"><div class="material-spec">{{ formatNumber(row.coil) }}</div></td>
               <td class="text-end"><div class="material-spec">{{ formatNumber(row.qtyKgsPcs) }}</div></td>
               <td><div class="material-spec">{{ row.unit || '-' }}</div></td>
+              <td class="text-end">
+                <div class="material-no">{{ formatNumber(row.unitPrice,2) }}</div>
+              </td>
               <td class="text-end"><div class="material-no">{{ formatNumber(row.totalPrice) }}</div></td>
               <td><div class="account-code">{{ row.area || '-' }}</div></td>
               <td>
@@ -386,7 +432,7 @@
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="13" class="empty-cell">
+              <td colspan="15" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No inventory data found</div>
@@ -400,7 +446,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="13" class="loading-cell">
+              <td colspan="15" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading inventory data...
