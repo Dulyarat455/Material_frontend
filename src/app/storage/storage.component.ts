@@ -819,14 +819,23 @@ private toSortableTime(value?: string): number {
   const v = (value || '').trim();
   if (!v) return Number.MAX_SAFE_INTEGER;
 
-  const direct = Date.parse(v);
-  if (!Number.isNaN(direct)) return direct;
-
-  const m = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
-  if (m) {
-    const [, dd, mm, yyyy] = m;
+  // ✅ ต้อง parse format dd/mm/yyyy หรือ dd-mm-yyyy ก่อน Date.parse()
+  // เพราะ Date.parse('09/03/2026') อาจถูกตีความเป็น Sep 03, 2026
+  const dmy = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (dmy) {
+    const [, dd, mm, yyyy] = dmy;
     return new Date(Number(yyyy), Number(mm) - 1, Number(dd)).getTime();
   }
+
+  // ✅ รองรับ yyyy-mm-dd ถ้ามีจาก backend
+  const ymd = v.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+  if (ymd) {
+    const [, yyyy, mm, dd] = ymd;
+    return new Date(Number(yyyy), Number(mm) - 1, Number(dd)).getTime();
+  }
+
+  const direct = Date.parse(v);
+  if (!Number.isNaN(direct)) return direct;
 
   return Number.MAX_SAFE_INTEGER;
 }
@@ -2422,7 +2431,8 @@ searchStockOutItem() {
 
     const allMaterialNos = [
       ...this.slots.flatMap(slot => (slot.materials || []).map(m => (m.materialNo || m.itemNo || '').trim())),
-      ...this.pendingItems.map(m => (m.materialNo || m.itemNo || '').trim())
+      ...this.pendingItems.map(m => (m.materialNo || m.itemNo || '').trim()),
+      ...this.chemicalItems.map(m => (m.materialNo || m.itemNo || '').trim())
     ].filter(Boolean);
 
     const uniqueMaterialNos = Array.from(new Set(allMaterialNos));
@@ -2432,6 +2442,24 @@ searchStockOutItem() {
       .slice(0, 8);
 
     this.showMaterialSuggestions = this.materialSuggestions.length > 0;
+  }
+
+  clearMoveAreaPanel() {
+    this.moveSearchItemNo = '';
+    this.moveRows = [];
+    this.moveDestinationArea = '';
+    this.oldestMoveReceivedDate = '';
+    this.moveForm = {
+      itemNo: '',
+      itemName: '',
+      itemSpec: ''
+    };
+  
+    this.selectedSlot = null;
+    this.viewMode = 'NONE';
+  
+    this.materialSuggestions = [];
+    this.showMaterialSuggestions = false;
   }
 
   selectMaterialSuggestion(materialNo: string) {

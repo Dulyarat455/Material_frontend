@@ -1412,7 +1412,7 @@
                   <div class="stock-footer">
                     <button
                       class="btn-soft"
-                      (click)="moveSearchItemNo=''; moveRows=[]; moveDestinationArea=''; moveForm={ itemNo:'', itemName:'', itemSpec:'' }">
+                      (click)="clearMoveAreaPanel()">
                       Clear
                     </button>
                     <button class="btn-main" (click)="confirmMoveArea()" [disabled]="isMovingArea">
