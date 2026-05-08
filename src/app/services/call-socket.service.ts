@@ -12,8 +12,9 @@ export class CallSocketService {
   private socket: Socket;
 
   constructor() {
-    this.socket = io(config.apiServer, {
-      transports: ['websocket'],
+    this.socket = io('http://10.121.1.85:3007', {
+      path: '/materialPressAPI/socket.io',
+      transports: ['websocket', 'polling'],
       withCredentials: true,
     });
   }
