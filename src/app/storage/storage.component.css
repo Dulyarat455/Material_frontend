@@ -476,13 +476,15 @@
 }
 
 .btn-soft {
-  border: none;
+  border: 1px solid rgba(39, 114, 220, 0.22);
   border-radius: 10px;
-  padding: 7px 12px;
-  background: #e2e8f0;
-  color: #334155;
+  padding: 7px 14px;
+  background: #f3f8ff;
+  color: #2772dc;
   font-size: 12px;
   font-weight: 800;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
 }
 
 .btn-main {
@@ -2128,6 +2130,10 @@ spin for panel returnStockIn
     transform: rotate(360deg);
   }
 }
+
+
+
+
 
 
 

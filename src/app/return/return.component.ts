@@ -577,6 +577,18 @@ export class ReturnComponent {
         icon: 'warning',
         title: 'Delete Return Request?',
         html: `
+           <div style="
+          text-align:center;
+          margin-top:-6px;
+          margin-bottom:18px;
+          color:#dc2626;
+          font-size:16px;
+          font-weight:800;
+        ">
+          คุณต้องการยกเลิกรายการส่งคืน Material นี้หรือไม่?
+        </div>
+
+
           <div style="text-align:left; line-height:1.7;">
             <div><b>Job No:</b> ${r.jobNo || '-'}</div>
             <div><b>Material No:</b> ${r.materialNo || '-'}</div>
@@ -742,11 +754,49 @@ export class ReturnComponent {
       }
     
       this.selectMaterial(exact);
+        // ✅ Toast success
+    this.showAppToast(
+      'success',
+      `Search Material สำเร็จ : ${exact.materialNo}`
+    );
     }
     
     onClickSearchMaterial() {
       this.searchMaterialByExactInput();
     }
+
+
+
+     private showAppToast(
+        icon: 'success' | 'error' | 'warning' | 'info',
+        title: string
+      ) {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon,
+          title,
+          timer: 1800,
+          showConfirmButton: false,
+          timerProgressBar: true,
+      
+          customClass: {
+            container: 'app-toast-container',
+            popup: 'app-toast'
+          },
+      
+          didOpen: (toast) => {
+            toast.style.borderRadius = '14px';
+            toast.style.padding = '10px 14px';
+            toast.style.boxShadow = '0 12px 30px rgba(15, 23, 42, 0.18)';
+            toast.style.fontSize = '13px';
+            toast.style.fontWeight = '800';
+            toast.style.background = '#ffffff';
+            toast.style.color = '#0f172a';
+            toast.style.border = '1px solid rgba(2, 6, 23, 0.08)';
+          }
+        });
+      }
 
 
 

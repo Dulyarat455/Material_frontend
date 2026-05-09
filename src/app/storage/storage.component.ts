@@ -1095,6 +1095,38 @@ private resetMoveAreaScanForm() {
   };
 }
 
+
+private showAppToast(
+  icon: 'success' | 'error' | 'warning' | 'info',
+  title: string
+) {
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon,
+    title,
+    timer: 1800,
+    showConfirmButton: false,
+    timerProgressBar: true,
+
+    customClass: {
+      container: 'app-toast-container',
+      popup: 'app-toast'
+    },
+
+    didOpen: (toast) => {
+      toast.style.borderRadius = '14px';
+      toast.style.padding = '10px 14px';
+      toast.style.boxShadow = '0 12px 30px rgba(15, 23, 42, 0.18)';
+      toast.style.fontSize = '13px';
+      toast.style.fontWeight = '800';
+      toast.style.background = '#ffffff';
+      toast.style.color = '#0f172a';
+      toast.style.border = '1px solid rgba(2, 6, 23, 0.08)';
+    }
+  });
+}
+
 searchMoveAreaScanJob() {
   const key = (this.moveAreaScanForm.jobNo || '').trim();
 
@@ -1207,6 +1239,11 @@ searchMoveAreaScanJob() {
     stockNote: picked.stockNote
   }];
 
+  this.showAppToast(
+    'success',
+    `Search Incoming สำเร็จ : ${picked.jobNo || key}`
+  );
+
   setTimeout(() => {
     this.focusEl(this.moveAreaScanStoreCode);
   }, 0);
@@ -1272,6 +1309,12 @@ searchMoveAreaScanStoreCode() {
     this.moveAreaScanForm.targetStoreId = Number(store.id || 0);
     this.moveAreaScanForm.targetStoreCode = store.name || specialArea;
 
+     // ✅ Toast success
+     this.showAppToast(
+      'success',
+      `Search Store Code สำเร็จ : ${this.moveAreaScanForm.targetStoreCode}`
+    );
+
     return;
   }
 
@@ -1307,6 +1350,13 @@ searchMoveAreaScanStoreCode() {
   this.viewMode = 'SLOT';
   this.moveAreaScanForm.targetStoreId = Number(store.id || 0);
   this.moveAreaScanForm.targetStoreCode = store.name || slot.storeCode;
+
+    // ✅ Toast success
+    this.showAppToast(
+      'success',
+      `Search Store Code สำเร็จ : ${this.moveAreaScanForm.targetStoreCode}`
+    );
+    
 }
 
 
