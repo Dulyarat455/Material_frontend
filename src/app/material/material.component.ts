@@ -599,6 +599,21 @@ export class MaterialComponent implements OnInit {
 
 
 
+  get latestSyncTime(): string {
+    const latest = (this.materials || [])
+      .map(row => row.timeStamp)
+      .filter((v): v is string => !!v)
+      .map(v => new Date(v))
+      .filter(d => !Number.isNaN(d.getTime()))
+      .sort((a, b) => b.getTime() - a.getTime())[0];
+  
+    if (!latest) return '-';
+  
+    return this.formatDateTime(latest.toISOString());
+  }
+
+
+
 
   formatDateTime(value?: string): string {
     if (!value) return '-';

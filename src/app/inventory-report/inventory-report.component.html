@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="page-header-left">
         <div class="page-header-icon">
-          <i class="fa fa-archive"></i>
+          <i class="fas fa-boxes"></i>
         </div>
 
         <div class="page-header-text">
@@ -334,6 +334,44 @@
         <div class="table-title">Inventory List</div>
         <div class="table-subtitle">
           แสดงข้อมูล Inventory จาก TransactionStore 
+        </div>
+      </div>
+
+
+      <!-- ✅ Summary ตาม UNIT และอ้างอิงตาม filteredRows -->
+      <div class="inventory-summary-strip" *ngIf="!isLoading && filteredRows.length">
+        <div class="summary-title">Total</div>
+
+        <div class="summary-unit-list">
+          <div class="summary-unit-row" *ngFor="let s of unitSummaryRows">
+            <div class="summary-value">
+              {{ formatNumber(s.totalQty) }}
+            </div>
+
+            <div class="summary-unit">
+              {{ s.unit }}
+            </div>
+
+            <div class="summary-value">
+              {{ formatNumber(s.totalPrice) }}
+            </div>
+
+            <div class="summary-currency">
+              Baht
+            </div>
+          </div>
+
+          <div class="summary-grand-row">
+            <div class="summary-grand-spacer"></div>
+
+            <div class="summary-grand-value">
+              {{ formatNumber(grandTotalPriceByUnit) }}
+            </div>
+
+            <div class="summary-currency">
+              Baht
+            </div>
+          </div>
         </div>
       </div>
 

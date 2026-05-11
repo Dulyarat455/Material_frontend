@@ -77,13 +77,14 @@
           </a>
         </li>
 
-
-        <li class="nav-item mb-1">
-          <a routerLink="/register" class="nav-link" routerLinkActive="active">
-            <i class="nav-icon fas fa-home"></i>
-            <p class="ms-2">Add Member</p>
-          </a>
-        </li>
+        @if (this.role === 'admin') {
+          <li class="nav-item mb-1">
+            <a routerLink="/register" class="nav-link" routerLinkActive="active">
+              <i class="nav-icon fas fa-home"></i>
+              <p class="ms-2">Add Member</p>
+            </a>
+          </li>
+        }
 
         <!-- Inventory Menu -->
         <!-- @if (level == 'Admin') {} -->
@@ -108,7 +109,7 @@
                 class="nav-link"
                 routerLinkActive="active"
               >
-                <i class="fas fa-boxes nav-icon"></i>
+              <i class="fa fa-cubes"></i>
                 <p class="ms-2">Material</p>
               </a>
             </li>
@@ -152,7 +153,7 @@
                 ZY
                 routerLinkActive="active"
               >
-                <i class="fas fa-route nav-icon"></i>
+                <i class="fas fa-clipboard-list"></i>
                 <p class="ms-2">TransactionJob</p>
               </a>
             </li>
@@ -175,7 +176,7 @@
                 ZY
                 routerLinkActive="active"
               >
-                <i class="fas fa-route nav-icon"></i>
+              <i class="fas fa-dolly"></i>
                 <p class="ms-2">StockOut</p>
               </a>
             </li>
@@ -186,7 +187,7 @@
                 ZY
                 routerLinkActive="active"
               >
-                <i class="fas fa-route nav-icon"></i>
+                <i class="fas fa-exchange-alt"></i>
                 <p class="ms-2">TransactionAll</p>
               </a>
             </li>
@@ -196,103 +197,7 @@
 
        
         
-        <!-- Admin Menu -->
-        @if (level == 'Admin') {
-        <li class="nav-item">
-          <h6
-            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-light"
-          >
-            <span><b>ADMINISTRATOR</b></span>
-          </h6>
-
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-cog"></i>
-            <p class="ms-2">
-              Set Master
-              <i class="fas fa-angle-right ms-auto"></i>
-            </p>
-          </a>
-
-          <ul class="nav nav-treeview bg-dark bg-opacity-50 rounded mx-2 mt-1">
-            <li class="nav-item">
-              <a
-                routerLink="/register"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="far fa-user nav-icon"></i>
-                <p class="ms-2">Register</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/defect-list"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="far fa-list-alt nav-icon"></i>
-                <p class="ms-2">Defect List</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/part-list"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-boxes nav-icon"></i>
-                <p class="ms-2">Part List</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/die-list"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-tools nav-icon"></i>
-                <p class="ms-2">Die No. List</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/routing-list"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-route nav-icon"></i>
-                <p class="ms-2">Routing List</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/machine-list"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-pallet nav-icon"></i>
-                <p class="ms-2">Machine List</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/machine-routing"
-                class="nav-link"
-                routerLinkActive="active"
-              >
-                <i class="fas fa-dolly nav-icon"></i>
-                <p class="ms-2">Machine-Routing</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a routerLink="/sale" class="nav-link" routerLinkActive="active">
-                <i class="fas fa-bullseye nav-icon"></i>
-                <p class="ms-2">Target Scrap</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        }
+       
 
 
 

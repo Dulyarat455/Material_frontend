@@ -536,7 +536,7 @@ export class StorageComponent {
 
 
   // panel stockIn
-  stockInMode: 'MANUAL' | 'SYNC_PBASS' = 'MANUAL';
+  stockInMode: 'MANUAL' | 'SYNC_PBASS' = 'SYNC_PBASS';
 
   pbassSyncForm = {
     fromDate: '',
@@ -1364,7 +1364,7 @@ clearMoveAreaScanForm() {
   this.isClearingMoveAreaScan = true;
   this.moveAreaScanForm = {
     jobNo: '',
-    yearMonth: '',
+    yearMonth: '',  
     recivedDate: '',
     inspector: '',
     unloadBy: '',
@@ -1412,10 +1412,16 @@ clearMoveAreaScanForm() {
   this.selectedSlot = null;
   this.viewMode = 'NONE';
 
-  this.focusEl(this.moveAreaScanJobNo);
-
   setTimeout(() => {
-    this.isClearingMoveAreaScan = false;
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  
+    setTimeout(() => {
+      this.focusEl(this.moveAreaScanJobNo);
+      this.isClearingMoveAreaScan = false;
+    }, 250);
   }, 0);
 }
 
@@ -3192,10 +3198,24 @@ searchMoveItem() {
       error: (err) => {
         this.isSavingStock = false;
 
+        const rawMessage = err?.error?.message || err?.message || '';
+
+        let displayMessage = 'บันทึก Stock In ไม่สำเร็จ';
+      
+        if (rawMessage === 'incoming_already') {
+          displayMessage = 'มี Incoming นี้อยู่ในระบบแล้ว';
+        } else if(rawMessage === 'not_found_this_Material_in_Master'){
+          displayMessage = 'ยังไม่มี Material No นี้ใน Material Master';
+        } 
+        else if (rawMessage) {
+          displayMessage = rawMessage;
+        } 
+
+
         Swal.fire({
           icon: 'error',
           title: 'Stock In Fail',
-          text: err?.error?.message || err?.message || 'บันทึก Stock In ไม่สำเร็จ'
+          text: displayMessage
         });
       }
     });
@@ -3840,11 +3860,27 @@ searchMoveItem() {
       },
       error: (err) => {
         this.isSavingStock = false;
-  
+      
+        const rawMessage = String(err?.error?.message || err?.message || '').trim();
+      
+        let displayMessage = denial
+          ? 'ยกเลิก การรับคืน Material ไม่สำเร็จ'
+          : 'รับคืน Material ไม่สำเร็จ';
+      
+        if (rawMessage === 'incoming_notFound_inSystem') {
+          displayMessage = 'ไม่มี Incoming นี้ในระบบ';
+        } else if (rawMessage === 'canNot_returnStockIn_have_material_inStock') {
+          displayMessage = 'ไม่สามารถส่งคืน Material ได้ เนื่องจากมี Material นี้ใน Stock';
+        } else if (rawMessage === 'this_job_notFound') {
+          displayMessage = 'ไม่พบ Job นี้ในระบบ';
+        } else if (rawMessage) {
+          displayMessage = rawMessage;
+        }
+      
         Swal.fire({
           icon: 'error',
           title: 'Return Stock In Fail',
-          text: err?.error?.message || err?.message || 'รับคืน Material ไม่สำเร็จ'
+          text: displayMessage
         });
       }
     });
@@ -4300,7 +4336,15 @@ searchMoveItem() {
         this.viewMode = 'NONE';
   
         this.fetchStorageMap();
-        this.focusEl(this.moveAreaScanJobNo);
+        
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+        
+        setTimeout(() => {
+          this.focusEl(this.moveAreaScanJobNo);
+        }, 250);
       },
       error: async (err) => {
         this.isMovingArea = false;

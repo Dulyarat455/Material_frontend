@@ -31,6 +31,16 @@ type InventoryReportRow = {
   isSavingStockNote?: boolean;
 };
 
+
+
+type InventoryUnitSummaryRow = {
+  unit: string;
+  totalQty: number;
+  totalPrice: number;
+};
+
+
+
 type FilterKey =
   | 'jobNo'
   | 'recivedDate'
@@ -662,6 +672,36 @@ saveStockNote(row: InventoryReportRow) {
       minimumFractionDigits: digits,
       maximumFractionDigits: digits
     });
+  }
+
+  get unitSummaryRows(): InventoryUnitSummaryRow[] {
+    const map = new Map<string, InventoryUnitSummaryRow>();
+  
+    (this.filteredRows || []).forEach((row) => {
+      const unit = String(row.unit || '').trim() || '-';
+  
+      if (!map.has(unit)) {
+        map.set(unit, {
+          unit,
+          totalQty: 0,
+          totalPrice: 0
+        });
+      }
+  
+      const item = map.get(unit)!;
+      item.totalQty += Number(row.qtyKgsPcs || 0);
+      item.totalPrice += Number(row.totalPrice || 0);
+    });
+  
+    return Array.from(map.values()).sort((a, b) =>
+      a.unit.localeCompare(b.unit)
+    );
+  }
+  
+  get grandTotalPriceByUnit(): number {
+    return this.unitSummaryRows.reduce((sum, row) => {
+      return sum + Number(row.totalPrice || 0);
+    }, 0);
   }
 
   trackByInventory(_index: number, row: InventoryReportRow) {

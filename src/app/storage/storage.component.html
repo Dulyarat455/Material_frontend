@@ -421,6 +421,16 @@
                       <button
                         type="button"
                         class="stockin-mode-btn"
+                        [class.active]="stockInMode === 'SYNC_PBASS'"
+                        (click)="stockInMode = 'SYNC_PBASS'"
+                      >
+                        <i class="fas fa-sync-alt me-2"></i>
+                        Sync PBASS
+                      </button>
+                      
+                      <button
+                        type="button"
+                        class="stockin-mode-btn"
                         [class.active]="stockInMode === 'MANUAL'"
                         (click)="stockInMode = 'MANUAL'"
                       >
@@ -428,15 +438,7 @@
                         Manual
                       </button>
 
-                      <button
-                        type="button"
-                        class="stockin-mode-btn"
-                        [class.active]="stockInMode === 'SYNC_PBASS'"
-                        (click)="stockInMode = 'SYNC_PBASS'"
-                      >
-                        <i class="fas fa-sync-alt me-2"></i>
-                        Sync PBASS
-                      </button>
+                      
                     </div>
 
 

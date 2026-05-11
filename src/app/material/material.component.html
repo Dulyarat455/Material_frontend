@@ -13,57 +13,72 @@
         </div>
   
         <div class="page-header-right">
+          <div class="sync-chip">
+            <div class="sync-icon">
+              <i class="fas fa-history"></i>
+            </div>
+        
+            <div class="sync-info">
+              <span class="sync-label">Last Sync</span>
+              <span class="sync-value">{{ latestSyncTime }}</span>
+            </div>
+          </div>
+        
           <div class="stat-chip">
             <span class="stat-label">Total</span>
             <span class="stat-value">{{ filteredMaterials.length }}</span>
           </div>
         </div>
+
+
+
       </div>
   
       <div class="toolbar-card">
         <div class="toolbar-left">
-          <button
-            class="btn btn-primary action-btn"
-            type="button"
-            [disabled]="isAddingMaterial || isLoading || isSyncing"
-            (click)="onClickAddMaterial()"
-          >
-            <i class="fa fa-plus me-2" *ngIf="!isAddingMaterial"></i>
-            <i class="fa fa-spinner fa-spin me-2" *ngIf="isAddingMaterial"></i>
-            {{ isAddingMaterial ? 'Adding...' : 'Add Material' }}
-          </button>
+          @if (this.role === 'admin') {
+            <button
+              class="btn btn-primary action-btn"
+              type="button"
+              [disabled]="isAddingMaterial || isLoading || isSyncing"
+              (click)="onClickAddMaterial()"
+            >
+              <i class="fa fa-plus me-2" *ngIf="!isAddingMaterial"></i>
+              <i class="fa fa-spinner fa-spin me-2" *ngIf="isAddingMaterial"></i>
+              {{ isAddingMaterial ? 'Adding...' : 'Add Material' }}
+            </button>
+          }
+      
           <button
             class="btn btn-success action-btn"
             type="button"
             [disabled]="isSyncing"
             (click)="syncMaterialFromPbass()"
           >
-          <i
-          class="fa me-2"
-          [class.fa-database]="!isSyncing"
-          [class.fa-spinner]="isSyncing"
-          [class.fa-spin]="isSyncing"
-        ></i>
+            <i
+              class="fa me-2"
+              [class.fa-database]="!isSyncing"
+              [class.fa-spinner]="isSyncing"
+              [class.fa-spin]="isSyncing"
+            ></i>
             {{ isSyncing ? 'Syncing...' : 'Sync PBASS' }}
           </button>
-
-
-
+      
           <button
             class="btn btn-success action-btn export-btn"
             type="button"
             [disabled]="isLoading || isSyncing || isExporting"
             (click)="exportExcel()"
           >
-              <i
+            <i
               class="fa me-2"
               [class.fa-download]="!isExporting"
               [class.fa-spinner]="isExporting"
               [class.fa-spin]="isExporting"
             ></i>
             {{ isExporting ? 'Exporting...' : 'Export Excel' }}
-        </button>
-  
+          </button>
+      
           <button
             class="btn btn-outline-secondary action-btn"
             type="button"
@@ -74,7 +89,7 @@
             Refresh
           </button>
         </div>
-  
+      
         <div class="toolbar-right">
           <div class="search-box">
             <i class="fa fa-search search-icon"></i>
@@ -87,37 +102,37 @@
             />
           </div>
         </div>
-
-        <div class="date-filter-box">
-          <label>From Date</label>
-          <input
-            type="date"
-            class="form-control date-filter-input"
-            [(ngModel)]="fromDate"
-            (change)="onDateFilterChange()"
-          />
-        </div>
       
-        <div class="date-filter-box">
-          <label>To Date</label>
-          <input
-            type="date"
-            class="form-control date-filter-input"
-            [(ngModel)]="toDate"
-            (change)="onDateFilterChange()"
-          />
-        </div>
+        <div class="toolbar-filter-row">
+          <div class="date-filter-box">
+            <label>From Date</label>
+            <input
+              type="date"
+              class="form-control date-filter-input"
+              [(ngModel)]="fromDate"
+              (change)="onDateFilterChange()"
+            />
+          </div>
       
-        <button
-          type="button"
-          class="btn btn-outline-dark action-btn clear-filter-btn"
-          (click)="clearMaterialFilters()"
-        >
-          <i class="fa fa-times me-2"></i>
-          Clear Filter
-        </button>
-
-
+          <div class="date-filter-box">
+            <label>To Date</label>
+            <input
+              type="date"
+              class="form-control date-filter-input"
+              [(ngModel)]="toDate"
+              (change)="onDateFilterChange()"
+            />
+          </div>
+      
+          <button
+            type="button"
+            class="btn btn-outline-dark action-btn clear-filter-btn"
+            (click)="clearMaterialFilters()"
+          >
+            <i class="fa fa-times me-2"></i>
+            Clear Filter
+          </button>
+        </div>
       </div>
   
       <div class="table-card">

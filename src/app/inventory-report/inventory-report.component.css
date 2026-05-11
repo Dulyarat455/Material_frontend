@@ -614,3 +614,116 @@ export Button
 .note-icon-cancel {
   background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
 }
+
+
+/* =============================
+Summary part
+============================= */
+
+
+.inventory-summary-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-bottom: 1px solid rgba(2, 6, 23, 0.08);
+  border-top: 1px solid rgba(37, 99, 235, 0.08);
+
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.summary-title {
+  min-width: 78px;
+  padding: 6px 12px;
+
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.10);
+  color: #1d4ed8;
+
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-unit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-unit-row,
+.summary-grand-row {
+  display: grid;
+  grid-template-columns: 130px 70px 150px 70px;
+  align-items: center;
+  column-gap: 8px;
+
+  min-height: 30px;
+  line-height: 1.25;
+}
+
+.summary-value,
+.summary-grand-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.summary-unit {
+  text-align: left;
+  white-space: nowrap;
+
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.summary-currency {
+  text-align: left;
+  white-space: nowrap;
+
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.summary-grand-row {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(37, 99, 235, 0.28);
+}
+
+.summary-grand-spacer {
+  grid-column: 1 / 3;
+}
+
+.summary-grand-value {
+  grid-column: 3;
+  color: #dc2626;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .inventory-summary-strip {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .summary-title {
+    min-width: auto;
+    width: fit-content;
+  }
+
+  .summary-unit-row,
+  .summary-grand-row {
+    grid-template-columns: 110px 55px 125px 60px;
+    font-size: 13px;
+  }
+}
