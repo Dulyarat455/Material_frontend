@@ -37,6 +37,7 @@ type InventoryUnitSummaryRow = {
   unit: string;
   totalQty: number;
   totalPrice: number;
+  palletCount: number;
 };
 
 
@@ -109,10 +110,69 @@ export class InventoryReportComponent {
     area: ''
   };
 
+
+  
+
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.fetchInventoryList();
   }
+
+
+  private readonly areaSortPriority = [
+    'Pending',
+    '1101', '1102', '1103', '1104', '1105', '1106', '1107',
+    '1108', '1109', '1110', '1111',
+    '1201', '1202', '1203', '1204',
+    '1205', '1206', '1207', '1208', '1209', '1210', '1211',
+    '2101', '2102', '2103', '2104', '2105', '2106',
+    '2201', '2202', '2203', '2204', '2205', '2206',
+    '3101', '3102', '3103', '3104', '3105', '3106',
+    '3201', '3202', '3203', '3204', '3205', '3206',
+    'Chemical'
+  ];
+
+
+
+  private getAreaSortIndex(area: string): number {
+    const key = String(area || '').trim();
+  
+    const index = this.areaSortPriority.findIndex(x =>
+      x.toLowerCase() === key.toLowerCase()
+    );
+  
+    // ถ้า AREA ไม่อยู่ใน priority list ให้ไปอยู่ท้าย
+    return index >= 0 ? index : 999999;
+  }
+  
+  private getTimeSortValue(value: string): number {
+    if (!value) return 0;
+  
+    const d = new Date(value);
+  
+    if (Number.isNaN(d.getTime())) return 0;
+  
+    return d.getTime();
+  }
+  
+  private sortInventoryRows(rows: InventoryReportRow[]): InventoryReportRow[] {
+    return [...rows].sort((a, b) => {
+      const areaA = this.getAreaSortIndex(a.area);
+      const areaB = this.getAreaSortIndex(b.area);
+  
+      if (areaA !== areaB) {
+        return areaA - areaB;
+      }
+  
+      // AREA เดียวกัน เรียงตาม TIME จากเก่า -> ใหม่
+      const timeA = this.getTimeSortValue(a.timeStmp);
+      const timeB = this.getTimeSortValue(b.timeStmp);
+  
+      return timeA - timeB;
+    });
+  }
+
+  
 
   fetchInventoryList() {
     this.isLoading = true;
@@ -342,7 +402,9 @@ export class InventoryReportComponent {
     this.syncInvalidSelectedFilters();
     this.rebuildRelatedOptions();
 
-    this.filteredRows = this.inventoryRows.filter((row) => this.rowMatchesFilter(row));
+    const rows = this.inventoryRows.filter((row) => this.rowMatchesFilter(row));
+
+    this.filteredRows = this.sortInventoryRows(rows);
   }
 
   getOptions(key: FilterKey): string[] {
@@ -684,13 +746,21 @@ saveStockNote(row: InventoryReportRow) {
         map.set(unit, {
           unit,
           totalQty: 0,
-          totalPrice: 0
+          totalPrice: 0,
+          palletCount: 0
         });
       }
   
       const item = map.get(unit)!;
       item.totalQty += Number(row.qtyKgsPcs || 0);
       item.totalPrice += Number(row.totalPrice || 0);
+
+        // ✅ นับจำนวนแถวเฉพาะ UNIT = KGS
+      if (unit.toUpperCase() === 'KGS') {
+        item.palletCount += 1;
+      }
+
+
     });
   
     return Array.from(map.values()).sort((a, b) =>

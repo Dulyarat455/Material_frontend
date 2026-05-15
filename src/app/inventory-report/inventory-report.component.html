@@ -344,6 +344,23 @@
 
         <div class="summary-unit-list">
           <div class="summary-unit-row" *ngFor="let s of unitSummaryRows">
+
+              <!-- ✅ แสดงจำนวน PALLET เฉพาะ KGS -->
+            <ng-container *ngIf="s.unit.toUpperCase() === 'KGS'; else emptyPalletTpl">
+              <div class="summary-pallet-value">
+                {{ formatNumber(s.palletCount) }}
+              </div>
+
+              <div class="summary-pallet-unit">
+                PALLET
+              </div>
+            </ng-container>
+
+            <ng-template #emptyPalletTpl>
+              <div></div>
+              <div></div>
+            </ng-template>
+
             <div class="summary-value">
               {{ formatNumber(s.totalQty) }}
             </div>

@@ -344,6 +344,8 @@ export class StorageComponent {
   viewMode: 'NONE' | 'SLOT' | 'PENDING' | 'CHEMICAL' = 'NONE';
   panelMode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA'  | 'MOVE_AREA_SCAN' | 'RETURN_STOCK_IN' = 'TABLE';
 
+  showMobileAreaStore = false;
+
   stockForm = {
     jobNo: '',
     yearMonth: '',
@@ -488,7 +490,7 @@ export class StorageComponent {
   showMaterialSuggestions = false;
 
   userId: number | null = null;
-
+  role: string = '';
 
 
   
@@ -614,6 +616,7 @@ export class StorageComponent {
   pbassSyncLogs: string[] = [];
 
 
+  
 
   get totalSlots() {
     return this.slots.length;
@@ -674,8 +677,16 @@ export class StorageComponent {
   }
 
 
+  get shouldHideAreaStoreOnMobile(): boolean {
+    if (this.panelMode === 'MOVE_AREA_SCAN') return true;
+  
+    return !this.showMobileAreaStore;
+  }
+
+
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
+    this.role = localStorage.getItem('materialStore_role')!;
 
 
     this.fetchStoreMaster();
@@ -1643,6 +1654,22 @@ searchStockOutItem() {
     this.focusEl(this.scanJobNo);
   }
 
+  setStockInMode(mode: 'MANUAL' | 'SYNC_PBASS') {
+    this.stockInMode = mode;
+  
+    if (mode === 'MANUAL') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+  
+      setTimeout(() => {
+        this.focusScanFirst();
+      }, 250);
+    }
+  }
+
+
   onStockScanEnter(field: StockScanField, ev: any) {
     if (ev?.key === 'Enter') ev.preventDefault();
 
@@ -2023,6 +2050,9 @@ searchStockOutItem() {
 
   setPanelMode(mode: 'TABLE' | 'STOCK_IN' | 'STOCK_OUT' | 'MOVE_AREA'  | 'MOVE_AREA_SCAN' | 'RETURN_STOCK_IN') {
     this.panelMode = mode;
+
+     // ✅ mobile default ให้ปิด Area Store ทุกครั้งที่เปลี่ยน panel
+    this.showMobileAreaStore = false;
   
     // ใช้กับ stock in เดิมเท่านั้น
     if (this.viewMode === 'PENDING') {
@@ -2420,7 +2450,14 @@ searchStockOutItem() {
     this.selectedSlot = null;
     this.viewMode = 'NONE';
 
-    setTimeout(() => this.focusScanFirst(), 0);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    
+    setTimeout(() => {
+      this.focusScanFirst();
+    }, 250);
   }
 
   slotClass(s: SlotRow) {
@@ -3191,8 +3228,8 @@ searchMoveItem() {
           title: 'Stock In Success',
           text: res?.message || 'บันทึก Stock In สำเร็จ'
         }).then(() => {
-          this.resetStockForm();
           this.fetchStorageMap();
+          this.resetStockForm();
         });
       },
       error: (err) => {
@@ -3661,18 +3698,18 @@ searchMoveItem() {
       Swal.fire({
         icon: 'warning',
         title: 'Missing Job',
-        text: 'ไม่พบข้อมูล Job สำหรับการ Denial'
+        text: 'ไม่พบข้อมูล Job สำหรับการ Deny'
       });
       return;
     }
   
     Swal.fire({
       icon: 'warning',
-      title: 'Confirm Denial',
+      title: 'Confirm Deny',
       html: `
         <div style="text-align:left; line-height:1.9;">
           <div style="margin-bottom:10px;">
-            คุณต้องการ <b style="color:#dc2626;">Denial / ยกเลิก Job</b> นี้ใช่หรือไม่
+            คุณต้องการ <b style="color:#dc2626;">Deny / ยกเลิก Job</b> นี้ใช่หรือไม่
           </div>
   
           <div><b>Request Job No:</b> ${this.escapeHtml(this.selectedTransactionJob.jobNo || '-')}</div>
@@ -3682,7 +3719,7 @@ searchMoveItem() {
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'Confirm Denial',
+      confirmButtonText: 'Confirm Deny',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#dc2626'
     }).then((result) => {
@@ -3700,18 +3737,18 @@ searchMoveItem() {
       Swal.fire({
         icon: 'warning',
         title: 'Missing Job',
-        text: 'ไม่พบข้อมูล Job สำหรับการ Denial'
+        text: 'ไม่พบข้อมูล Job สำหรับการ Deny'
       });
       return;
     }
   
     Swal.fire({
       icon: 'warning',
-      title: 'Confirm Denial',
+      title: 'Confirm Deny',
       html: `
         <div style="text-align:left; line-height:1.9;">
           <div style="margin-bottom:10px;">
-            คุณต้องการ <b style="color:#dc2626;">Denial / ยกเลิก Job</b> นี้ใช่หรือไม่
+            คุณต้องการ <b style="color:#dc2626;">Deny / ยกเลิก Job</b> นี้ใช่หรือไม่
           </div>
   
           <div><b>Request Job No:</b> ${this.escapeHtml(this.selectedTransactionJob.jobNo || '-')}</div>
@@ -3721,7 +3758,7 @@ searchMoveItem() {
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'Confirm Denial',
+      confirmButtonText: 'Confirm Deny',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#dc2626'
     }).then((result) => {
@@ -4135,8 +4172,14 @@ searchMoveItem() {
     };
 
     
-  
-    setTimeout(() => this.focusEl(this.returnScanJobNo), 0);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    
+    setTimeout(() => {
+      this.focusEl(this.returnScanJobNo);
+    }, 250);
   }
 
 
@@ -4273,7 +4316,7 @@ searchMoveItem() {
       showCancelButton: true,
       confirmButtonText: 'Confirm Move',
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: false
     });
   
     if (!confirm.isConfirmed) return;
@@ -4336,7 +4379,7 @@ searchMoveItem() {
         this.viewMode = 'NONE';
   
         this.fetchStorageMap();
-        
+
         window.scrollTo({
           top: 0,
           behavior: 'smooth'
@@ -4932,7 +4975,9 @@ searchMoveItem() {
   }
 
 
-
+  toggleMobileAreaStore() {
+    this.showMobileAreaStore = !this.showMobileAreaStore;
+  }
 
 
   private applyDefaultPanelForMobile() {
