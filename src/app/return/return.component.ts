@@ -87,7 +87,7 @@ export class ReturnComponent {
 
   areas: AreaRow[] = [];
   machinesView: string[] = [];
-  lines = ['A', 'B', 'C'];
+  lines = ['A', 'B', 'C', 'D', 'M'];
 
   requestsAll: ReturnRequestRow[] = [];
   requestsView: ReturnRequestRow[] = [];

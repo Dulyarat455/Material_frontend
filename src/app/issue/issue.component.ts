@@ -84,7 +84,7 @@ export class IssueComponent {
 
   areas: AreaRow[] = [];
   machinesView: string[] = [];
-  lines = ['A', 'B', 'C'];
+  lines = ['A', 'B', 'C', 'D', 'M'];
 
   requestsAll: IssueRequestRow[] = [];
   requestsView: IssueRequestRow[] = [];

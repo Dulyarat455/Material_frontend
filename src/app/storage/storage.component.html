@@ -351,7 +351,7 @@
                     class="mode-btn ghost"
                     [class.active]="panelMode === 'TABLE'"
                     (click)="setPanelMode('TABLE')">
-                    Table
+                    Stock
                   </button>
                 </div>
               </div>
@@ -1249,7 +1249,7 @@
                           <td class="text-end">{{ row.qty | number }}</td>
                           <td>{{ row.unit || '-' }}</td>
 
-                          @if (row.stockNote) {
+                          <!-- @if (row.stockNote) {
                             <td class="text-center">
                               <button
                               type="button"
@@ -1262,7 +1262,26 @@
                             </button>
                             </td>
                           }
+                          
                           @if(!row.stockNote){
+                              <td class="text-center"> - </td>
+                          } -->
+
+                          @if (row.remark) {
+                            <td class="text-center">
+                              <button
+                              type="button"
+                              class="remark-icon-btn"
+                              (click)="openRemarkSwal(row.remark)"
+                              [disabled]="!(row.remark || '').trim()"
+                              title="Remark"
+                            >
+                              <i class="fas fa-comment-dots"></i>
+                            </button>
+                            </td>
+                          }
+                          
+                          @if(!row.remark){
                               <td class="text-center"> - </td>
                           }
                           
@@ -1412,7 +1431,8 @@
                           <td class="text-center">{{ row.coil ?? '-' }}</td>
                           <td class="text-center">{{ row.qty | number }}</td>
                           <td>{{ row.unit || '-' }}</td>
-                          @if (row.stockNote) {
+
+                          <!-- @if (row.stockNote) {
                             <td class="text-center">
                               <button
                                 type="button"
@@ -1426,7 +1446,25 @@
                           }
                           @if (!row.stockNote) {
                             <td class="text-center"> - </td>
+                          } -->
+
+
+                          @if (row.remark) {
+                            <td class="text-center">
+                              <button
+                                type="button"
+                                class="remark-icon-btn"
+                                (click)="openRemarkSwal(row.remark)"
+                                [disabled]="!(row.remark || '').trim()"
+                              >
+                                <i class="fas fa-comment-dots"></i>
+                              </button>
+                            </td>
                           }
+                          @if (!row.remark) {
+                            <td class="text-center"> - </td>
+                          }
+
                         </tr>
 
                         <tr *ngIf="!moveRows.length">
@@ -2190,7 +2228,11 @@
                     />
                   </div>
               
-                  <div class="stock-row">
+
+
+                  
+               <!-- Desktop: ใช้ dropdown เหมือนเดิม -->
+                  <div class="stock-row return-area-desktop">
                     <label>Storage Area</label>
                     <div class="storage-area-box">
                       <select
@@ -2204,6 +2246,62 @@
                           {{ a.name }}
                         </option>
                       </select>
+                    </div>
+                  </div>
+
+                  <!-- Mobile: ใช้ Scan Store Code -->
+                  <div class="return-area-mobile">
+                    <div class="form-divider mc-divider">
+                      <span>Scan Storage Area</span>
+                    </div>
+
+                    <div class="stock-row">
+                      <label>Store Code</label>
+
+                      <div class="move-search-group">
+                        <input
+                          #returnScanStorageArea
+                          type="text"
+                          class="scan-input"
+                          placeholder=".▦ Scan storage area here."
+                          [(ngModel)]="returnStorageAreaScan"
+                          (input)="onReturnStorageAreaScanInputChange()"
+                          (keydown.enter)="searchReturnStorageAreaScan()"
+                          name="returnStorageAreaScan"
+                        />
+
+                        <button
+                          type="button"
+                          class="btn-search"
+                          (click)="searchReturnStorageAreaScan()"
+                        >
+                          Search
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      class="return-area-scan-result"
+                      *ngIf="returnStorageAreaScanStatus !== 'idle'"
+                      [class.found]="returnStorageAreaScanStatus === 'found'"
+                      [class.not-found]="returnStorageAreaScanStatus === 'not-found'"
+                    >
+                      <i
+                        class="fas me-2"
+                        [class.fa-check-circle]="returnStorageAreaScanStatus === 'found'"
+                        [class.fa-times-circle]="returnStorageAreaScanStatus === 'not-found'"
+                      ></i>
+
+                      {{ returnStorageAreaScanMessage }}
+                    </div>
+
+                    <div class="move-form-grid stockout-form-grid">
+                      <div class="move-form-row">
+                        <label>Selected Area</label>
+                        <div class="value-box">
+                          {{ returnStockForm.storageArea || '-' }}
+                        </div>
+                      </div>
                     </div>
                   </div>
               

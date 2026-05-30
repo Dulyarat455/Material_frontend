@@ -309,6 +309,7 @@ export class StorageComponent {
 @ViewChild('returnScanSupplier') returnScanSupplier?: ElementRef<HTMLInputElement>;
 @ViewChild('returnScanAmount') returnScanAmount?: ElementRef<HTMLInputElement>;
 
+@ViewChild('returnScanStorageArea') returnScanStorageArea?: ElementRef<HTMLInputElement>;
 
 
 
@@ -423,6 +424,15 @@ export class StorageComponent {
       stockNote: '',
       mcRemark: ''
   };
+
+
+  returnStorageAreaScan = '';
+  returnStorageAreaScanStatus: 'idle' | 'found' | 'not-found' = 'idle';
+  returnStorageAreaScanMessage = '';
+
+
+
+
 
 
 
@@ -2041,7 +2051,7 @@ searchStockOutItem() {
   
       case 'qtyKgsPcs':
         if (!this.returnStockForm.qtyKgsPcs) return;
-        return;
+        return this.focusEl(this.returnScanStorageArea);
     }
   }
 
@@ -2133,6 +2143,10 @@ searchStockOutItem() {
         stockNote: '',
         mcRemark: ''
       };
+
+      this.returnStorageAreaScan = '';
+      this.returnStorageAreaScanStatus = 'idle';
+      this.returnStorageAreaScanMessage = '';
     }
 
 
@@ -2692,7 +2706,8 @@ searchStockOutItem() {
           <div><b>Material Name:</b> ${item.itemName || item.description || '-'}</div>
           <div><b>D/O NO:</b> ${item.invNo || '-'}</div>
           <div><b>ReceivedDate:</b> ${item.receivedAt || '-'}</div>
-           <div><b>Remark:</b> ${item.stockNote || '-'}</div>
+          <div><b>Remark:</b> ${item.remark || '-'}</div>
+           <div><b>StockNote:</b> ${item.stockNote || '-'}</div>
         </div>
       `,
       confirmButtonText: 'Close',
@@ -4171,6 +4186,11 @@ searchMoveItem() {
       mcRemark: ''
     };
 
+
+    this.returnStorageAreaScan = '';
+    this.returnStorageAreaScanStatus = 'idle';
+    this.returnStorageAreaScanMessage = '';
+
     
     window.scrollTo({
       top: 0,
@@ -5413,6 +5433,70 @@ searchMoveItem() {
     this.pbassSubmitStatusFilter = 'all';
     this.pbassSubmitReasonFilter = 'all';
     this.pbassSubmitKindFilter = 'all';
+  }
+
+
+
+
+
+  searchReturnStorageAreaScan() {
+    const code = (this.returnStorageAreaScan || '').trim();
+  
+    this.returnStorageAreaScanStatus = 'idle';
+    this.returnStorageAreaScanMessage = '';
+  
+    if (!code) {
+      this.returnStockForm.storageArea = '';
+      this.returnStorageAreaScanStatus = 'not-found';
+      this.returnStorageAreaScanMessage = 'Please scan or input Storage Area.';
+      return;
+    }
+  
+    const found = this.storeMasters.find(a =>
+      String(a.name || '').trim().toLowerCase() === code.toLowerCase()
+    );
+  
+    if (!found?.name) {
+      this.returnStockForm.storageArea = '';
+      this.returnStorageAreaScanStatus = 'not-found';
+      this.returnStorageAreaScanMessage = `Area "${code}" not found in Store Master.`;
+  
+      Swal.fire({
+        icon: 'warning',
+        title: 'Area Not Found',
+        text: `ไม่พบ Storage Area: ${code}`,
+        timer: 1400,
+        showConfirmButton: false
+      });
+  
+      return;
+    }
+  
+    this.returnStockForm.storageArea = found.name;
+    this.returnStorageAreaScan = found.name;
+    this.returnStorageAreaScanStatus = 'found';
+    this.returnStorageAreaScanMessage = `Found area: ${found.name}`;
+  
+    this.onChangeStorageArea();
+  
+    Swal.fire({
+      icon: 'success',
+      title: 'Area Found',
+      text: `เลือก Storage Area: ${found.name}`,
+      timer: 1000,
+      showConfirmButton: false
+    });
+  }
+
+
+
+  onReturnStorageAreaScanInputChange() {
+    this.returnStorageAreaScanStatus = 'idle';
+    this.returnStorageAreaScanMessage = '';
+  
+    if (!this.returnStorageAreaScan?.trim()) {
+      this.returnStockForm.storageArea = '';
+    }
   }
 
 

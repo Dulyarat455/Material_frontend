@@ -409,6 +409,7 @@
               <th style="width: 130px;">Unit Price</th>
               <th style="width: 140px;">Total Price</th>
               <th style="width: 140px;">Area</th>
+              <th style="width: 220px;">Remark</th>
               <th style="width: 220px;">Stock Note</th>
               <th style="width: 190px;">Time</th>
             </tr>
@@ -431,12 +432,16 @@
               </td>
               <td class="text-end"><div class="material-no">{{ formatNumber(row.totalPrice) }}</div></td>
               <td><div class="account-code">{{ row.area || '-' }}</div></td>
+              <td><div class="material-spec">{{ row.remark || '-' }}</div></td>
+              
+
+
               <td>
                 <div class="stock-note-cell">
                   <ng-container *ngIf="!row.isEditingStockNote; else editStockNoteTpl">
                     <div
                       class="stock-note-view"
-                      (click)="startEditStockNote(row)"
+                      (click)="role === 'admin' && startEditStockNote(row)"
                       [title]="row.stockNote || '-'"
                     >
                       {{ row.stockNote || '-' }}
@@ -483,6 +488,9 @@
                   </ng-template>
                 </div>
               </td>
+
+
+              
               <td><div class="time-text">{{ formatDateTime(row.timeStmp) }}</div></td>
             </tr>
 

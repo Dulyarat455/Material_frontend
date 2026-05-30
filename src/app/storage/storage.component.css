@@ -2279,3 +2279,77 @@ toggle on-off  Store Area
     padding: 8px 10px;
   }
 }
+
+
+
+
+
+
+/* ============================
+   RETURN STOCK IN - Mobile scan area
+============================ */
+
+.return-area-mobile {
+  display: none;
+}
+
+.return-area-desktop {
+  display: grid;
+}
+
+.return-area-scan-result {
+  display: flex;
+  align-items: center;
+  margin: 8px 0 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 900;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.return-area-scan-result.found {
+  background: linear-gradient(180deg, #ecfdf5 0%, #dcfce7 100%);
+  border-color: rgba(22, 163, 74, 0.28);
+  color: #15803d;
+}
+
+.return-area-scan-result.not-found {
+  background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: rgba(220, 38, 38, 0.28);
+  color: #b91c1c;
+}
+
+@media (max-width: 991.98px) {
+  .return-area-desktop {
+    display: none !important;
+  }
+
+  .return-area-mobile {
+    display: block;
+  }
+
+  .return-area-mobile .stock-row {
+    grid-template-columns: 1fr !important;
+    gap: 6px;
+  }
+
+  .return-area-mobile .stock-row label {
+    font-size: 13px;
+  }
+
+  .return-area-mobile .move-search-group {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .return-area-mobile .move-search-group input {
+    min-height: 40px;
+    font-size: 14px;
+  }
+
+  .return-area-mobile .btn-search {
+    min-width: 82px;
+  }
+}

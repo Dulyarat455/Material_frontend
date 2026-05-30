@@ -22,6 +22,7 @@ type InventoryReportRow = {
   area: string;
   stockNote: string;
   timeStmp: string;
+  remark: string;
 
 
    // ui state
@@ -110,11 +111,14 @@ export class InventoryReportComponent {
     area: ''
   };
 
+  role: string = '';
 
   
 
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
+    this.role = localStorage.getItem('materialStore_role')!;
+    
     this.fetchInventoryList();
   }
 
