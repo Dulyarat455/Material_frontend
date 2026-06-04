@@ -12,6 +12,7 @@ type TransactionAllReportRow = {
   materialName: string;
   materialSpec: string;
   lotNo: string;
+  coil: number;
   qty: number;
   type: string;
   inchargeBy: string;

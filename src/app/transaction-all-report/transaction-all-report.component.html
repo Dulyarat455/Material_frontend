@@ -376,6 +376,7 @@
               <th style="width: 220px;">Material Name</th>
               <th style="width: 180px;">Material Spec</th>
               <th style="width: 170px;">Lot No</th>
+              <th style="width: 110px;">Coil</th>
               <th style="width: 120px;">Qty</th>
               <th style="width: 180px;">Area Name</th>
               <th style="width: 150px;">Type</th>
@@ -410,6 +411,10 @@
               </td>
 
               <td class="cell-short text-end">
+                <div class="material-spec">{{ formatNumber(row.coil) }}</div>
+              </td>
+
+              <td class="cell-short text-end">
                 <div class="material-spec">{{ formatNumber(row.qty) }}</div>
               </td>
 
@@ -435,7 +440,7 @@
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="11" class="empty-cell">
+              <td colspan="13" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No transaction data found</div>
@@ -449,7 +454,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="11" class="loading-cell">
+              <td colspan="13" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading transaction data...
