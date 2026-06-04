@@ -424,8 +424,117 @@
               <td><div class="material-name">{{ row.itemName || '-' }}</div></td>
               <td><div class="material-spec">{{ row.itemSpec || '-' }}</div></td>
               <td><div class="material-spec">{{ row.lotNo || '-' }}</div></td>
-              <td class="text-center"><div class="material-spec">{{ formatNumber(row.coil) }}</div></td>
-              <td class="text-end"><div class="material-spec">{{ formatNumber(row.qtyKgsPcs) }}</div></td>
+              <!-- Coil -->
+              <td class="text-center">
+                <div class="editable-number-cell">
+                  <ng-container *ngIf="!row.isEditingCoil; else editCoilTpl">
+                    <div
+                      class="editable-number-view"
+                      [class.can-edit]="role === 'admin'"
+                      (click)="role === 'admin' && startEditCoil(row)"
+                      [title]="formatNumber(row.coil)"
+                    >
+                      {{ formatNumber(row.coil) }}
+                    </div>
+                  </ng-container>
+
+                  <ng-template #editCoilTpl>
+                    <div class="editable-number-edit-wrap" (click)="$event.stopPropagation()">
+                      <input
+                        type="number"
+                        min="0"
+                        class="editable-number-input"
+                        [ngModel]="row.coilDraft"
+                        (ngModelChange)="onCoilDraftChange(row, $event)"
+                        (blur)="onCoilBlur(row)"
+                        [disabled]="!!row.isSavingCoil"
+                        autofocus
+                      />
+
+                      <div class="editable-number-actions" *ngIf="hasCoilChanged(row)">
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-save"
+                          title="Save"
+                          [disabled]="row.isSavingCoil"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="saveCoil(row)"
+                        >
+                          <i class="fa fa-check" *ngIf="!row.isSavingCoil"></i>
+                          <i class="fa fa-spinner fa-spin" *ngIf="row.isSavingCoil"></i>
+                        </button>
+
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-cancel"
+                          title="Cancel"
+                          [disabled]="row.isSavingCoil"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="cancelEditCoil(row)"
+                        >
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>
+                </div>
+              </td>
+
+              <!-- Qty Kgs/Pcs -->
+              <td class="text-end">
+                <div class="editable-number-cell">
+                  <ng-container *ngIf="!row.isEditingQty; else editQtyTpl">
+                    <div
+                      class="editable-number-view text-end"
+                      [class.can-edit]="role === 'admin'"
+                      (click)="role === 'admin' && startEditQty(row)"
+                      [title]="formatNumber(row.qtyKgsPcs)"
+                    >
+                      {{ formatNumber(row.qtyKgsPcs) }}
+                    </div>
+                  </ng-container>
+
+                  <ng-template #editQtyTpl>
+                    <div class="editable-number-edit-wrap" (click)="$event.stopPropagation()">
+                      <input
+                        type="number"
+                        min="0"
+                        class="editable-number-input"
+                        [ngModel]="row.qtyDraft"
+                        (ngModelChange)="onQtyDraftChange(row, $event)"
+                        (blur)="onQtyBlur(row)"
+                        [disabled]="!!row.isSavingQty"
+                        autofocus
+                      />
+
+                      <div class="editable-number-actions" *ngIf="hasQtyChanged(row)">
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-save"
+                          title="Save"
+                          [disabled]="row.isSavingQty"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="saveQty(row)"
+                        >
+                          <i class="fa fa-check" *ngIf="!row.isSavingQty"></i>
+                          <i class="fa fa-spinner fa-spin" *ngIf="row.isSavingQty"></i>
+                        </button>
+
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-cancel"
+                          title="Cancel"
+                          [disabled]="row.isSavingQty"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="cancelEditQty(row)"
+                        >
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>
+                </div>
+              </td>
               <td><div class="material-spec">{{ row.unit || '-' }}</div></td>
               <td class="text-end">
                 <div class="material-no">{{ formatNumber(row.unitPrice,2) }}</div>
@@ -495,7 +604,7 @@
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="15" class="empty-cell">
+              <td colspan="16" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No inventory data found</div>
@@ -509,7 +618,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="15" class="loading-cell">
+              <td colspan="16" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading inventory data...

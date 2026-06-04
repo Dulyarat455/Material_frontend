@@ -30,6 +30,19 @@ type InventoryReportRow = {
   stockNoteDraft?: string;
   originalStockNote?: string;
   isSavingStockNote?: boolean;
+
+
+  // ui state: Coil
+  isEditingCoil?: boolean;
+  coilDraft?: number | string;
+  originalCoil?: number;
+  isSavingCoil?: boolean;
+
+  // ui state: Qty
+  isEditingQty?: boolean;
+  qtyDraft?: number | string;
+  originalQty?: number;
+  isSavingQty?: boolean;
 };
 
 
@@ -713,6 +726,242 @@ saveStockNote(row: InventoryReportRow) {
     }
   });
 }
+
+
+
+
+startEditCoil(row: InventoryReportRow) {
+  if (this.role !== 'admin') return;
+  if (row.isSavingCoil) return;
+
+  this.filteredRows.forEach(r => {
+    if (r !== row) {
+      if (r.isEditingCoil) this.cancelEditCoil(r);
+      if (r.isEditingQty) this.cancelEditQty(r);
+      if (r.isEditingStockNote) this.cancelEditStockNote(r);
+    }
+  });
+
+  row.isEditingCoil = true;
+  row.originalCoil = Number(row.coil || 0);
+  row.coilDraft = Number(row.coil || 0);
+}
+
+onCoilDraftChange(row: InventoryReportRow, value: string) {
+  row.coilDraft = value;
+}
+
+hasCoilChanged(row: InventoryReportRow): boolean {
+  return Number(row.coilDraft || 0) !== Number(row.originalCoil || 0);
+}
+
+onCoilBlur(row: InventoryReportRow) {
+  setTimeout(() => {
+    if (!row.isEditingCoil) return;
+
+    if (!this.hasCoilChanged(row)) {
+      this.cancelEditCoil(row);
+    }
+  }, 150);
+}
+
+cancelEditCoil(row: InventoryReportRow) {
+  row.coilDraft = row.originalCoil ?? row.coil ?? 0;
+  row.isEditingCoil = false;
+  row.isSavingCoil = false;
+}
+
+private syncEditedCoil(incomingId: number, coil: number) {
+  this.inventoryRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.coil = coil;
+      r.originalCoil = coil;
+      r.coilDraft = coil;
+      r.isEditingCoil = false;
+      r.isSavingCoil = false;
+    }
+  });
+
+  this.filteredRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.coil = coil;
+      r.originalCoil = coil;
+      r.coilDraft = coil;
+      r.isEditingCoil = false;
+      r.isSavingCoil = false;
+    }
+  });
+}
+
+
+
+saveCoil(row: InventoryReportRow) {
+  if (this.role !== 'admin') return;
+  if (row.isSavingCoil) return;
+  if (!this.hasCoilChanged(row)) return;
+
+  const coilValue = Number(row.coilDraft);
+
+  if (Number.isNaN(coilValue) || coilValue < 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Coil',
+      text: 'กรุณากรอก Coil เป็นตัวเลขที่ถูกต้อง'
+    });
+    return;
+  }
+
+  row.isSavingCoil = true;
+
+  const body = {
+    userId: this.userId,
+    incomingId: row.incomingId,
+    coil: coilValue
+  };
+
+  this.http.post<any>(`${config.apiServer}/api/inventory/editCoil`, body).subscribe({
+    next: async () => {
+      this.syncEditedCoil(row.incomingId, coilValue);
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: 'แก้ไข Coil เรียบร้อยแล้ว',
+        timer: 1000,
+        showConfirmButton: false
+      });
+    },
+    error: async (err) => {
+      console.error('saveCoil error:', err);
+      row.isSavingCoil = false;
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err?.error?.message || err?.error?.error || 'ไม่สามารถบันทึก Coil ได้'
+      });
+    }
+  });
+}
+
+
+
+
+
+startEditQty(row: InventoryReportRow) {
+  if (this.role !== 'admin') return;
+  if (row.isSavingQty) return;
+
+  this.filteredRows.forEach(r => {
+    if (r !== row) {
+      if (r.isEditingCoil) this.cancelEditCoil(r);
+      if (r.isEditingQty) this.cancelEditQty(r);
+      if (r.isEditingStockNote) this.cancelEditStockNote(r);
+    }
+  });
+
+  row.isEditingQty = true;
+  row.originalQty = Number(row.qtyKgsPcs || 0);
+  row.qtyDraft = Number(row.qtyKgsPcs || 0);
+}
+
+onQtyDraftChange(row: InventoryReportRow, value: string) {
+  row.qtyDraft = value;
+}
+
+hasQtyChanged(row: InventoryReportRow): boolean {
+  return Number(row.qtyDraft || 0) !== Number(row.originalQty || 0);
+}
+
+onQtyBlur(row: InventoryReportRow) {
+  setTimeout(() => {
+    if (!row.isEditingQty) return;
+
+    if (!this.hasQtyChanged(row)) {
+      this.cancelEditQty(row);
+    }
+  }, 150);
+}
+
+cancelEditQty(row: InventoryReportRow) {
+  row.qtyDraft = row.originalQty ?? row.qtyKgsPcs ?? 0;
+  row.isEditingQty = false;
+  row.isSavingQty = false;
+}
+
+private syncEditedQty(incomingId: number, qty: number) {
+  this.inventoryRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.qtyKgsPcs = qty;
+      r.totalPrice = Number(qty || 0) * Number(r.unitPrice || 0);
+      r.originalQty = qty;
+      r.qtyDraft = qty;
+      r.isEditingQty = false;
+      r.isSavingQty = false;
+    }
+  });
+
+  this.filteredRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.qtyKgsPcs = qty;
+      r.totalPrice = Number(qty || 0) * Number(r.unitPrice || 0);
+      r.originalQty = qty;
+      r.qtyDraft = qty;
+      r.isEditingQty = false;
+      r.isSavingQty = false;
+    }
+  });
+}
+
+saveQty(row: InventoryReportRow) {
+  if (this.role !== 'admin') return;
+  if (row.isSavingQty) return;
+  if (!this.hasQtyChanged(row)) return;
+
+  const qtyValue = Number(row.qtyDraft);
+
+  if (Number.isNaN(qtyValue) || qtyValue < 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Qty',
+      text: 'กรุณากรอก Qty เป็นตัวเลขที่ถูกต้อง'
+    });
+    return;
+  }
+
+  row.isSavingQty = true;
+
+  const body = {
+    userId: this.userId,
+    incomingId: row.incomingId,
+    qty: qtyValue
+  };
+
+  this.http.post<any>(`${config.apiServer}/api/inventory/editQty`, body).subscribe({
+    next: async () => {
+      this.syncEditedQty(row.incomingId, qtyValue);
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: 'แก้ไข Qty เรียบร้อยแล้ว',
+        timer: 1000,
+        showConfirmButton: false
+      });
+    },
+    error: async (err) => {
+      console.error('saveQty error:', err);
+      row.isSavingQty = false;
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err?.error?.message || err?.error?.error || 'ไม่สามารถบันทึก Qty ได้'
+      });
+    }
+  });
+}
+
 
 
 

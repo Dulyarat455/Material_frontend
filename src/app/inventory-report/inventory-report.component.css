@@ -759,3 +759,68 @@ Summary part
     font-size: 14px;
   }
 }
+
+
+
+
+/* =============================
+Editable Coil / Qty
+============================= */
+
+.editable-number-cell {
+  width: 100%;
+}
+
+.editable-number-view {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+.editable-number-view.text-end {
+  justify-content: flex-end;
+}
+
+.editable-number-view.can-edit {
+  cursor: pointer;
+}
+
+.editable-number-view.can-edit:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.editable-number-edit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editable-number-input {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  padding: 6px 10px;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.editable-number-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
