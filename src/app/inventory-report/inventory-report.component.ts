@@ -23,6 +23,7 @@ type InventoryReportRow = {
   stockNote: string;
   timeStmp: string;
   remark: string;
+  notControl: string;
 
 
    // ui state
@@ -43,6 +44,9 @@ type InventoryReportRow = {
   qtyDraft?: number | string;
   originalQty?: number;
   isSavingQty?: boolean;
+
+  // ui state: Not Control
+  isSavingNotControl?: boolean;
 };
 
 
@@ -186,7 +190,7 @@ export class InventoryReportComponent {
     });
   }
 
-  
+
 
   
 
@@ -962,6 +966,78 @@ saveQty(row: InventoryReportRow) {
 }
 
 
+
+
+
+private syncEditedNotControl(incomingId: number, controlKey: string) {
+  this.inventoryRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.notControl = controlKey;
+      r.isSavingNotControl = false;
+    }
+  });
+
+  this.filteredRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.notControl = controlKey;
+      r.isSavingNotControl = false;
+    }
+  });
+}
+
+
+
+onToggleNotControl(row: InventoryReportRow, event: Event) {
+  if (this.role !== 'admin') {
+    event.preventDefault();
+    return;
+  }
+
+  if (row.isSavingNotControl) {
+    event.preventDefault();
+    return;
+  }
+
+  const input = event.target as HTMLInputElement;
+  const checked = input.checked;
+  const oldValue = row.notControl || '';
+  const controlKey = checked ? 'yes' : '';
+
+  row.isSavingNotControl = true;
+
+  const body = {
+    userId: this.userId,
+    incomingId: row.incomingId,
+    controlKey
+  };
+
+  this.http.post<any>(`${config.apiServer}/api/inventory/editNotControl`, body).subscribe({
+    next: async () => {
+      this.syncEditedNotControl(row.incomingId, controlKey);
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: checked ? 'ตั้งค่า Not Control เรียบร้อยแล้ว' : 'ยกเลิก Not Control เรียบร้อยแล้ว',
+        timer: 900,
+        showConfirmButton: false
+      });
+    },
+    error: async (err) => {
+      console.error('editNotControl error:', err);
+
+      row.notControl = oldValue;
+      row.isSavingNotControl = false;
+      input.checked = oldValue === 'yes';
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err?.error?.message || err?.error?.error || 'ไม่สามารถบันทึก Not Control ได้'
+      });
+    }
+  });
+}
 
 
 

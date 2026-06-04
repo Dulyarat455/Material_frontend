@@ -411,6 +411,7 @@
               <th style="width: 140px;">Area</th>
               <th style="width: 220px;">Remark</th>
               <th style="width: 220px;">Stock Note</th>
+              <th style="width: 130px;">Not Control</th>
               <th style="width: 190px;">Time</th>
             </tr>
           </thead>
@@ -598,13 +599,36 @@
                 </div>
               </td>
 
-
+              <td class="text-center">
+                <div class="not-control-cell">
+                  <label class="not-control-check-wrap">
+                    <input
+                      type="checkbox"
+                      class="not-control-checkbox"
+                      [checked]="row.notControl === 'yes'"
+                      [disabled]="role !== 'admin' || !!row.isSavingNotControl"
+                      (change)="onToggleNotControl(row, $event)"
+                    />
+              
+                    <span class="not-control-box">
+                      <i
+                        class="fa"
+                        [class.fa-check]="row.notControl === 'yes' && !row.isSavingNotControl"
+                        [class.fa-spinner]="row.isSavingNotControl"
+                        [class.fa-spin]="row.isSavingNotControl"
+                      ></i>
+                    </span>
+                  </label>
+                </div>
+              </td>
+              
+             
               
               <td><div class="time-text">{{ formatDateTime(row.timeStmp) }}</div></td>
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="16" class="empty-cell">
+              <td colspan="17" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No inventory data found</div>
@@ -618,7 +642,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="16" class="loading-cell">
+              <td colspan="17" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading inventory data...
