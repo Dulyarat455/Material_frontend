@@ -382,6 +382,7 @@
               <th style="width: 150px;">Type</th>
               <th style="width: 240px;">Incharge By</th>
               <th style="width: 260px;">Remark</th>
+              <th style="width: 130px;">Not Control</th>
               <th style="width: 220px;">Time</th>
             </tr>
           </thead>
@@ -434,13 +435,27 @@
                 <div class="time-text">{{ row.remark || '-' }}</div>
               </td>
 
+              
+              <td class="cell-short text-center">
+                <div class="not-control-display">
+                  <span
+                    class="not-control-box"
+                    [class.checked]="row.notControl === 'yes'"
+                    [title]="row.notControl === 'yes' ? 'Not Control' : 'Control'"
+                  >
+                    <i class="fa fa-check" *ngIf="row.notControl === 'yes'"></i>
+                  </span>
+                </div>
+              </td>
+              
+
               <td class="cell-date">
                 <div class="time-text">{{ formatDateTime(row.time) }}</div>
               </td>
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="13" class="empty-cell">
+              <td colspan="14" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No transaction data found</div>
@@ -454,7 +469,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="13" class="loading-cell">
+              <td colspan="14" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading transaction data...
