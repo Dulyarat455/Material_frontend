@@ -339,57 +339,122 @@
 
 
       <!-- ✅ Summary ตาม UNIT และอ้างอิงตาม filteredRows -->
-      <div class="inventory-summary-strip" *ngIf="!isLoading && filteredRows.length">
-        <div class="summary-title">Total</div>
+      <div class="inventory-summary-split" *ngIf="!isLoading && filteredRows.length">
 
-        <div class="summary-unit-list">
-          <div class="summary-unit-row" *ngFor="let s of unitSummaryRows">
-
-              <!-- ✅ แสดงจำนวน PALLET เฉพาะ KGS -->
-            <ng-container *ngIf="s.unit.toUpperCase() === 'KGS'; else emptyPalletTpl">
-              <div class="summary-pallet-value">
-                {{ formatNumber(s.palletCount) }}
-              </div>
-
-              <div class="summary-pallet-unit">
-                PALLET
-              </div>
-            </ng-container>
-
-            <ng-template #emptyPalletTpl>
-              <div></div>
-              <div></div>
-            </ng-template>
-
-            <div class="summary-value">
-              {{ formatNumber(s.totalQty) }}
-            </div>
-
-            <div class="summary-unit">
-              {{ s.unit }}
-            </div>
-
-            <div class="summary-value">
-              {{ formatNumber(s.totalPrice) }}
-            </div>
-
-            <div class="summary-currency">
-              Baht
+        <!-- Control -->
+        <div class="summary-card summary-card-control">
+          <div class="summary-card-head">
+            <div class="summary-title">Control</div>
+            <div class="summary-count">
+              {{ formatNumber(controlRows.length) }} Items
             </div>
           </div>
-
-          <div class="summary-grand-row">
-            <div class="summary-grand-spacer"></div>
-
-            <div class="summary-grand-value">
-              {{ formatNumber(grandTotalPriceByUnit) }}
+      
+          <div class="summary-unit-list">
+            <div class="summary-unit-row" *ngFor="let s of controlUnitSummaryRows">
+              <ng-container *ngIf="s.unit.toUpperCase() === 'KGS'; else emptyControlPalletTpl">
+                <div class="summary-pallet-value">
+                  {{ formatNumber(s.palletCount) }}
+                </div>
+      
+                <div class="summary-pallet-unit">
+                  PALLET
+                </div>
+              </ng-container>
+      
+              <ng-template #emptyControlPalletTpl>
+                <div></div>
+                <div></div>
+              </ng-template>
+      
+              <div class="summary-value">
+                {{ formatNumber(s.totalQty) }}
+              </div>
+      
+              <div class="summary-unit">
+                {{ s.unit }}
+              </div>
+      
+              <div class="summary-value">
+                {{ formatNumber(s.totalPrice) }}
+              </div>
+      
+              <div class="summary-currency">
+                Baht
+              </div>
             </div>
-
-            <div class="summary-currency">
-              Baht
+      
+            <div class="summary-grand-row">
+              <div class="summary-grand-spacer"></div>
+      
+              <div class="summary-grand-value">
+                {{ formatNumber(controlGrandTotalPrice) }}
+              </div>
+      
+              <div class="summary-currency">
+                Baht
+              </div>
             </div>
           </div>
         </div>
+      
+        <!-- Not Control -->
+        <div class="summary-card summary-card-not-control">
+          <div class="summary-card-head">
+            <div class="summary-title not-control-title">Not Control</div>
+            <div class="summary-count">
+              {{ formatNumber(notControlRows.length) }} Items
+            </div>
+          </div>
+      
+          <div class="summary-unit-list">
+            <div class="summary-unit-row" *ngFor="let s of notControlUnitSummaryRows">
+              <ng-container *ngIf="s.unit.toUpperCase() === 'KGS'; else emptyNotControlPalletTpl">
+                <div class="summary-pallet-value">
+                  {{ formatNumber(s.palletCount) }}
+                </div>
+      
+                <div class="summary-pallet-unit">
+                  PALLET
+                </div>
+              </ng-container>
+      
+              <ng-template #emptyNotControlPalletTpl>
+                <div></div>
+                <div></div>
+              </ng-template>
+      
+              <div class="summary-value">
+                {{ formatNumber(s.totalQty) }}
+              </div>
+      
+              <div class="summary-unit">
+                {{ s.unit }}
+              </div>
+      
+              <div class="summary-value">
+                {{ formatNumber(s.totalPrice) }}
+              </div>
+      
+              <div class="summary-currency">
+                Baht
+              </div>
+            </div>
+      
+            <div class="summary-grand-row">
+              <div class="summary-grand-spacer"></div>
+      
+              <div class="summary-grand-value">
+                {{ formatNumber(notControlGrandTotalPrice) }}
+              </div>
+      
+              <div class="summary-currency">
+                Baht
+              </div>
+            </div>
+          </div>
+        </div>
+      
       </div>
 
       <div class="table-wrap">

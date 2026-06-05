@@ -151,11 +151,47 @@ export class InventoryReportComponent {
   
     return d.getTime();
   }
+
+
+
+  private readonly areaSortPriority = [
+    'Pending',
+    '1101', '1102', '1103', '1104', '1105', '1106',
+    '1107', '1108', '1109', '1110', '1111',
+    '1201', '1202', '1203', '1204', '1205', '1206',
+    '1207', '1208', '1209', '1210', '1211',
+    '2101', '2102', '2103', '2104', '2105', '2106',
+    '2201', '2202', '2203', '2204', '2205', '2206',
+    '3101', '3102', '3103', '3104', '3105', '3106',
+    '3201', '3202', '3203', '3204', '3205', '3206',
+    'Chemical'
+  ];
+  
+  private getAreaSortIndex(area: string): number {
+    const areaText = String(area || '').trim();
+  
+    const index = this.areaSortPriority.findIndex(
+      x => x.toLowerCase() === areaText.toLowerCase()
+    );
+  
+    return index >= 0 ? index : 9999;
+  }
   
 
 
   private sortInventoryRows(rows: InventoryReportRow[]): InventoryReportRow[] {
     return [...rows].sort((a, b) => {
+      // 1) Control มาก่อน Not Control
+      // notControl !== 'yes' => 0
+      // notControl === 'yes' => 1
+      const controlA = a.notControl === 'yes' ? 1 : 0;
+      const controlB = b.notControl === 'yes' ? 1 : 0;
+  
+      if (controlA !== controlB) {
+        return controlA - controlB;
+      }
+  
+      // 2) Sort by Item Name
       const nameCompare = String(a.itemName || '').localeCompare(
         String(b.itemName || ''),
         undefined,
@@ -169,6 +205,7 @@ export class InventoryReportComponent {
         return nameCompare;
       }
   
+      // 3) Sort by Item Spec
       const specCompare = String(a.itemSpec || '').localeCompare(
         String(b.itemSpec || ''),
         undefined,
@@ -182,7 +219,29 @@ export class InventoryReportComponent {
         return specCompare;
       }
   
-      // ถ้า MaterialName และ Spec เท่ากัน ค่อยเรียงตามเวลาเก่า -> ใหม่
+      // 4) Sort by Area Priority
+      const areaA = this.getAreaSortIndex(a.area);
+      const areaB = this.getAreaSortIndex(b.area);
+  
+      if (areaA !== areaB) {
+        return areaA - areaB;
+      }
+  
+      // ถ้า Area ไม่อยู่ใน priority list ให้เรียง A-Z ต่อ
+      const areaTextCompare = String(a.area || '').localeCompare(
+        String(b.area || ''),
+        undefined,
+        {
+          numeric: true,
+          sensitivity: 'base'
+        }
+      );
+  
+      if (areaTextCompare !== 0) {
+        return areaTextCompare;
+      }
+  
+      // 5) ถ้ายังเท่ากัน ค่อยเรียงตามเวลาเก่า -> ใหม่
       const timeA = this.getTimeSortValue(a.timeStmp);
       const timeB = this.getTimeSortValue(b.timeStmp);
   
@@ -1064,10 +1123,24 @@ onToggleNotControl(row: InventoryReportRow, event: Event) {
     });
   }
 
-  get unitSummaryRows(): InventoryUnitSummaryRow[] {
+
+  private getUnitSortPriority(unit: string): number {
+    const u = String(unit || '').trim().toUpperCase();
+  
+    if (u === 'KGS') return 0;   // บนสุด
+    if (u === 'PAL') return 90;   // ก่อน DRM
+    if (u === 'DRM') return 100;  // ล่างสุด
+  
+    return 10; // unit อื่น ๆ อยู่ต่อจาก KGS และก่อน PAL/DRM
+  }
+
+
+
+
+  private buildUnitSummaryRows(rows: InventoryReportRow[]): InventoryUnitSummaryRow[] {
     const map = new Map<string, InventoryUnitSummaryRow>();
   
-    (this.filteredRows || []).forEach((row) => {
+    (rows || []).forEach((row) => {
       const unit = String(row.unit || '').trim() || '-';
   
       if (!map.has(unit)) {
@@ -1082,25 +1155,62 @@ onToggleNotControl(row: InventoryReportRow, event: Event) {
       const item = map.get(unit)!;
       item.totalQty += Number(row.qtyKgsPcs || 0);
       item.totalPrice += Number(row.totalPrice || 0);
-
-        // ✅ นับจำนวนแถวเฉพาะ UNIT = KGS
+  
       if (unit.toUpperCase() === 'KGS') {
         item.palletCount += 1;
       }
-
-
     });
   
-    return Array.from(map.values()).sort((a, b) =>
-      a.unit.localeCompare(b.unit)
-    );
+    return Array.from(map.values()).sort((a, b) => {
+      const priorityA = this.getUnitSortPriority(a.unit);
+      const priorityB = this.getUnitSortPriority(b.unit);
+    
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+    
+      return String(a.unit || '').localeCompare(
+        String(b.unit || ''),
+        undefined,
+        {
+          numeric: true,
+          sensitivity: 'base'
+        }
+      );
+    });
   }
   
-  get grandTotalPriceByUnit(): number {
-    return this.unitSummaryRows.reduce((sum, row) => {
+  get controlRows(): InventoryReportRow[] {
+    return (this.filteredRows || []).filter(row => row.notControl !== 'yes');
+  }
+  
+  get notControlRows(): InventoryReportRow[] {
+    return (this.filteredRows || []).filter(row => row.notControl === 'yes');
+  }
+  
+  get controlUnitSummaryRows(): InventoryUnitSummaryRow[] {
+    return this.buildUnitSummaryRows(this.controlRows);
+  }
+  
+  get notControlUnitSummaryRows(): InventoryUnitSummaryRow[] {
+    return this.buildUnitSummaryRows(this.notControlRows);
+  }
+  
+  get controlGrandTotalPrice(): number {
+    return this.controlUnitSummaryRows.reduce((sum, row) => {
       return sum + Number(row.totalPrice || 0);
     }, 0);
   }
+  
+  get notControlGrandTotalPrice(): number {
+    return this.notControlUnitSummaryRows.reduce((sum, row) => {
+      return sum + Number(row.totalPrice || 0);
+    }, 0);
+  }
+
+
+
+
 
   trackByInventory(_index: number, row: InventoryReportRow) {
     return row.transactionStoreId;

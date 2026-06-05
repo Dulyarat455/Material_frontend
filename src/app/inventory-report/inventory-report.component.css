@@ -622,34 +622,70 @@ export Button
 Summary part
 ============================= */
 
-.inventory-summary-strip {
-  display: flex;
-  align-items: flex-start;
-  gap: 22px;
+/* =============================
+Summary Split: Control / Not Control
+============================= */
 
-  padding: 12px 16px;
+.inventory-summary-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+
+  padding: 14px 16px;
   background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   border-bottom: 1px solid rgba(2, 6, 23, 0.08);
   border-top: 1px solid rgba(37, 99, 235, 0.08);
+}
 
-  color: #0f172a;
-  font-size: 14px;
-  font-weight: 800;
+.summary-card {
+  min-width: 0;
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 12px 14px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+.summary-card-control {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.summary-card-not-control {
+  background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+  border-color: rgba(249, 115, 22, 0.20);
+}
+
+.summary-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .summary-title {
-  min-width: 78px;
+  min-width: 110px;
   padding: 6px 12px;
-
   border-radius: 999px;
   background: rgba(37, 99, 235, 0.10);
   color: #1d4ed8;
-
   font-size: 13px;
   font-weight: 900;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.summary-title.not-control-title {
+  background: rgba(249, 115, 22, 0.12);
+  color: #ea580c;
+}
+
+.summary-count {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .summary-unit-list {
@@ -665,7 +701,6 @@ Summary part
   grid-template-columns: 70px 70px 130px 70px 150px 70px;
   align-items: center;
   column-gap: 8px;
-
   min-height: 30px;
   line-height: 1.25;
 }
@@ -696,7 +731,6 @@ Summary part
 .summary-unit {
   text-align: left;
   white-space: nowrap;
-
   color: #2563eb;
   font-size: 13px;
   font-weight: 900;
@@ -705,7 +739,6 @@ Summary part
 .summary-currency {
   text-align: left;
   white-space: nowrap;
-
   color: #64748b;
   font-size: 13px;
   font-weight: 800;
@@ -727,10 +760,20 @@ Summary part
   font-size: 15px;
 }
 
+@media (max-width: 1200px) {
+  .inventory-summary-split {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  .inventory-summary-strip {
+  .inventory-summary-split {
+    padding: 12px;
+  }
+
+  .summary-card-head {
+    align-items: flex-start;
     flex-direction: column;
-    gap: 10px;
   }
 
   .summary-title {
@@ -999,3 +1042,7 @@ Freeze Material No / Item Name / Spec to left
 .material-table tbody td:nth-child(6) {
   box-shadow: 3px 0 0 rgba(148, 163, 184, 0.35);
 }
+
+
+
+
