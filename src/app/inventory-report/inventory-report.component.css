@@ -934,3 +934,68 @@ Not Control Checkbox
 .not-control-check-wrap:hover .not-control-box {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
+
+
+
+
+/* =============================
+Freeze Material No / Item Name / Spec to left
+============================= */
+
+/* Material No */
+.material-table thead th:nth-child(4),
+.material-table tbody td:nth-child(4) {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+}
+
+/* Item Name */
+.material-table thead th:nth-child(5),
+.material-table tbody td:nth-child(5) {
+  position: sticky;
+  left: 180px; /* Material No width */
+  z-index: 20;
+}
+
+/* Spec */
+.material-table thead th:nth-child(6),
+.material-table tbody td:nth-child(6) {
+  position: sticky;
+  left: 400px; /* Material No 180 + Item Name 220 */
+  z-index: 20;
+}
+
+/* Header sticky */
+.material-table thead th:nth-child(4),
+.material-table thead th:nth-child(5),
+.material-table thead th:nth-child(6) {
+  z-index: 40;
+  background: #5b8fc9;
+}
+
+/* Body background ต้องกำหนดเอง ไม่ใช้ inherit */
+.material-table tbody tr:nth-child(odd) td:nth-child(4),
+.material-table tbody tr:nth-child(odd) td:nth-child(5),
+.material-table tbody tr:nth-child(odd) td:nth-child(6) {
+  background: #dbe7f3;
+}
+
+.material-table tbody tr:nth-child(even) td:nth-child(4),
+.material-table tbody tr:nth-child(even) td:nth-child(5),
+.material-table tbody tr:nth-child(even) td:nth-child(6) {
+  background: #ffffff;
+}
+
+/* Hover background ของ frozen columns */
+.material-table tbody tr:hover td:nth-child(4),
+.material-table tbody tr:hover td:nth-child(5),
+.material-table tbody tr:hover td:nth-child(6) {
+  background: #cdddf0;
+}
+
+/* เส้นแบ่งขวาสุดของ column frozen */
+.material-table thead th:nth-child(6),
+.material-table tbody td:nth-child(6) {
+  box-shadow: 3px 0 0 rgba(148, 163, 184, 0.35);
+}
