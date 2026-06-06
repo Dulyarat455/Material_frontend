@@ -67,7 +67,8 @@ type FilterKey =
   | 'itemName'
   | 'spec'
   | 'lotNo'
-  | 'area';
+  | 'area'
+  | 'notControl';
 
 @Component({
   selector: 'app-inventory-report',
@@ -92,6 +93,7 @@ export class InventoryReportComponent {
   lotNoFilter = 'all';
   areaFilter = 'all';
   recivedDateFilter = 'all';
+  notControlFilter = 'all';
 
 
   inventoryRows: InventoryReportRow[] = [];
@@ -104,7 +106,7 @@ export class InventoryReportComponent {
   lotNoOptions: string[] = [];
   areaOptions: string[] = [];
   recivedDateOptions: string[] = [];
-
+  notControlOptions: string[] = [];
 
   userId: number | null = null;
 
@@ -115,7 +117,8 @@ export class InventoryReportComponent {
     itemName: false,
     spec: false,
     lotNo: false,
-    area: false
+    area: false,
+    notControl: false
   };
 
   dropdownSearch: Record<FilterKey, string> = {
@@ -125,7 +128,8 @@ export class InventoryReportComponent {
     itemName: '',
     spec: '',
     lotNo: '',
-    area: ''
+    area: '',
+    notControl: ''
   };
 
   role: string = '';
@@ -292,6 +296,7 @@ export class InventoryReportComponent {
     this.lotNoFilter = 'all';
     this.areaFilter = 'all';
     this.recivedDateFilter = 'all';
+    this.notControlFilter = 'all';
 
     this.dropdownSearch.jobNo = '';
     this.dropdownSearch.materialNo = '';
@@ -300,6 +305,7 @@ export class InventoryReportComponent {
     this.dropdownSearch.lotNo = '';
     this.dropdownSearch.area = '';
     this.dropdownSearch.recivedDate = '';
+    this.dropdownSearch.notControl = '';
 
     this.closeAllDropdowns();
     this.applyFilter();
@@ -313,6 +319,7 @@ export class InventoryReportComponent {
     this.lotNoOptions = [];
     this.areaOptions = [];
     this.recivedDateOptions = [];
+    this.notControlOptions = [];
   }
 
   private buildUniqueOptions(values: any[]): string[] {
@@ -345,6 +352,13 @@ export class InventoryReportComponent {
 
     return matchStartDate && matchEndDate;
   }
+
+
+  private getNotControlLabel(row: InventoryReportRow): string {
+    return row.notControl === 'yes' ? 'Not Control' : 'Control';
+  }
+
+
 
   private rowMatchesFilter(row: InventoryReportRow, excludeKey?: FilterKey): boolean {
     if (!this.matchDateRange(row)) return false;
@@ -384,6 +398,18 @@ export class InventoryReportComponent {
       this.areaFilter === 'all' ||
       (row.area || '') === this.areaFilter;
 
+
+    const matchNotControl =
+      excludeKey === 'notControl' ||
+      this.notControlFilter === 'all' ||
+      (
+        this.notControlFilter === 'Not Control'
+          ? row.notControl === 'yes'
+          : row.notControl !== 'yes'
+      );
+
+    
+
     return (
       matchJobNo &&
       matchRecivedDate &&
@@ -391,7 +417,8 @@ export class InventoryReportComponent {
       matchItemName &&
       matchSpec &&
       matchLotNo &&
-      matchArea
+      matchArea &&
+      matchNotControl
     );
   }
 
@@ -437,6 +464,13 @@ export class InventoryReportComponent {
         .filter(row => this.rowMatchesFilter(row, 'area'))
         .map(x => x.area)
     );
+
+    this.notControlOptions = this.buildUniqueOptions(
+      this.inventoryRows
+        .filter(row => this.rowMatchesFilter(row, 'notControl'))
+        .map(row => this.getNotControlLabel(row))
+    );
+
   }
 
   private syncInvalidSelectedFilters() {
@@ -474,6 +508,13 @@ export class InventoryReportComponent {
       this.areaFilter = 'all';
       this.dropdownSearch.area = '';
     }
+
+    if (this.notControlFilter !== 'all' && !this.notControlOptions.includes(this.notControlFilter)) {
+      this.notControlFilter = 'all';
+      this.dropdownSearch.notControl = '';
+    }
+
+
   }
 
   applyFilter() {
@@ -495,6 +536,7 @@ export class InventoryReportComponent {
       case 'spec': return this.specOptions;
       case 'lotNo': return this.lotNoOptions;
       case 'area': return this.areaOptions;
+      case 'notControl': return this.notControlOptions;
     }
   }
 
@@ -507,6 +549,7 @@ export class InventoryReportComponent {
       case 'spec': return this.specFilter;
       case 'lotNo': return this.lotNoFilter;
       case 'area': return this.areaFilter;
+      case 'notControl': return this.notControlFilter;
     }
   }
 
@@ -519,6 +562,7 @@ export class InventoryReportComponent {
       case 'spec': this.specFilter = value; break;
       case 'lotNo': this.lotNoFilter = value; break;
       case 'area': this.areaFilter = value; break;
+      case 'notControl': this.notControlFilter = value; break;
     }
   }
 
@@ -641,7 +685,8 @@ export class InventoryReportComponent {
       itemName: this.itemNameFilter || 'all',
       spec: this.specFilter || 'all',
       lotNo: this.lotNoFilter || 'all',
-      area: this.areaFilter || 'all'
+      area: this.areaFilter || 'all',
+      notControl: this.notControlFilter || 'all'
     };
   }
 

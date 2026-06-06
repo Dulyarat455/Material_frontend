@@ -315,6 +315,44 @@
           </div>
         </div>
 
+
+
+        <!-- Not Control -->
+        <div class="filter-box">
+          <label class="filter-label">Not Control</label>
+          <div class="smart-dropdown" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              class="form-control filter-input"
+              placeholder="Select Not Control."
+              [ngModel]="getDisplayedInputValue('notControl')"
+              (focus)="onDropdownFocus('notControl')"
+              (ngModelChange)="onDropdownInput('notControl', $event)"
+              (keydown)="onDropdownKeydown('notControl', $event)"
+              (blur)="onDropdownBlur('notControl')"
+            />
+
+            <div class="dropdown-panel" *ngIf="dropdownOpen.notControl">
+              <div class="dropdown-option dropdown-option-all" (mousedown)="clearDropdownSelection('notControl')">
+                All
+              </div>
+
+              <div
+                class="dropdown-option"
+                *ngFor="let x of getFilteredDropdownOptions('notControl')"
+                (mousedown)="selectDropdownOption('notControl', x)"
+              >
+                {{ x }}
+              </div>
+
+              <div class="dropdown-empty" *ngIf="!getFilteredDropdownOptions('notControl').length">
+                No data
+              </div>
+            </div>
+          </div>
+        </div>
+
+
         <div class="filter-box filter-action-box">
           <label class="filter-label filter-label-hidden">Action</label>
           <button
