@@ -406,7 +406,7 @@
               </ng-template>
       
               <div class="summary-value">
-                {{ formatNumber(s.totalQty) }}
+                {{ formatQty(s.totalQty) }}
               </div>
       
               <div class="summary-unit">
@@ -463,7 +463,7 @@
               </ng-template>
       
               <div class="summary-value">
-                {{ formatNumber(s.totalQty) }}
+                {{ formatQty(s.totalQty) }}
               </div>
       
               <div class="summary-unit">
@@ -592,9 +592,9 @@
                       class="editable-number-view text-end"
                       [class.can-edit]="role === 'admin'"
                       (click)="role === 'admin' && startEditQty(row)"
-                      [title]="formatNumber(row.qtyKgsPcs)"
+                      [title]="formatQty(row.qtyKgsPcs)"
                     >
-                      {{ formatNumber(row.qtyKgsPcs) }}
+                       {{ formatQty(row.qtyKgsPcs) }} 
                     </div>
                   </ng-container>
 
@@ -603,6 +603,7 @@
                       <input
                         type="number"
                         min="0"
+                        step="any"
                         class="editable-number-input"
                         [ngModel]="row.qtyDraft"
                         (ngModelChange)="onQtyDraftChange(row, $event)"

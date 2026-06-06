@@ -384,7 +384,7 @@
                           <td class="muted">{{ p.itemName || p.description }}</td>
                           <td class="muted">{{ p.itemSpec }}</td>
                           <td class="text-center">{{ p.coil | number }}</td>
-                          <td class="text-center">{{ p.qty | number }}</td>
+                          <td class="text-center">{{ formatQty(p.qty) }}</td>
                           <td class="muted">{{ p.uom }}</td>
                           <td class="text-center">
                             <button (click)="openMaterialDetailSwal(p)"> Detail </button>
@@ -409,7 +409,7 @@
                           <td class="muted">{{ c.itemName || c.description }}</td>
                           <td class="muted">{{ c.itemSpec }}</td>
                           <td class="text-center">{{ c.coil | number }}</td>
-                          <td class="text-center">{{ c.qty | number }}</td>
+                          <td class="text-center">{{ formatQty(c.qty) }}</td>
                           <td class="muted">{{ c.uom }}</td>
                           <td class="text-center">
                             <button (click)="openMaterialDetailSwal(c)">Detail</button>
@@ -435,7 +435,7 @@
                           <td class="muted">{{ m.itemName }}</td>
                           <td class="muted">{{ m.itemSpec }}</td>
                           <td class="text-center">{{ m.coil | number }}</td>
-                          <td class="text-center">{{ m.qty }}</td>
+                          <td class="text-center">{{ formatQty(m.qty) }}</td>
                           <td class="muted">{{ m.uom }}</td>
                           <td class="text-center"><button (click)="openMaterialDetailSwal(m)"> Detail </button></td>
                           @if (this.role === 'admin') {
@@ -981,7 +981,7 @@
                             <td>{{ row.itemSpec || '-' }}</td>
                             <td>{{ row.lotNo || '-' }}</td>
                             <td class="text-center">{{ row.coil ?? '-' }}</td>
-                            <td class="text-end">{{ row.qtyKgsPcs | number }}</td>
+                            <td class="text-end">{{ formatQty(row.qtyKgsPcs) }}</td>
                             <td>{{ row.supplier || '-' }}</td>
                             <td>{{ row.accountCode || '-' }}</td>
                           </tr>
@@ -1137,7 +1137,7 @@
                             <td>{{ row.itemSpec || '-' }}</td>
                             <td>{{ row.lotNo || '-' }}</td>
                             <td class="text-center">{{ row.coil ?? '-' }}</td>
-                            <td class="text-end">{{ row.qtyKgsPcs | number }}</td>
+                            <td class="text-end">{{ formatQty(row.qtyKgsPcs) }}</td>
                             <td>{{ row.supplier || '-' }}</td>
                             <td>{{ row.accountCode || '-' }}</td>
                           </tr>
@@ -1246,7 +1246,7 @@
                           <td>{{ row.jobNo || '-' }}</td>
                           <td>{{ row.invoice || '-' }}</td>
                           <td class="text-center">{{ row.coil ?? '-' }}</td>
-                          <td class="text-end">{{ row.qty | number }}</td>
+                          <td class="text-end">{{ formatQty(row.qty) }}</td>
                           <td>{{ row.unit || '-' }}</td>
 
                           <!-- @if (row.stockNote) {
@@ -1429,7 +1429,7 @@
                           <td>{{ row.jobNo }}</td>
                           <td>{{ row.invoice }}</td>
                           <td class="text-center">{{ row.coil ?? '-' }}</td>
-                          <td class="text-center">{{ row.qty | number }}</td>
+                          <td class="text-center">{{ formatQty(row.qty) }}</td>
                           <td>{{ row.unit || '-' }}</td>
 
                           <!-- @if (row.stockNote) {

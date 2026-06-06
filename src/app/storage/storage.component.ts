@@ -722,6 +722,16 @@ export class StorageComponent {
   }
 
 
+  formatQty(value: any, maxDigits: number = 3) {
+    const n = Number(value || 0);
+  
+    return n.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: maxDigits
+    });
+  }
+
+
 
   private applyTransactionState() {
     const navState = (history.state || {}) as {
@@ -2928,7 +2938,7 @@ searchMoveItem() {
             <div><b>${i + 1}. Material:</b> ${r.itemNo}</div>
             <div><b>From:</b> ${r.sourceStoreCode}</div>
             <div><b>To:</b> ${this.moveDestinationArea}</div>
-            <div><b>Qty:</b> ${r.qty}</div>
+            <div><b>Qty:</b> ${this.formatQty(r.qty)}</div>
             <div><b>Invoice:</b> ${r.invoice || '-'}</div>
           </div>
         `).join('')}

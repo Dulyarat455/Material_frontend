@@ -1169,6 +1169,16 @@ onToggleNotControl(row: InventoryReportRow, event: Event) {
   }
 
 
+  formatQty(value: any, maxDigits: number = 3) {
+    const n = Number(value || 0);
+  
+    return n.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: maxDigits
+    });
+  }
+
+
   private getUnitSortPriority(unit: string): number {
     const u = String(unit || '').trim().toUpperCase();
   

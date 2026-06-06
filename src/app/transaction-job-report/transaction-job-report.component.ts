@@ -740,10 +740,10 @@ export class TransactionJobReportComponent {
     });
   }
 
-  formatNumber(value: any) {
+  formatNumber(value: any, maxDigits: number = 3) {
     return Number(value || 0).toLocaleString('en-US', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2
+      maximumFractionDigits: maxDigits
     });
   }
 
