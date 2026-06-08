@@ -2353,3 +2353,66 @@ toggle on-off  Store Area
     min-width: 82px;
   }
 }
+
+
+
+
+
+
+
+.storage-map-summary {
+  width: 540px;
+  max-width: calc(100% - 32px);
+  height: 24px;
+
+  display: flex;
+  overflow: hidden;
+
+  border-radius: 0;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  background: #fff;
+
+  margin: 6px 0 12px 16px;
+
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 22px;
+  text-align: center;
+}
+
+.storage-map-summary-slot {
+  background: #c85a0b;
+  color: #ffffff;
+  min-width: 44px;
+  white-space: nowrap;
+}
+
+.storage-map-summary-pending {
+  background: #fee2e2;
+  color: #dc2626;
+  min-width: 44px;
+  white-space: nowrap;
+  border-left: 1px solid rgba(220, 38, 38, 0.35);
+}
+
+@media (max-width: 768px) {
+  .storage-map-summary {
+    width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
+    margin: 6px 12px 12px;
+    height: 24px;
+    min-width: 0;
+  }
+
+  .storage-map-summary-slot,
+  .storage-map-summary-pending {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .storage-map-summary-pending {
+    min-width: 82px;
+  }
+}

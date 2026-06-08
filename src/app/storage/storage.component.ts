@@ -694,6 +694,40 @@ export class StorageComponent {
   }
 
 
+
+
+//analytic percent Inventory
+
+
+  get storagePendingCount(): number {
+    return this.pendingItems?.length || 0;
+  }
+  
+  get storageSlotCount(): number {
+    return (this.slots || [])
+      .reduce((sum, slot) => {
+        return sum + (slot.materials?.length || 0);
+      }, 0);
+  }
+  
+  get storageTotalCount(): number {
+    return this.storagePendingCount + this.storageSlotCount;
+  }
+  
+  get storageSlotPercent(): number {
+    if (!this.storageTotalCount) return 0;
+    return Math.round((this.storageSlotCount / this.storageTotalCount) * 100);
+  }
+  
+  get storagePendingPercent(): number {
+    if (!this.storageTotalCount) return 0;
+    return 100 - this.storageSlotPercent;
+  }
+
+
+  
+
+
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.role = localStorage.getItem('materialStore_role')!;
@@ -720,6 +754,9 @@ export class StorageComponent {
 
     })
   }
+
+
+ 
 
 
   formatQty(value: any, maxDigits: number = 3) {
