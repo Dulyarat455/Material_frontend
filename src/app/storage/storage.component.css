@@ -2357,62 +2357,109 @@ toggle on-off  Store Area
 
 
 
+/* ===============================
+   STORAGE MAP SUMMARY BAR
+   =============================== */
 
-
-
-.storage-map-summary {
-  width: 540px;
-  max-width: calc(100% - 32px);
-  height: 24px;
-
-  display: flex;
-  overflow: hidden;
-
-  border-radius: 0;
-  border: 1px solid rgba(220, 38, 38, 0.35);
-  background: #fff;
-
-  margin: 6px 0 12px 16px;
-
-  font-size: 13px;
-  font-weight: 900;
-  line-height: 22px;
-  text-align: center;
-}
-
-.storage-map-summary-slot {
-  background: #c85a0b;
-  color: #ffffff;
-  min-width: 44px;
-  white-space: nowrap;
-}
-
-.storage-map-summary-pending {
-  background: #fee2e2;
-  color: #dc2626;
-  min-width: 44px;
-  white-space: nowrap;
-  border-left: 1px solid rgba(220, 38, 38, 0.35);
-}
-
-@media (max-width: 768px) {
-  .storage-map-summary {
-    width: calc(100% - 24px);
-    max-width: calc(100% - 24px);
-    margin: 6px 12px 12px;
-    height: 24px;
-    min-width: 0;
+   .storage-map-summary-shell {
+    --storage-area-summary-width: 480px;
+  
+    width: var(--storage-area-summary-width) !important;
+    max-width: var(--storage-area-summary-width) !important;
+  
+    margin: 8px 0 18px 34px !important;
+    box-sizing: border-box;
   }
-
-  .storage-map-summary-slot,
-  .storage-map-summary-pending {
-    min-width: 0;
+  
+  /* ตัวกราฟ bar */
+  .storage-map-summary-track {
+    width: 100%;
+    height: 22px;
+  
+    display: flex;
     overflow: hidden;
-    white-space: nowrap;
-    font-size: 12px;
+  
+    border-radius: 0;
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    background: #fff;
+    box-sizing: border-box;
   }
-
+  
+  /* ฝั่ง Slot */
+  .storage-map-summary-slot {
+    height: 100%;
+    background: #c85a0b;
+    min-width: 0;
+  }
+  
+  /* ฝั่ง Pending */
   .storage-map-summary-pending {
-    min-width: 82px;
+    height: 100%;
+    background: #fee2e2;
+    border-left: 1px solid rgba(220, 38, 38, 0.35);
+    min-width: 0;
   }
-}
+  
+  /* ตัวเลขด้านล่าง */
+  .storage-map-summary-labels {
+    width: 100%;
+  
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  
+    margin-top: 5px;
+  
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+  
+  .storage-map-summary-label-slot {
+    flex: 1 1 auto;
+    min-width: 0;
+  
+    color: #c85a0b;
+    text-align: left;
+    white-space: nowrap;
+  }
+  
+  .storage-map-summary-label-pending {
+    flex: 0 0 auto;
+  
+    color: #dc2626;
+    text-align: right;
+    white-space: nowrap;
+  
+    margin-left: 8px;
+  }
+  
+  /* ===============================
+     MOBILE
+     =============================== */
+  
+  @media (max-width: 991.98px) {
+    .storage-map-summary-shell {
+      width: calc(100% - 24px) !important;
+      max-width: calc(100% - 24px) !important;
+  
+      margin: 6px 12px 14px !important;
+    }
+  
+    .storage-map-summary-track {
+      height: 22px;
+    }
+  
+    .storage-map-summary-labels {
+      font-size: 12px;
+    }
+  
+    .storage-map-summary-label-slot {
+      text-align: left;
+    }
+  
+    .storage-map-summary-label-pending {
+      text-align: right;
+      margin-left: 8px;
+    }
+  }

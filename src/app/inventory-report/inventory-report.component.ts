@@ -10,10 +10,12 @@ type InventoryReportRow = {
   incomingId: number;
   jobNo: string;
   recivedDate: string;
+  invoiceOne: string;
   materialNo: string;
   itemName: string;
   itemSpec: string;
   lotNo: string;
+  accountCode: string;
   coil: number;
   qtyKgsPcs: number;
   unit: string;
@@ -185,7 +187,17 @@ export class InventoryReportComponent {
 
   private sortInventoryRows(rows: InventoryReportRow[]): InventoryReportRow[] {
     return [...rows].sort((a, b) => {
-      // 1) Control มาก่อน Not Control
+      // 1) Account Code 4520 มาก่อนเสมอ
+      // accountCode === '4520' => 0
+      // accountCode อื่น ๆ => 1
+      const accountA = String(a.accountCode || '').trim() === '4520' ? 0 : 1;
+      const accountB = String(b.accountCode || '').trim() === '4520' ? 0 : 1;
+  
+      if (accountA !== accountB) {
+        return accountA - accountB;
+      }
+  
+      // 2) Control มาก่อน Not Control
       // notControl !== 'yes' => 0
       // notControl === 'yes' => 1
       const controlA = a.notControl === 'yes' ? 1 : 0;
@@ -195,7 +207,7 @@ export class InventoryReportComponent {
         return controlA - controlB;
       }
   
-      // 2) Sort by Item Name
+      // 3) Sort by Item Name
       const nameCompare = String(a.itemName || '').localeCompare(
         String(b.itemName || ''),
         undefined,
@@ -209,7 +221,7 @@ export class InventoryReportComponent {
         return nameCompare;
       }
   
-      // 3) Sort by Item Spec
+      // 4) Sort by Item Spec
       const specCompare = String(a.itemSpec || '').localeCompare(
         String(b.itemSpec || ''),
         undefined,
@@ -223,7 +235,7 @@ export class InventoryReportComponent {
         return specCompare;
       }
   
-      // 4) Sort by Area Priority
+      // 5) Sort by Area Priority
       const areaA = this.getAreaSortIndex(a.area);
       const areaB = this.getAreaSortIndex(b.area);
   
@@ -245,7 +257,7 @@ export class InventoryReportComponent {
         return areaTextCompare;
       }
   
-      // 5) ถ้ายังเท่ากัน ค่อยเรียงตามเวลาเก่า -> ใหม่
+      // 6) ถ้ายังเท่ากัน ค่อยเรียงตามเวลาเก่า -> ใหม่
       const timeA = this.getTimeSortValue(a.timeStmp);
       const timeB = this.getTimeSortValue(b.timeStmp);
   

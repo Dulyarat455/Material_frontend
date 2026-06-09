@@ -23,19 +23,33 @@
           </div>
         </div>
 
-        <div class="storage-map-summary storage-map-mobile-hide" *ngIf="storageTotalCount > 0">
-          <div
-            class="storage-map-summary-slot"
-            [style.width.%]="storageSlotPercent"
-          >
-            {{ storageSlotPercent }}% ({{ storageSlotCount }})
+        <div class="storage-map-summary-shell storage-map-mobile-hide" *ngIf="storageTotalCount > 0">
+          <div class="storage-map-summary-track">
+            <div
+              class="storage-map-summary-slot"
+              [style.width.%]="storageSlotPercent"
+              title="Store Area"
+            ></div>
+        
+            <div
+              class="storage-map-summary-pending"
+              [style.width.%]="storagePendingPercent"
+              title="Pending Area"
+            ></div>
           </div>
         
-          <div
-            class="storage-map-summary-pending"
-            [style.width.%]="storagePendingPercent"
-          >
-            {{ storagePendingPercent }}% ({{ storagePendingCount }})
+          <div class="storage-map-summary-labels">
+            <div class="storage-map-summary-label-slot"
+            title="Store Area"
+            >
+              {{ storageSlotPercent }}% ({{ storageSlotCount }})
+            </div>
+        
+            <div class="storage-map-summary-label-pending"
+            title="Pending Area"
+            >
+              {{ storagePendingPercent }}% ({{ storagePendingCount }})
+            </div>
           </div>
         </div>
 

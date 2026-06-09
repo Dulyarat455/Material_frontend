@@ -338,29 +338,48 @@ export class MaterialComponent implements OnInit {
           const updatedCount = Number(res?.updatedCount || 0);
           const duplicateCount = Number(res?.duplicateCount || 0);
           const duplicateInPayloadCount = Number(res?.duplicateInPayloadCount || 0);
-          const totalCreateChunks = Number(res?.totalCreateChunks || 0);
-          const chunkSize = Number(res?.chunkSize || 0);
-  
-          const duplicateItems = Array.isArray(res?.duplicateItems) ? res.duplicateItems : [];
-          const duplicatePreview = duplicateItems.slice(0, 10);
-  
-          const updateItems = Array.isArray(res?.updateItems) ? res.updateItems : [];
-          const updatePreview = updateItems.slice(0, 10);
-  
+          const filteredOutAccountCount = Number(res?.filteredOutAccountCount || 0);
+          const replacedByLatestCount = Number(res?.replacedByLatestCount || 0);
+        
+          const targetYear = res?.targetYear || res?.year || '-';
+        
+          const createSample = Array.isArray(res?.createSample) ? res.createSample : [];
+          const updateSample = Array.isArray(res?.updateSample) ? res.updateSample : [];
+          const duplicateSample = Array.isArray(res?.duplicateSample) ? res.duplicateSample : [];
+        
+          const updatePreview = updateSample.slice(0, 10);
+          const duplicatePreview = duplicateSample.slice(0, 10);
+        
+          const duplicateMessage = duplicateCount > 0
+            ? `พบรายการที่มีอยู่แล้วและข้อมูลไม่เปลี่ยนแปลง ${duplicateCount.toLocaleString()} รายการ ระบบจึงข้ามรายการเหล่านี้`
+            : 'ไม่พบรายการที่ซ้ำและข้อมูลเหมือนเดิมในฐานข้อมูล';
+        
           Swal.fire({
             icon: 'success',
             title: 'Sync Completed',
             width: 900,
             html: `
               <div style="text-align:left">
-                <div style="display:grid;grid-template-columns:180px 1fr;gap:8px 12px;margin-bottom:14px">
-                  <div><b>Total From API</b></div><div>${totalFromApi}</div>
-                  <div><b>Valid Rows</b></div><div>${validRows}</div>
-                  <div><b>Created</b></div><div style="color:#16a34a;font-weight:700">${createdCount}</div>
-                  <div><b>Updated</b></div><div style="color:#d97706;font-weight:700">${updatedCount}</div>
-                  <div><b>Duplicate In DB</b></div><div style="color:#dc2626;font-weight:700">${duplicateCount}</div>
+                <div style="display:grid;grid-template-columns:220px 1fr;gap:8px 12px;margin-bottom:14px">
+                  <div><b>Target Year</b></div><div>${targetYear}</div>
+                  <div><b>Total From API</b></div><div>${totalFromApi.toLocaleString()}</div>
+                  <div><b>Valid Rows</b></div><div>${validRows.toLocaleString()}</div>
+                  <div><b>Filtered Out Account</b></div><div>${filteredOutAccountCount.toLocaleString()}</div>
+                  <div><b>Created</b></div><div style="color:#16a34a;font-weight:700">${createdCount.toLocaleString()}</div>
+                  <div><b>Updated</b></div><div style="color:#d97706;font-weight:700">${updatedCount.toLocaleString()}</div>
+                  <div><b>Duplicate / No Change</b></div><div style="color:#dc2626;font-weight:700">${duplicateCount.toLocaleString()}</div>
                 </div>
-  
+        
+                <div style="
+                  padding:10px 12px;
+                  background:#f8fafc;
+                  border-radius:10px;
+                  color:#475569;
+                  margin-bottom:12px;
+                ">
+                  ${duplicateMessage}
+                </div>
+        
                 ${
                   updatePreview.length
                     ? `
@@ -375,6 +394,7 @@ export class MaterialComponent implements OnInit {
                                 <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">New Name</th>
                                 <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Old Spec</th>
                                 <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">New Spec</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Account</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -385,26 +405,22 @@ export class MaterialComponent implements OnInit {
                                   <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.newMaterialName || '-'}</td>
                                   <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.oldMaterialSpec || '-'}</td>
                                   <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.newMaterialSpec || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.newAccountCode || '-'}</td>
                                 </tr>
                               `).join('')}
                             </tbody>
                           </table>
                         </div>
-                        ${
-                          updateItems.length > 10
-                            ? `<div style="margin-top:6px;color:#64748b;font-size:12px">แสดง 10 รายการแรกจากทั้งหมด ${updateItems.length} รายการ</div>`
-                            : ''
-                        }
                       </div>
                     `
                     : ''
                 }
-  
+        
                 ${
                   duplicatePreview.length
                     ? `
                       <div style="margin-top:12px">
-                        <div style="font-weight:700;margin-bottom:6px">ตัวอย่าง Material ที่ซ้ำในฐานข้อมูล</div>
+                        <div style="font-weight:700;margin-bottom:6px">ตัวอย่าง Material ที่ข้อมูลเหมือนเดิม</div>
                         <div style="max-height:220px;overflow:auto;border:1px solid #e2e8f0;border-radius:10px">
                           <table style="width:100%;border-collapse:collapse;font-size:13px">
                             <thead style="background:#f8fafc">
@@ -412,6 +428,7 @@ export class MaterialComponent implements OnInit {
                                 <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material No</th>
                                 <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Material Name</th>
                                 <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Spec</th>
+                                <th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0">Account</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -420,23 +437,15 @@ export class MaterialComponent implements OnInit {
                                   <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialNo || '-'}</td>
                                   <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialName || '-'}</td>
                                   <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.materialSpec || '-'}</td>
+                                  <td style="padding:8px;border-bottom:1px solid #f1f5f9">${x.accountCode || '-'}</td>
                                 </tr>
                               `).join('')}
                             </tbody>
                           </table>
                         </div>
-                        ${
-                          duplicateItems.length > 10
-                            ? `<div style="margin-top:6px;color:#64748b;font-size:12px">แสดง 10 รายการแรกจากทั้งหมด ${duplicateItems.length} รายการ</div>`
-                            : ''
-                        }
                       </div>
                     `
-                    : `
-                      <div style="padding:10px 12px;background:#f8fafc;border-radius:10px;color:#475569">
-                        ไม่พบรายการซ้ำในฐานข้อมูล
-                      </div>
-                    `
+                    : ''
                 }
               </div>
             `
