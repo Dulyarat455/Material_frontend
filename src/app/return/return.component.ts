@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -50,8 +50,9 @@ type AreaRow = {
   templateUrl: './return.component.html',
   styleUrl: './return.component.css'
 })
-export class ReturnComponent {
+export class ReturnComponent implements AfterViewInit {
   wsSub?: Subscription;
+  @ViewChild('materialNoInput') materialNoInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private http: HttpClient,
@@ -95,6 +96,19 @@ export class ReturnComponent {
   q = '';
   statusFilter: ReturnRequestRow['status'] = 'Waiting';
   refreshTimer: any = null;
+
+
+  ngAfterViewInit() {
+    this.focusMaterialNoInput();
+  }
+  
+  private focusMaterialNoInput(delay: number = 200) {
+    setTimeout(() => {
+      this.materialNoInput?.nativeElement?.focus();
+      this.materialNoInput?.nativeElement?.select();
+    }, delay);
+  }
+
 
   ngOnInit() {
     this.userId = this.toNumber(localStorage.getItem('materialStore_userId'));
@@ -291,6 +305,9 @@ export class ReturnComponent {
       next: (res) => {
         this.isSubmitting = false;
 
+        this.resetForm();
+        this.fetchReturnQueueFollowFilter();
+
         Swal.fire({
           icon: 'success',
           title: 'Created',
@@ -299,10 +316,11 @@ export class ReturnComponent {
             : 'Create success',
           timer: 1200,
           showConfirmButton: false
-        });
+        }).then(()=>{
+          this.focusMaterialNoInput(50);
+        })
 
-        this.resetForm();
-        this.fetchReturnQueueFollowFilter();
+        
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -468,6 +486,8 @@ export class ReturnComponent {
     this.materialDropdown = [];
     this.areas = [];
     this.machinesView = [];
+
+    this.focusMaterialNoInput();
   }
 
   formatDateTime(value: any): string {

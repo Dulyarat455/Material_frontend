@@ -30,6 +30,7 @@
         
           <div class="material-search-box">
             <input
+              #materialNoInput
               [(ngModel)]="materialNo"
               (input)="onMaterialNoInput()"
               (keydown.enter)="onMaterialNoEnter($event)"

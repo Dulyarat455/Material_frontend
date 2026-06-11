@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { CallSocketService } from '../services/call-socket.service';
-
 
 import Swal from 'sweetalert2';
 import config from '../../config';
@@ -49,8 +48,10 @@ type AreaRow = {
   templateUrl: './issue.component.html',
   styleUrl: './issue.component.css'
 })
-export class IssueComponent {
+export class IssueComponent implements AfterViewInit {
   wsSub?: Subscription;
+
+  @ViewChild('materialNoInput') materialNoInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private http: HttpClient,
@@ -71,7 +72,7 @@ export class IssueComponent {
   groupId: number | null = null;
   sectionId: number | null = null;
   groupName: string = '';
-  role : string = '' ;
+  role: string = '';
 
   isSubmitting = false;
   isLoadingQueue = false;
@@ -94,6 +95,17 @@ export class IssueComponent {
 
   refreshTimer: any = null;
 
+  ngAfterViewInit() {
+    this.focusMaterialNoInput();
+  }
+
+  private focusMaterialNoInput(delay: number = 200) {
+    setTimeout(() => {
+      this.materialNoInput?.nativeElement?.focus();
+      this.materialNoInput?.nativeElement?.select();
+    }, delay);
+  }
+
   ngOnInit() {
     this.userId = Number(localStorage.getItem('materialStore_userId')) || null;
     this.groupId = Number(localStorage.getItem('materialStore_groupId')) || null;
@@ -104,21 +116,17 @@ export class IssueComponent {
     this.fetchMaterials();
     this.fetchIssueQueueFollowFilter();
 
-
-
-    // ✅ ฟัง event จาก websocket
     this.wsSub = this.callSocket.onJobChanged().subscribe((payload: any) => {
       console.log('onJobChanged payload =', payload);
-    
+
       const type = payload?.type as 'materialIssue' | 'materialReturn' | undefined;
       console.log('socket type =', type);
-    
+
       if (type === 'materialIssue') {
         console.log('fetchIssueQueueFollowFilter from socket');
         this.fetchIssueQueueFollowFilter();
       }
     });
-
 
     this.refreshTimer = setInterval(() => {
       this.requestsAll = [...this.requestsAll];
@@ -143,7 +151,7 @@ export class IssueComponent {
 
   onSearchMaterial() {
     const keyword = (this.materialNo || '').trim().toLowerCase();
-  
+
     if (!keyword) {
       this.materialDropdown = [];
       this.showMaterialDropdown = false;
@@ -152,20 +160,20 @@ export class IssueComponent {
       this.materialSpec = '';
       return;
     }
-  
+
     if (!this.canUseMaterialDropdown()) {
       this.materialDropdown = [];
       this.showMaterialDropdown = false;
       return;
     }
-  
+
     this.materialDropdown = this.materials
       .filter(m =>
         (m.materialNo || '').toLowerCase().includes(keyword) ||
         (m.materialName || '').toLowerCase().includes(keyword)
       )
       .slice(0, 10);
-  
+
     this.showMaterialDropdown = this.materialDropdown.length > 0;
   }
 
@@ -182,7 +190,7 @@ export class IssueComponent {
       this.showMaterialDropdown = false;
       return;
     }
-  
+
     setTimeout(() => {
       this.showMaterialDropdown = false;
     }, 150);
@@ -232,11 +240,13 @@ export class IssueComponent {
 
     if (!materialNo) {
       Swal.fire('Error', 'กรุณากรอก Material No', 'error');
+      this.focusMaterialNoInput();
       return;
     }
 
     if (!this.selectedMaterialId) {
       Swal.fire('Error', 'กรุณาเลือก Material จากรายการ', 'error');
+      this.focusMaterialNoInput();
       return;
     }
 
@@ -277,6 +287,8 @@ export class IssueComponent {
     this.http.post<any>(config.apiServer + '/api/issue/create', body).subscribe({
       next: (res) => {
         this.isSubmitting = false;
+        this.resetForm();
+        this.fetchIssueQueueFollowFilter();
 
         Swal.fire({
           icon: 'success',
@@ -286,10 +298,11 @@ export class IssueComponent {
             : 'Create success',
           timer: 1200,
           showConfirmButton: false
+        }).then(() => {
+          this.focusMaterialNoInput(50)
         });
 
-        this.resetForm();
-        this.fetchIssueQueueFollowFilter();
+       
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -297,7 +310,9 @@ export class IssueComponent {
           'Error',
           err?.error?.message || err?.message || 'Create issue fail',
           'error'
-        );
+        ).then(() => {
+          this.focusMaterialNoInput();
+        });
       }
     });
   }
@@ -350,14 +365,10 @@ export class IssueComponent {
               ? `${r.requestUserEmpNo} - ${r.requestUserName}`
               : r?.requestUserEmpNo || r?.requestUserName || '-';
 
-
-
           const inchargeByText =
             r?.inchargeUserEmpNo && r?.inchargeUserName
               ? `${r.inchargeUserEmpNo} - ${r.inchargeUserName}`
               : r?.inchargeUserEmpNo || r?.inchargeUserName || '';
-
-
 
           return {
             id: Number(r?.id || 0),
@@ -368,7 +379,7 @@ export class IssueComponent {
             qty: Number(r?.qty || 0),
             destination: r?.areaName || '-',
             priority: String(r?.priority || '').trim().toLowerCase() === 'urgent' ? 'Urgent' : 'Normal',
-            requestByUserId: Number(r?.requestByUserId || 0),   
+            requestByUserId: Number(r?.requestByUserId || 0),
             requestBy: requestByText,
             requestAt: this.formatDateTime(r?.requestTime),
             inchargeBy: inchargeByText,
@@ -376,8 +387,8 @@ export class IssueComponent {
             status,
             fifoHint: r?.jobNo ? `JOB#${r.jobNo}` : undefined,
             remark: r?.remark || '',
-            remarkMC:r?.remarkMC || '',
-            accountCode:r?.accountCode || ''
+            remarkMC: r?.remarkMC || '',
+            accountCode: r?.accountCode || ''
           };
         });
 
@@ -435,6 +446,8 @@ export class IssueComponent {
     this.materialDropdown = [];
     this.areas = [];
     this.machinesView = [];
+
+    this.focusMaterialNoInput();
   }
 
   formatDateTime(value: any): string {
@@ -445,8 +458,6 @@ export class IssueComponent {
 
     const pad = (n: number) => String(n).padStart(2, '0');
 
-    
-    // return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
 
@@ -478,31 +489,25 @@ export class IssueComponent {
     });
   }
 
-
-
-
-
   showRemarkMC(row: IssueRequestRow) {
     const remarkText = (row.remarkMC || '').trim();
-  
+
     if (!remarkText) return;
-  
+
     Swal.fire({
       icon: 'success',
       title: 'MC Acknowledge',
       html: `
         <div style="text-align:left; line-height:1.7;">
-         
-  
           <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
           <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
-  
+
           <div style="
             padding:12px;
             border-radius:12px;
-             background:#f8fafc;
+            background:#f8fafc;
             border:1px solid #e2e8f0;
-             color:#0f172a;
+            color:#0f172a;
             white-space:pre-wrap;
             word-break:break-word;
             box-shadow: inset 0 1px 0 rgba(123, 192, 235, 0.65);
@@ -514,34 +519,33 @@ export class IssueComponent {
     });
   }
 
-
-
   canDeleteRequest(r: IssueRequestRow): boolean {
     if (!r) return false;
-  
+
     if (this.role === 'admin') {
       return r.status === 'Waiting';
     }
-  
+
     if (this.role === 'user') {
       return r.status === 'Waiting' && Number(r.requestByUserId) === Number(this.userId);
     }
-  
+
     return false;
   }
-  
+
   deleteIssueRequest(r: IssueRequestRow) {
     if (!r?.id) return;
+
     if (!this.userId) {
       Swal.fire('Error', 'User not found', 'error');
       return;
     }
-  
+
     if (!this.canDeleteRequest(r)) {
       Swal.fire('Error', 'You have not permitted', 'error');
       return;
     }
-  
+
     Swal.fire({
       icon: 'warning',
       title: 'Delete Request?',
@@ -556,7 +560,7 @@ export class IssueComponent {
         ">
           คุณต้องการยกเลิกรายการเบิก Material นี้หรือไม่?
         </div>
-    
+
         <div style="text-align:left; line-height:1.7;">
           <div><b>Job No:</b> ${r.jobNo || '-'}</div>
           <div><b>Material No:</b> ${r.materialNo || '-'}</div>
@@ -569,7 +573,7 @@ export class IssueComponent {
       confirmButtonColor: '#dc2626'
     }).then((result) => {
       if (!result.isConfirmed) return;
-  
+
       this.http.post<any>(config.apiServer + '/api/issue/delete', {
         jobId: r.id,
         userId: this.userId,
@@ -583,7 +587,7 @@ export class IssueComponent {
             timer: 1200,
             showConfirmButton: false
           });
-  
+
           this.fetchIssueQueueFollowFilter();
         },
         error: (err) => {
@@ -597,14 +601,12 @@ export class IssueComponent {
     });
   }
 
-
-
   showInchargeDetail(row: IssueRequestRow) {
     const inchargeText = (row.inchargeBy || '').trim();
     const inchargeAtText = (row.inchargeAt || '').trim();
-  
+
     if (!inchargeText) return;
-  
+
     Swal.fire({
       icon: 'info',
       title: 'Incharge Detail',
@@ -612,7 +614,7 @@ export class IssueComponent {
         <div style="text-align:left; line-height:1.7;">
           <div style="margin-bottom:8px;"><b>Job No:</b> ${row.jobNo || '-'}</div>
           <div style="margin-bottom:8px;"><b>Material No:</b> ${row.materialNo || '-'}</div>
-  
+
           <div style="
             padding:12px;
             border-radius:12px;
@@ -625,7 +627,6 @@ export class IssueComponent {
           ">
             ${inchargeText}
             ${inchargeAtText}
-        
           </div>
         </div>
       `,
@@ -634,71 +635,64 @@ export class IssueComponent {
     });
   }
 
-
-
-
   isOver20MinWaiting(row: IssueRequestRow): boolean {
     if (!row) return false;
     if (row.status !== 'Waiting') return false;
     if (!row.requestAt || row.requestAt === '-') return false;
-  
+
     const d = this.parseDateTime(row.requestAt);
     if (!d) return false;
-  
+
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
     const diffMin = diffMs / (1000 * 60);
-  
+
     return diffMin >= 20;
   }
-  
+
   parseDateTime(value: string): Date | null {
     try {
       const [datePart, timePart] = value.split(' ');
       const [dd, mm, yyyy] = datePart.split('-').map(Number);
       const [hh, min, sec] = timePart.split(':').map(Number);
-  
+
       return new Date(yyyy, mm - 1, dd, hh || 0, min || 0, sec || 0);
     } catch {
       return null;
     }
   }
 
-
-
-
-
   canUseMaterialDropdown(): boolean {
     return this.role === 'admin';
   }
-  
+
   onMaterialNoInput() {
     if (this.canUseMaterialDropdown()) {
       this.onSearchMaterial();
       return;
     }
-  
+
     this.showMaterialDropdown = false;
     this.materialDropdown = [];
     this.selectedMaterialId = null;
     this.materialName = '';
     this.materialSpec = '';
   }
-  
+
   onMaterialNoEnter(event?: Event) {
     if (event) event.preventDefault();
     this.searchMaterialByExactInput();
   }
-  
+
   onMaterialNoBlur() {
     setTimeout(() => {
       this.searchMaterialByExactInput();
     }, 150);
   }
-  
+
   searchMaterialByExactInput() {
     const keyword = (this.materialNo || '').trim().toLowerCase();
-  
+
     if (!keyword) {
       this.selectedMaterialId = null;
       this.materialName = '';
@@ -707,11 +701,11 @@ export class IssueComponent {
       this.showMaterialDropdown = false;
       return;
     }
-  
+
     const exact = this.materials.find(m =>
       (m.materialNo || '').trim().toLowerCase() === keyword
     );
-  
+
     if (!exact) {
       this.selectedMaterialId = null;
       this.materialName = '';
@@ -719,22 +713,21 @@ export class IssueComponent {
       this.materialDropdown = [];
       this.showMaterialDropdown = false;
       this.materialNo = '';
+      this.focusMaterialNoInput();
       return;
     }
-  
+
     this.selectMaterial(exact);
 
-      // ✅ Toast success
     this.showAppToast(
       'success',
       `Search Material สำเร็จ : ${exact.materialNo}`
     );
   }
-  
+
   onClickSearchMaterial() {
     this.searchMaterialByExactInput();
   }
-
 
   private showAppToast(
     icon: 'success' | 'error' | 'warning' | 'info',
@@ -748,12 +741,12 @@ export class IssueComponent {
       timer: 1800,
       showConfirmButton: false,
       timerProgressBar: true,
-  
+
       customClass: {
         container: 'app-toast-container',
         popup: 'app-toast'
       },
-  
+
       didOpen: (toast) => {
         toast.style.borderRadius = '14px';
         toast.style.padding = '10px 14px';
@@ -767,8 +760,6 @@ export class IssueComponent {
     });
   }
 
-
-
   ngOnDestroy() {
     this.wsSub?.unsubscribe();
 
@@ -777,8 +768,4 @@ export class IssueComponent {
       this.refreshTimer = null;
     }
   }
-
-
-
-
 }
