@@ -501,7 +501,6 @@
             <tr>
               <th style="width: 90px;">Index</th>
               <th style="width: 160px;">Job No</th>
-              <th style="width: 150px;">Received Date</th>
               <th style="width: 180px;">Material No</th>
               <th style="width: 220px;">Item Name</th>
               <th style="width: 180px;">Spec</th>
@@ -516,6 +515,7 @@
               <th style="width: 220px;">Remark</th>
               <th style="width: 220px;">Stock Note</th>
               <th style="width: 130px;">Not Control</th>
+              <th style="width: 150px;">Received Date</th>
               <th style="width: 190px;">Time</th>
             </tr>
           </thead>
@@ -524,7 +524,6 @@
             <tr *ngFor="let row of filteredRows; let i = index; trackBy: trackByInventory">
               <td><span class="index-badge">{{ i + 1 }}</span></td>
               <td><div class="material-no">{{ row.jobNo || '-' }}</div></td>
-              <td><div class="material-spec">{{ row.recivedDate || '-' }}</div></td>
               <td><div class="material-no">{{ row.materialNo || '-' }}</div></td>
               <td><div class="material-name">{{ row.itemName || '-' }}</div></td>
               <td><div class="material-spec">{{ row.itemSpec || '-' }}</div></td>
@@ -729,7 +728,7 @@
               </td>
               
              
-              
+              <td><div class="material-spec">{{ row.recivedDate || '-' }}</div></td>
               <td><div class="time-text">{{ formatDateTime(row.timeStmp) }}</div></td>
             </tr>
 
