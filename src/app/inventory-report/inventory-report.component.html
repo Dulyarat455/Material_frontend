@@ -515,8 +515,10 @@
               <th style="width: 220px;">Remark</th>
               <th style="width: 220px;">Stock Note</th>
               <th style="width: 130px;">Not Control</th>
-              <th style="width: 150px;">Received Date</th>
               <th style="width: 190px;">Time</th>
+              <th style="width: 150px;">Received Date</th>
+              <th style="width: 150px;">Last Return</th>
+              
             </tr>
           </thead>
 
@@ -727,13 +729,69 @@
                 </div>
               </td>
               
-             
-              <td><div class="material-spec">{{ row.recivedDate || '-' }}</div></td>
               <td><div class="time-text">{{ formatDateTime(row.timeStmp) }}</div></td>
+              <td><div class="material-spec">{{ row.recivedDate || '-' }}</div></td>
+              <td>
+                <div class="editable-last-return-cell">
+                  <ng-container *ngIf="!row.isEditingLastReturn; else editLastReturnTpl">
+                    <div
+                      class="editable-last-return-view material-spec"
+                      [class.can-edit]="role === 'admin' && row.lastReturnRef !== 'TSH'"
+                      [class.cannot-edit]="role === 'admin' && row.lastReturnRef === 'TSH'"
+                      (click)="role === 'admin' && row.lastReturnRef !== 'TSH' && startEditLastReturn(row)"
+                      [title]="
+                        row.lastReturnRef === 'TSH'
+                          ? 'Last Return from ReturnStockIn cannot edit'
+                          : (row.lastReturn ? formatDateTime(row.lastReturn) : '')
+                      "
+                    >
+                      {{ formatDateOnly(row.lastReturn) || ' ' }}
+                    </div>
+                  </ng-container>
+              
+                  <ng-template #editLastReturnTpl>
+                    <div class="editable-last-return-edit-wrap" (click)="$event.stopPropagation()">
+                      <input
+                        type="datetime-local"
+                        class="editable-last-return-input"
+                        [ngModel]="row.lastReturnDraft"
+                        (ngModelChange)="onLastReturnDraftChange(row, $event)"
+                        [disabled]="!!row.isSavingLastReturn"
+                        autofocus
+                      />
+              
+                      <div class="editable-last-return-actions" *ngIf="hasLastReturnChanged(row)">
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-save"
+                          title="Save"
+                          [disabled]="row.isSavingLastReturn"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="saveLastReturn(row)"
+                        >
+                          <i class="fa fa-check" *ngIf="!row.isSavingLastReturn"></i>
+                          <i class="fa fa-spinner fa-spin" *ngIf="row.isSavingLastReturn"></i>
+                        </button>
+              
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-cancel"
+                          title="Cancel"
+                          [disabled]="row.isSavingLastReturn"
+                          (mousedown)="$event.preventDefault()"
+                          (click)="cancelEditLastReturn(row)"
+                        >
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>
+                </div>
+              </td>
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="17" class="empty-cell">
+              <td colspan="19" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No inventory data found</div>
@@ -747,7 +805,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="17" class="loading-cell">
+              <td colspan="19" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading inventory data...

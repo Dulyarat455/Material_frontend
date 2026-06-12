@@ -26,6 +26,8 @@ type InventoryReportRow = {
   timeStmp: string;
   remark: string;
   notControl: string;
+  lastReturn: string | null;
+  lastReturnRef: string
 
 
    // ui state
@@ -49,6 +51,13 @@ type InventoryReportRow = {
 
   // ui state: Not Control
   isSavingNotControl?: boolean;
+
+  
+  // ui state: Last Return
+  isEditingLastReturn?: boolean;
+  lastReturnDraft?: string;
+  originalLastReturn?: string | null;
+  isSavingLastReturn?: boolean;
 };
 
 
@@ -145,7 +154,7 @@ export class InventoryReportComponent {
   }
 
 
- 
+  
   
   
   private getTimeSortValue(value: string): number {
@@ -266,7 +275,7 @@ export class InventoryReportComponent {
   }
 
 
-
+  
   
 
   fetchInventoryList() {
@@ -1154,6 +1163,154 @@ onToggleNotControl(row: InventoryReportRow, event: Event) {
     }
   });
 }
+
+
+
+
+
+
+private toDateTimeLocalValue(value?: string | null): string {
+  const d = value ? new Date(value) : new Date();
+
+  const date = Number.isNaN(d.getTime()) ? new Date() : d;
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+startEditLastReturn(row: InventoryReportRow) {
+  if (this.role !== 'admin') return;
+  if (row.isSavingLastReturn) return;
+
+  this.filteredRows.forEach(r => {
+    if (r !== row) {
+      if (r.isEditingCoil) this.cancelEditCoil(r);
+      if (r.isEditingQty) this.cancelEditQty(r);
+      if (r.isEditingStockNote) this.cancelEditStockNote(r);
+      if (r.isEditingLastReturn) this.cancelEditLastReturn(r);
+    }
+  });
+
+  row.isEditingLastReturn = true;
+  row.originalLastReturn = row.lastReturn || null;
+
+  // เปิดปฏิทินแล้ว set ค่าเริ่มต้นเป็นวันที่/เวลาปัจจุบัน
+  row.lastReturnDraft = this.toDateTimeLocalValue(null);
+}
+
+onLastReturnDraftChange(row: InventoryReportRow, value: string) {
+  row.lastReturnDraft = value;
+}
+
+hasLastReturnChanged(row: InventoryReportRow): boolean {
+  return !!row.lastReturnDraft;
+}
+
+cancelEditLastReturn(row: InventoryReportRow) {
+  row.lastReturnDraft = '';
+  row.originalLastReturn = row.lastReturn || null;
+  row.isEditingLastReturn = false;
+  row.isSavingLastReturn = false;
+}
+
+private syncEditedLastReturn(incomingId: number, lastReturn: string | null) {
+  this.inventoryRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.lastReturn = lastReturn;
+      r.originalLastReturn = lastReturn;
+      r.lastReturnDraft = '';
+      r.isEditingLastReturn = false;
+      r.isSavingLastReturn = false;
+    }
+  });
+
+  this.filteredRows.forEach((r) => {
+    if (r.incomingId === incomingId) {
+      r.lastReturn = lastReturn;
+      r.originalLastReturn = lastReturn;
+      r.lastReturnDraft = '';
+      r.isEditingLastReturn = false;
+      r.isSavingLastReturn = false;
+    }
+  });
+}
+
+saveLastReturn(row: InventoryReportRow) {
+  if (this.role !== 'admin') return;
+  if (row.isSavingLastReturn) return;
+
+  if (!row.lastReturnDraft) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Last Return',
+      text: 'กรุณาเลือกวันที่ Last Return'
+    });
+    return;
+  }
+
+  const lastReturnDate = new Date(row.lastReturnDraft);
+
+  if (Number.isNaN(lastReturnDate.getTime())) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Last Return',
+      text: 'วันที่ Last Return ไม่ถูกต้อง'
+    });
+    return;
+  }
+
+  row.isSavingLastReturn = true;
+
+  const body = {
+    userId: this.userId,
+    incomingId: row.incomingId,
+    lastReturn: lastReturnDate.toISOString()
+  };
+
+  this.http.post<any>(`${config.apiServer}/api/inventory/editLastReturn`, body).subscribe({
+    next: async (res) => {
+      const newLastReturn =
+        res?.results?.createIncomingEditReturn?.timeStmp ||
+        body.lastReturn;
+
+      this.syncEditedLastReturn(row.incomingId, newLastReturn);
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Saved',
+        text: 'แก้ไข Last Return เรียบร้อยแล้ว',
+        timer: 1000,
+        showConfirmButton: false
+      });
+    },
+    error: async (err) => {
+      console.error('saveLastReturn error:', err);
+      row.isSavingLastReturn = false;
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err?.error?.message || err?.error?.error || 'ไม่สามารถบันทึก Last Return ได้'
+      });
+    }
+  });
+}
+
+
+
+
+
+  formatDateOnly(value?: string | null) {
+    if (!value) return '';
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '';
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  }
 
 
 
