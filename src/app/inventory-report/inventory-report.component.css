@@ -1150,3 +1150,10 @@ disable TSH
   box-shadow: none;
   text-decoration: none;
 }
+
+
+
+
+.note-icon-delete {
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+}

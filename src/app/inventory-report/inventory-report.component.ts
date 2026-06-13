@@ -58,6 +58,7 @@ type InventoryReportRow = {
   lastReturnDraft?: string;
   originalLastReturn?: string | null;
   isSavingLastReturn?: boolean;
+  isDeletingLastReturn?: boolean;
 };
 
 
@@ -1298,7 +1299,76 @@ saveLastReturn(row: InventoryReportRow) {
 }
 
 
+    deleteLastReturn(row: InventoryReportRow) {
+      if (this.role !== 'admin') return;
+      if (row.lastReturnRef === 'TSH') return;
+      if (row.isSavingLastReturn || row.isDeletingLastReturn) return;
 
+      if (!row.lastReturn) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No Last Return',
+          text: 'ไม่มี Last Return ให้ลบ'
+        });
+        return;
+      }
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Delete Last Return?',
+        html: `
+          <div style="text-align:left; line-height:1.7;">
+            <div><b>Job No:</b> ${row.jobNo || '-'}</div>
+            <div><b>Material No:</b> ${row.materialNo || '-'}</div>
+            <div><b>Last Return:</b> ${this.formatDateOnly(row.lastReturn) || '-'}</div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc2626'
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        row.isDeletingLastReturn = true;
+
+        const body = {
+          incomingId: row.incomingId,
+          userId: this.userId
+        };
+
+        this.http.post<any>(`${config.apiServer}/api/inventory/deleteLastReturn`, body).subscribe({
+          next: async () => {
+            row.isDeletingLastReturn = false;
+            row.isEditingLastReturn = false;
+            row.lastReturnDraft = '';
+
+            await Swal.fire({
+              icon: 'success',
+              title: 'Deleted',
+              text: 'ลบ Last Return เรียบร้อยแล้ว',
+              timer: 1000,
+              showConfirmButton: false
+            });
+
+            // โหลดใหม่เพื่อให้ backend คำนวณ lastReturn ล่าสุดอีกครั้ง
+            // ถ้ามี ReturnStockIn เดิมอยู่ จะกลับมาเป็น TSH
+            // ถ้าไม่มี จะเป็น null
+            this.fetchInventoryList();
+          },
+          error: async (err) => {
+            console.error('deleteLastReturn error:', err);
+            row.isDeletingLastReturn = false;
+
+            await Swal.fire({
+              icon: 'error',
+              title: 'Delete Failed',
+              text: err?.error?.message || err?.error?.error || 'ไม่สามารถลบ Last Return ได้'
+            });
+          }
+        });
+      });
+    }
 
 
   formatDateOnly(value?: string | null) {

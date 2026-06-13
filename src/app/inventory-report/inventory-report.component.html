@@ -783,6 +783,20 @@
                         >
                           <i class="fa fa-times"></i>
                         </button>
+
+                        <button
+                            type="button"
+                            class="note-icon-btn note-icon-delete"
+                            title="Delete Last Return"
+                            *ngIf="row.lastReturn && row.lastReturnRef !== 'TSH'"
+                            [disabled]="row.isSavingLastReturn || row.isDeletingLastReturn"
+                            (mousedown)="$event.preventDefault()"
+                            (click)="deleteLastReturn(row)"
+                          >
+                            <i class="fa fa-trash" *ngIf="!row.isDeletingLastReturn"></i>
+                            <i class="fa fa-spinner fa-spin" *ngIf="row.isDeletingLastReturn"></i>
+                        </button>
+
                       </div>
                     </div>
                   </ng-template>
