@@ -12,6 +12,7 @@ import { TransactionStoreReportComponent } from './transaction-store-report/tran
 import { StockOutReportComponent } from './stock-out-report/stock-out-report.component';
 import { RegisterComponent } from './register/register.component';
 import { TransactionAllReportComponent } from './transaction-all-report/transaction-all-report.component';
+import { GraphComponent } from './graph/graph.component';
 
 export const routes: Routes = [
 
@@ -92,6 +93,11 @@ export const routes: Routes = [
   {
     path: 'transactionAll',
     component: TransactionAllReportComponent,
+  },
+
+  {
+    path: 'graph',
+    component: GraphComponent,
   },
 
 

@@ -96,7 +96,7 @@
             <input
               type="text"
               class="form-control search-input"
-              placeholder="Search material no / name / spec / Account Code"
+              placeholder="Search material no / name / spec / Account Code/ line no"
               [(ngModel)]="searchText"
               (input)="onSearchChange()"
             />
@@ -152,6 +152,7 @@
                 <th>Material Name</th>
                 <th style="width: 220px;">Spec</th>
                 <th style="width: 140px;">Account Code</th>
+                <th style="width: 120px;">Line No</th>
                 <th style="width: 140px;">Type</th>
                 <th style="width: 180px;">Created At</th>
                 <th style="width: 90px;" *ngIf="role === 'admin'">Action</th>
@@ -178,6 +179,10 @@
 
                 <td>
                   <div class="account-code">{{ row.accountCode || '-' }}</div>
+                </td>
+
+                <td>
+                  <div class="line-no-badge">{{ row.lineNo || '-' }}</div>
                 </td>
                 <td>
                     <div
@@ -206,7 +211,7 @@
               </tr>
   
               <tr *ngIf="!filteredMaterials.length">
-                <td [attr.colspan]="role === 'admin' ? 8 : 7" class="empty-cell">
+                <td [attr.colspan]="role === 'admin' ? 9 : 8" class="empty-cell">
                   <div class="empty-state">
                     <i class="fa fa-inbox empty-icon"></i>
                     <div class="empty-title">No material data found</div>
@@ -220,7 +225,7 @@
   
             <tbody *ngIf="isLoading">
               <tr>
-                <td [attr.colspan]="role === 'admin' ? 8 : 7" class="loading-cell">
+                <td [attr.colspan]="role === 'admin' ? 9 : 8" class="loading-cell">
                   <div class="loading-state">
                     <i class="fa fa-spinner fa-spin me-2"></i>
                     Loading material data...

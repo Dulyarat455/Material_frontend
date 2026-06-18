@@ -28,6 +28,7 @@ type InventoryReportRow = {
   notControl: string;
   lastReturn: string | null;
   lastReturnRef: string
+  reInspectionDate: string | null;
 
 
    // ui state
@@ -59,6 +60,14 @@ type InventoryReportRow = {
   originalLastReturn?: string | null;
   isSavingLastReturn?: boolean;
   isDeletingLastReturn?: boolean;
+
+
+  // ui state: Reinspection
+  isEditingReInspection?: boolean;
+  reInspectionDraft?: string;
+  originalReInspection?: string | null;
+  isSavingReInspection?: boolean;
+  isDeletingReInspection?: boolean;
 };
 
 
@@ -1369,6 +1378,353 @@ saveLastReturn(row: InventoryReportRow) {
         });
       });
     }
+
+
+    startEditReInspection(row: InventoryReportRow) {
+      if (this.role !== 'admin') return;
+      if (row.isSavingReInspection || row.isDeletingReInspection) return;
+    
+      this.filteredRows.forEach(r => {
+        if (r !== row) {
+          if (r.isEditingCoil) this.cancelEditCoil(r);
+          if (r.isEditingQty) this.cancelEditQty(r);
+          if (r.isEditingStockNote) this.cancelEditStockNote(r);
+          if (r.isEditingLastReturn) this.cancelEditLastReturn(r);
+          if (r.isEditingReInspection) this.cancelEditReInspection(r);
+        }
+      });
+    
+      row.isEditingReInspection = true;
+      row.originalReInspection = row.reInspectionDate || null;
+    
+      // กำหนดค่าเริ่มต้นเป็นวันที่และเวลาปัจจุบัน
+      row.reInspectionDraft = this.toDateTimeLocalValue(null);
+    }
+    
+    onReInspectionDraftChange(
+      row: InventoryReportRow,
+      value: string
+    ) {
+      row.reInspectionDraft = value;
+    }
+    
+    hasReInspectionChanged(row: InventoryReportRow): boolean {
+      return !!row.reInspectionDraft;
+    }
+    
+    cancelEditReInspection(row: InventoryReportRow) {
+      row.reInspectionDraft = '';
+      row.originalReInspection = row.reInspectionDate || null;
+      row.isEditingReInspection = false;
+      row.isSavingReInspection = false;
+      row.isDeletingReInspection = false;
+    }    
+
+
+
+
+    private syncEditedReInspection(
+      incomingId: number,
+      reInspectionDate: string | null
+    ) {
+      this.inventoryRows.forEach((r) => {
+        if (r.incomingId === incomingId) {
+          r.reInspectionDate = reInspectionDate;
+          r.originalReInspection = reInspectionDate;
+          r.reInspectionDraft = '';
+          r.isEditingReInspection = false;
+          r.isSavingReInspection = false;
+          r.isDeletingReInspection = false;
+        }
+      });
+    
+      this.filteredRows.forEach((r) => {
+        if (r.incomingId === incomingId) {
+          r.reInspectionDate = reInspectionDate;
+          r.originalReInspection = reInspectionDate;
+          r.reInspectionDraft = '';
+          r.isEditingReInspection = false;
+          r.isSavingReInspection = false;
+          r.isDeletingReInspection = false;
+        }
+      });
+    }
+
+
+    saveReInspection(row: InventoryReportRow) {
+      if (this.role !== 'admin') return;
+      if (row.isSavingReInspection || row.isDeletingReInspection) return;
+    
+      if (!row.reInspectionDraft) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Invalid Reinspection',
+          text: 'กรุณาเลือกวันที่ Reinspection'
+        });
+        return;
+      }
+    
+      const reInspectionDate = new Date(row.reInspectionDraft);
+    
+      if (Number.isNaN(reInspectionDate.getTime())) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Invalid Reinspection',
+          text: 'วันที่ Reinspection ไม่ถูกต้อง'
+        });
+        return;
+      }
+    
+      row.isSavingReInspection = true;
+    
+      const body = {
+        incomingId: row.incomingId,
+        userId: this.userId,
+        reInspection: reInspectionDate.toISOString()
+      };
+    
+      this.http.post<any>(
+        `${config.apiServer}/api/inventory/updateReInspection`,
+        body
+      ).subscribe({
+        next: async (res) => {
+          const newValue =
+            res?.results?.editReInspection?.reInspectionDate ||
+            body.reInspection;
+    
+          this.syncEditedReInspection(row.incomingId, newValue);
+    
+          await Swal.fire({
+            icon: 'success',
+            title: 'Saved',
+            text: 'แก้ไข Reinspection เรียบร้อยแล้ว',
+            timer: 1000,
+            showConfirmButton: false
+          });
+        },
+        error: async (err) => {
+          console.error('saveReInspection error:', err);
+          row.isSavingReInspection = false;
+    
+          await Swal.fire({
+            icon: 'error',
+            title: 'Save Failed',
+            text:
+              err?.error?.message ||
+              err?.error?.error ||
+              'ไม่สามารถบันทึก Reinspection ได้'
+          });
+        }
+      });
+    }
+
+
+
+    deleteReInspection(row: InventoryReportRow) {
+      if (this.role !== 'admin') return;
+      if (row.isSavingReInspection || row.isDeletingReInspection) return;
+    
+      if (!row.reInspectionDate) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No Reinspection',
+          text: 'ไม่มีวันที่ Reinspection ให้ลบ'
+        });
+        return;
+      }
+    
+      Swal.fire({
+        icon: 'warning',
+        title: 'Delete Reinspection?',
+        html: `
+          <div style="text-align:left; line-height:1.7;">
+            <div><b>Job No:</b> ${row.jobNo || '-'}</div>
+            <div><b>Material No:</b> ${row.materialNo || '-'}</div>
+            <div>
+              <b>Reinspection:</b>
+              ${this.formatDateOnly(row.reInspectionDate) || '-'}
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc2626'
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+    
+        row.isDeletingReInspection = true;
+    
+        const body = {
+          incomingId: row.incomingId,
+          userId: this.userId,
+          reInspection: null
+        };
+    
+        this.http.post<any>(
+          `${config.apiServer}/api/inventory/updateReInspection`,
+          body
+        ).subscribe({
+          next: async () => {
+            this.syncEditedReInspection(row.incomingId, null);
+    
+            await Swal.fire({
+              icon: 'success',
+              title: 'Deleted',
+              text: 'ลบ Reinspection เรียบร้อยแล้ว',
+              timer: 1000,
+              showConfirmButton: false
+            });
+          },
+          error: async (err) => {
+            console.error('deleteReInspection error:', err);
+            row.isDeletingReInspection = false;
+    
+            await Swal.fire({
+              icon: 'error',
+              title: 'Delete Failed',
+              text:
+                err?.error?.message ||
+                err?.error?.error ||
+                'ไม่สามารถลบ Reinspection ได้'
+            });
+          }
+        });
+      });
+    }
+
+
+    
+
+    private parseInventoryDate(value?: string | null): Date | null {
+      if (!value) return null;
+    
+      const text = String(value).trim();
+    
+      if (!text) return null;
+    
+      // รองรับ DD/MM/YYYY
+      const ddMMyyyyMatch = text.match(
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+      );
+    
+      if (ddMMyyyyMatch) {
+        const day = Number(ddMMyyyyMatch[1]);
+        const month = Number(ddMMyyyyMatch[2]);
+        const year = Number(ddMMyyyyMatch[3]);
+    
+        const date = new Date(year, month - 1, day);
+        date.setHours(0, 0, 0, 0);
+    
+        // ป้องกันวันที่ผิด เช่น 31/02/2026
+        if (
+          date.getFullYear() !== year ||
+          date.getMonth() !== month - 1 ||
+          date.getDate() !== day
+        ) {
+          return null;
+        }
+    
+        return date;
+      }
+    
+      // รองรับ YYYY-MM-DD, ISO DateTime และ DateTime จาก API
+      const date = new Date(text);
+    
+      if (Number.isNaN(date.getTime())) {
+        return null;
+      }
+    
+      date.setHours(0, 0, 0, 0);
+    
+      return date;
+    }
+    
+    getUpdateDate(row: InventoryReportRow): Date | null {
+      const receivedDate = this.parseInventoryDate(row.recivedDate);
+      const lastReturnDate = this.parseInventoryDate(row.lastReturn);
+      const reInspectionDate = this.parseInventoryDate(
+        row.reInspectionDate
+      );
+    
+      const validDates = [
+        receivedDate,
+        lastReturnDate,
+        reInspectionDate
+      ].filter((date): date is Date => date !== null);
+    
+      if (!validDates.length) {
+        return null;
+      }
+    
+      return validDates.reduce((latest, current) => {
+        return current.getTime() > latest.getTime()
+          ? current
+          : latest;
+      });
+    }
+    
+    getUpdateDateText(row: InventoryReportRow): string {
+      const updateDate = this.getUpdateDate(row);
+    
+      if (!updateDate) {
+        return '';
+      }
+    
+      const pad = (n: number) => String(n).padStart(2, '0');
+    
+      return (
+        `${pad(updateDate.getDate())}/` +
+        `${pad(updateDate.getMonth() + 1)}/` +
+        `${updateDate.getFullYear()}`
+      );
+    }
+    
+    getCalculateDays(row: InventoryReportRow): number | null {
+      const updateDate = this.getUpdateDate(row);
+    
+      if (!updateDate) {
+        return null;
+      }
+    
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+    
+      const millisecondsPerDay = 1000 * 60 * 60 * 24;
+    
+      const difference =
+        today.getTime() - updateDate.getTime();
+    
+      // กรณี UPDATE เป็นวันในอนาคต ให้เป็น 0 วัน
+      return Math.max(
+        0,
+        Math.floor(difference / millisecondsPerDay)
+      );
+    }
+    
+    getCalculateDaysText(row: InventoryReportRow): string {
+      const days = this.getCalculateDays(row);
+    
+      return days == null ? '' : String(days);
+    }
+    
+    getJudgement(row: InventoryReportRow): string {
+      const days = this.getCalculateDays(row);
+    
+      if (days == null) {
+        return '';
+      }
+    
+      return days >= 365 ? 'Reinspection' : '';
+    }
+
+
+
+
+
+
+
+
 
 
   formatDateOnly(value?: string | null) {

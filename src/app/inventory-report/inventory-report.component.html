@@ -518,6 +518,10 @@
               <th style="width: 190px;">Time</th>
               <th style="width: 150px;">Received Date</th>
               <th style="width: 150px;">Last Return</th>
+              <th style="width: 160px;">Reinspection</th>
+              <th style="width: 150px;">Update</th>
+              <th style="width: 130px;">Calculate</th>
+              <th style="width: 160px;">Judgement</th>
               
             </tr>
           </thead>
@@ -802,10 +806,137 @@
                   </ng-template>
                 </div>
               </td>
+
+              <td>
+                <div class="editable-reinspection-cell">
+                  <ng-container
+                    *ngIf="!row.isEditingReInspection; else editReInspectionTpl"
+                  >
+                    <div
+                      class="editable-reinspection-view material-spec"
+                      [class.can-edit]="role === 'admin'"
+                      (click)="role === 'admin' && startEditReInspection(row)"
+                      [title]="
+                        row.reInspectionDate
+                          ? formatDateTime(row.reInspectionDate)
+                          : 'Click to edit Reinspection'
+                      "
+                    >
+                      {{ formatDateOnly(row.reInspectionDate) || ' ' }}
+                    </div>
+                  </ng-container>
+              
+                  <ng-template #editReInspectionTpl>
+                    <div
+                      class="editable-reinspection-edit-wrap"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <input
+                        type="datetime-local"
+                        class="editable-reinspection-input"
+                        [ngModel]="row.reInspectionDraft"
+                        (ngModelChange)="onReInspectionDraftChange(row, $event)"
+                        [disabled]="
+                          !!row.isSavingReInspection ||
+                          !!row.isDeletingReInspection
+                        "
+                        autofocus
+                      />
+              
+                      <div class="editable-reinspection-actions">
+                        <button
+                          *ngIf="hasReInspectionChanged(row)"
+                          type="button"
+                          class="note-icon-btn note-icon-save"
+                          title="Save"
+                          [disabled]="
+                            row.isSavingReInspection ||
+                            row.isDeletingReInspection
+                          "
+                          (mousedown)="$event.preventDefault()"
+                          (click)="saveReInspection(row)"
+                        >
+                          <i
+                            class="fa fa-check"
+                            *ngIf="!row.isSavingReInspection"
+                          ></i>
+                          <i
+                            class="fa fa-spinner fa-spin"
+                            *ngIf="row.isSavingReInspection"
+                          ></i>
+                        </button>
+              
+                      
+                        <button
+                          type="button"
+                          class="note-icon-btn note-icon-cancel"
+                          title="Cancel"
+                          [disabled]="
+                            row.isSavingReInspection ||
+                            row.isDeletingReInspection
+                          "
+                          (mousedown)="$event.preventDefault()"
+                          (click)="cancelEditReInspection(row)"
+                        >
+                          <i class="fa fa-times"></i>
+                        </button>
+
+                        <button
+                          *ngIf="row.reInspectionDate"
+                          type="button"
+                          class="note-icon-btn note-icon-delete"
+                          title="Delete Reinspection"
+                          [disabled]="
+                            row.isSavingReInspection ||
+                            row.isDeletingReInspection
+                          "
+                          (mousedown)="$event.preventDefault()"
+                          (click)="deleteReInspection(row)"
+                        >
+                          <i
+                            class="fa fa-trash"
+                            *ngIf="!row.isDeletingReInspection"
+                          ></i>
+                          <i
+                            class="fa fa-spinner fa-spin"
+                            *ngIf="row.isDeletingReInspection"
+                          ></i>
+                        </button>
+
+                      </div>
+                    </div>
+                  </ng-template>
+                </div>
+              </td>
+
+             <!-- Update -->
+              <td>
+                <div class="material-spec">
+                  {{ getUpdateDateText(row) }}
+                </div>
+              </td>
+
+              <!-- Calculate -->
+              <td class="text-center">
+                <div class="material-spec">
+                  {{ getCalculateDaysText(row) }}
+                </div>
+              </td>
+
+              <!-- Judgement -->
+              <td>
+                <div
+                  class="judgement-value"
+                  [class.reinspection]="getJudgement(row) === 'Reinspection'"
+                >
+                  {{ getJudgement(row) }}
+                </div>
+              </td>
+
             </tr>
 
             <tr *ngIf="!filteredRows.length">
-              <td colspan="19" class="empty-cell">
+              <td colspan="23" class="empty-cell">
                 <div class="empty-state">
                   <i class="fa fa-inbox empty-icon"></i>
                   <div class="empty-title">No inventory data found</div>
@@ -819,7 +950,7 @@
 
           <tbody *ngIf="isLoading">
             <tr>
-              <td colspan="19" class="loading-cell">
+              <td colspan="23" class="loading-cell">
                 <div class="loading-state">
                   <i class="fa fa-spinner fa-spin me-2"></i>
                   Loading inventory data...

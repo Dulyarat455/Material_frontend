@@ -1,0 +1,215 @@
+<div class="graph-page">
+    <div class="page-shell">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-header-icon">
+            <i class="fas fa-chart-column"></i>
+          </div>
+  
+          <div class="page-header-text">
+            <div class="page-title">
+              Inventory Dashboard
+            </div>
+  
+            <div class="page-subtitle">
+              Stock value, quantity and pallet storage overview
+            </div>
+          </div>
+        </div>
+  
+        <div class="page-header-right">
+          <div class="status-chip">
+            <span class="status-dot"></span>
+  
+            <div>
+              <div class="status-label">
+                Data Source
+              </div>
+  
+              <div class="status-value">
+                Dummy Data
+              </div>
+            </div>
+          </div>
+  
+          <div class="date-chip">
+            <i class="fas fa-calendar-alt"></i>
+            04/06/2026 - 08/06/2026
+          </div>
+        </div>
+      </div>
+  
+      <div class="graph-toolbar">
+        <div class="toolbar-title">
+          <i class="fas fa-chart-bar"></i>
+          Inventory Summary
+        </div>
+  
+        <div class="toolbar-actions">
+          <button
+            type="button"
+            class="toolbar-btn"
+          >
+            <i class="fas fa-sync-alt"></i>
+            Refresh
+          </button>
+  
+          <button
+            type="button"
+            class="toolbar-btn toolbar-btn-primary"
+          >
+            <i class="fas fa-camera"></i>
+            Save Snapshot
+          </button>
+        </div>
+      </div>
+  
+      <div class="graph-grid">
+        <section
+          class="graph-card"
+          *ngFor="
+            let card of graphCards;
+            trackBy: trackByCard
+          "
+        >
+          <div class="graph-card-head">
+            <div>
+              <div class="graph-card-title">
+                {{ card.title }}
+              </div>
+  
+              <div
+                class="graph-card-subtitle"
+                *ngIf="card.subtitle"
+              >
+                {{ card.subtitle }}
+                <span *ngIf="card.unit">
+                  ({{ card.unit }})
+                </span>
+              </div>
+            </div>
+  
+            <div class="graph-legend">
+              <div
+                class="legend-item"
+                *ngFor="
+                  let legend of getLegendItems(card);
+                  trackBy: trackByValue
+                "
+              >
+                <span
+                  class="legend-color"
+                  [style.background]="legend.color"
+                ></span>
+  
+                <span>{{ legend.label }}</span>
+              </div>
+            </div>
+          </div>
+  
+          <div
+            class="chart-area"
+            [class.chart-area-single]="card.days.length === 1"
+          >
+            <div class="chart-grid-lines">
+              <div class="grid-line grid-line-100"></div>
+              <div class="grid-line grid-line-75"></div>
+              <div class="grid-line grid-line-50"></div>
+              <div class="grid-line grid-line-25"></div>
+              <div class="grid-line grid-line-0"></div>
+            </div>
+  
+            <div
+              class="chart-columns"
+              [style.--column-count]="card.days.length"
+            >
+              <div
+                class="chart-column"
+                *ngFor="
+                  let day of card.days;
+                  trackBy: trackByDay
+                "
+              >
+                <div class="bar-value-total">
+                  <span *ngIf="getTotal(day) > 0">
+                    {{
+                      formatValue(
+                        getTotal(day),
+                        card.decimals
+                      )
+                    }}
+                  </span>
+                </div>
+  
+                <div class="bar-track">
+                  <div
+                    class="bar-segment"
+                    *ngFor="
+                      let item of day.values;
+                      trackBy: trackByValue
+                    "
+                    [style.height.%]="
+                      getSegmentHeight(
+                        item.value,
+                        card.maxValue
+                      )
+                    "
+                    [style.background]="item.color"
+                    [title]="
+                      item.label +
+                      ': ' +
+                      formatValue(
+                        item.value,
+                        card.decimals
+                      )
+                    "
+                  >
+                    <span
+                      class="bar-segment-value"
+                      *ngIf="item.value > 0"
+                    >
+                      {{
+                        formatValue(
+                          item.value,
+                          card.decimals
+                        )
+                      }}
+                    </span>
+                  </div>
+                </div>
+  
+                <div class="chart-date">
+                  {{ day.date }}
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="graph-card-footer">
+            <div class="footer-stat">
+              <span class="footer-label">
+                Latest Total
+              </span>
+  
+              <span class="footer-value">
+                {{
+                  formatValue(
+                    getTotal(
+                      card.days[card.days.length - 1]
+                    ),
+                    card.decimals
+                  )
+                }}
+                {{ card.unit || '' }}
+              </span>
+            </div>
+  
+            <div class="footer-status">
+              <i class="fas fa-circle-check"></i>
+              Updated
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>

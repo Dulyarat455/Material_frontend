@@ -11,6 +11,7 @@ type MaterialRow = {
   materialName: string;
   materialSpec: string;
   accountCode?: string;
+  lineNo?: string;
   timeStamp?: string;
   status?: string;
 };
@@ -60,6 +61,7 @@ export class MaterialComponent implements OnInit {
           materialName: item.materialName || '',
           materialSpec: item.materialSpec || '',
           accountCode: item.accountCode || '',
+          lineNo: item.lineNo || '',
           timeStamp: item.timeStamp || '',
           status: item.status || ''
         }));
@@ -93,19 +95,98 @@ export class MaterialComponent implements OnInit {
   }
 
 
+
+  private sortMaterialRows(rows: MaterialRow[]): MaterialRow[] {
+    const getAccountPriority = (accountCode?: string): number => {
+      return String(accountCode || '').trim() === '4520' ? 0 : 1;
+    };
+  
+    const getLinePriority = (lineNo?: string): number => {
+      const line = String(lineNo || '').trim().toUpperCase();
+  
+      if (line === 'LAM') return 0;
+      if (line === 'GEN') return 1;
+  
+      return 2;
+    };
+  
+    return [...rows].sort((a, b) => {
+      // 1) Account Code 4520 มาก่อนเสมอ
+      const accountPriorityA = getAccountPriority(a.accountCode);
+      const accountPriorityB = getAccountPriority(b.accountCode);
+  
+      if (accountPriorityA !== accountPriorityB) {
+        return accountPriorityA - accountPriorityB;
+      }
+  
+      // 2) จัดกลุ่มตาม Line No: LAM -> GEN -> อื่น ๆ
+      const linePriorityA = getLinePriority(a.lineNo);
+      const linePriorityB = getLinePriority(b.lineNo);
+  
+      if (linePriorityA !== linePriorityB) {
+        return linePriorityA - linePriorityB;
+      }
+  
+      // 3) ถ้าเป็น Line เดียวกัน ให้เรียง Account Code
+      const accountCompare = String(a.accountCode || '').localeCompare(
+        String(b.accountCode || ''),
+        undefined,
+        {
+          numeric: true,
+          sensitivity: 'base'
+        }
+      );
+  
+      if (accountCompare !== 0) {
+        return accountCompare;
+      }
+  
+      // 4) เรียง Material No
+      const materialNoCompare = String(a.materialNo || '').localeCompare(
+        String(b.materialNo || ''),
+        undefined,
+        {
+          numeric: true,
+          sensitivity: 'base'
+        }
+      );
+  
+      if (materialNoCompare !== 0) {
+        return materialNoCompare;
+      }
+  
+      // 5) หาก Material No เหมือนกัน ให้เรียง Material Name
+      return String(a.materialName || '').localeCompare(
+        String(b.materialName || ''),
+        undefined,
+        {
+          numeric: true,
+          sensitivity: 'base'
+        }
+      );
+    });
+  }
+
+
   applyFilter() {
     const key = (this.searchText || '').trim().toLowerCase();
   
-    const start = this.fromDate ? this.toDateOnly(this.fromDate) : null;
-    const end = this.toDate ? this.toDateOnly(this.toDate) : null;
+    const start = this.fromDate
+      ? this.toDateOnly(this.fromDate)
+      : null;
   
-    this.filteredMaterials = this.materials.filter((row) => {
+    const end = this.toDate
+      ? this.toDateOnly(this.toDate)
+      : null;
+  
+    const filteredRows = this.materials.filter((row) => {
       const matchSearch =
         !key ||
         (row.materialNo || '').toLowerCase().includes(key) ||
         (row.materialName || '').toLowerCase().includes(key) ||
         (row.materialSpec || '').toLowerCase().includes(key) ||
-        (row.accountCode || '').toLowerCase().includes(key);
+        (row.accountCode || '').toLowerCase().includes(key) ||
+        (row.lineNo || '').toLowerCase().includes(key);
   
       const rowDate = this.toDateOnly(row.timeStamp);
   
@@ -117,6 +198,9 @@ export class MaterialComponent implements OnInit {
   
       return matchSearch && matchFrom && matchTo;
     });
+  
+    this.filteredMaterials =
+      this.sortMaterialRows(filteredRows);
   }
 
   onSearchChange() {
@@ -299,8 +383,8 @@ export class MaterialComponent implements OnInit {
         <div style="text-align:left">
           ระบบจะดึงข้อมูล Material จาก PBASS
           <br>• ถ้ายังไม่มีในฐานข้อมูล จะทำการเพิ่มข้อมูล
-          <br>• ถ้า Material No เดิม แต่ชื่อหรือ Spec เปลี่ยน จะทำการอัปเดตข้อมูล
-          <br>• ถ้าซ้ำครบทั้ง 3 ค่า จะข้ามรายการนั้น
+          <br>• ถ้า Material No เดิม แต่ Name, Spec, Account Code หรือ Line No เปลี่ยน จะอัปเดตข้อมูล
+          <br>• ถ้าซ้ำครบทั้ง 4 ค่า จะข้ามรายการนั้น
         </div>
       `,
       icon: 'question',
