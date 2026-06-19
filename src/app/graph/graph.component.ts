@@ -213,6 +213,283 @@ export class GraphComponent {
           ]
         }
       ]
+    },
+    {
+      title: 'Pallet Movement',
+      subtitle: 'Stock In',
+      decimals: 0,
+      maxValue: 150,
+      chartType: 'movement',
+      days: [
+        {
+          date: '04/06/2026',
+          values: [
+            {
+              label: 'StockIn-G',
+              value: 97,
+              color: '#28b9e8'
+            },
+            {
+              label: 'StockIn-L',
+              value: 33,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '05/06/2026',
+          values: [
+            {
+              label: 'StockIn-G',
+              value: 73,
+              color: '#28b9e8'
+            },
+            {
+              label: 'StockIn-L',
+              value: 60,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '06/06/2026',
+          values: [
+            {
+              label: 'StockIn-G',
+              value: 26,
+              color: '#28b9e8'
+            },
+            {
+              label: 'StockIn-L',
+              value: 54,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '07/06/2026',
+          values: [
+            {
+              label: 'StockIn-G',
+              value: 0,
+              color: '#28b9e8'
+            },
+            {
+              label: 'StockIn-L',
+              value: 0,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '08/06/2026',
+          values: [
+            {
+              label: 'StockIn-G',
+              value: 11,
+              color: '#28b9e8'
+            },
+            {
+              label: 'StockIn-L',
+              value: 0,
+              color: '#89f28d'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: 'Pallet Movement',
+      subtitle: 'Issue - Return',
+      decimals: 0,
+      maxValue: 80,
+      chartType: 'movement',
+      days: [
+        {
+          date: '04/06/2026',
+          values: [
+            {
+              label: 'Issue-G',
+              value: 30,
+              color: '#28b9e8'
+            },
+            {
+              label: 'Issue-L',
+              value: 30,
+              color: '#89f28d'
+            },
+            {
+              label: 'Return',
+              value: 0,
+              color: '#082f49'
+            }
+          ]
+        },
+        {
+          date: '05/06/2026',
+          values: [
+            {
+              label: 'Issue-G',
+              value: 33,
+              color: '#28b9e8'
+            },
+            {
+              label: 'Issue-L',
+              value: 36,
+              color: '#89f28d'
+            },
+            {
+              label: 'Return',
+              value: 0,
+              color: '#082f49'
+            }
+          ]
+        },
+        {
+          date: '06/06/2026',
+          values: [
+            {
+              label: 'Issue-G',
+              value: 32,
+              color: '#28b9e8'
+            },
+            {
+              label: 'Issue-L',
+              value: 33,
+              color: '#89f28d'
+            },
+            {
+              label: 'Return',
+              value: 0,
+              color: '#082f49'
+            }
+          ]
+        },
+        {
+          date: '07/06/2026',
+          values: [
+            {
+              label: 'Issue-G',
+              value: 6,
+              color: '#28b9e8'
+            },
+            {
+              label: 'Issue-L',
+              value: 9,
+              color: '#89f28d'
+            },
+            {
+              label: 'Return',
+              value: 1,
+              color: '#082f49'
+            }
+          ]
+        },
+        {
+          date: '08/06/2026',
+          values: [
+            {
+              label: 'Issue-G',
+              value: 11,
+              color: '#28b9e8'
+            },
+            {
+              label: 'Issue-L',
+              value: 11,
+              color: '#89f28d'
+            },
+            {
+              label: 'Return',
+              value: 1,
+              color: '#082f49'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: 'Pallet Movement',
+      subtitle: 'Move Area',
+      decimals: 0,
+      maxValue: 110,
+      chartType: 'movement',
+      days: [
+        {
+          date: '04/06/2026',
+          values: [
+            {
+              label: 'MoveArea-G',
+              value: 32,
+              color: '#28b9e8'
+            },
+            {
+              label: 'MoveArea-L',
+              value: 10,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '05/06/2026',
+          values: [
+            {
+              label: 'MoveArea-G',
+              value: 34,
+              color: '#28b9e8'
+            },
+            {
+              label: 'MoveArea-L',
+              value: 63,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '06/06/2026',
+          values: [
+            {
+              label: 'MoveArea-G',
+              value: 70,
+              color: '#28b9e8'
+            },
+            {
+              label: 'MoveArea-L',
+              value: 24,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '07/06/2026',
+          values: [
+            {
+              label: 'MoveArea-G',
+              value: 3,
+              color: '#28b9e8'
+            },
+            {
+              label: 'MoveArea-L',
+              value: 11,
+              color: '#89f28d'
+            }
+          ]
+        },
+        {
+          date: '08/06/2026',
+          values: [
+            {
+              label: 'MoveArea-G',
+              value: 5,
+              color: '#28b9e8'
+            },
+            {
+              label: 'MoveArea-L',
+              value: 6,
+              color: '#89f28d'
+            }
+          ]
+        }
+      ]
     }
 
 

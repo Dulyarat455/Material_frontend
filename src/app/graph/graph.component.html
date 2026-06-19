@@ -1,146 +1,178 @@
 <div class="graph-page">
-    <div class="page-shell">
-      <div class="page-header">
-        <div class="page-header-left">
-          <div class="page-header-icon">
-            <i class="fas fa-chart-column"></i>
-          </div>
-  
-          <div class="page-header-text">
-            <div class="page-title">
-              Inventory Dashboard
-            </div>
-  
-            <div class="page-subtitle">
-              Stock value, quantity and pallet storage overview
-            </div>
-          </div>
+  <div class="page-shell">
+
+    <!-- =========================
+         PAGE HEADER
+    ========================== -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon">
+          <i class="fas fa-chart-column"></i>
         </div>
-  
-        <div class="page-header-right">
-          <div class="status-chip">
-            <span class="status-dot"></span>
-  
-            <div>
-              <div class="status-label">
-                Data Source
-              </div>
-  
-              <div class="status-value">
-                Dummy Data
-              </div>
-            </div>
+
+        <div class="page-header-text">
+          <div class="page-title">
+            Inventory Dashboard
           </div>
-  
-          <div class="date-chip">
-            <i class="fas fa-calendar-alt"></i>
-            04/06/2026 - 08/06/2026
+
+          <div class="page-subtitle">
+            Stock value, quantity, pallet storage and movement overview
           </div>
         </div>
       </div>
-  
-      <div class="graph-toolbar">
-        <div class="toolbar-title">
-          <i class="fas fa-chart-bar"></i>
-          Inventory Summary
+
+      <div class="page-header-right">
+        <div class="status-chip">
+          <span class="status-dot"></span>
+
+          <div class="status-info">
+            <div class="status-label">
+              Data Source
+            </div>
+
+            <div class="status-value">
+              Dummy Data
+            </div>
+          </div>
         </div>
-  
-        <div class="toolbar-actions">
-          <button
-            type="button"
-            class="toolbar-btn"
-          >
-            <i class="fas fa-sync-alt"></i>
-            Refresh
-          </button>
-  
-          <button
-            type="button"
-            class="toolbar-btn toolbar-btn-primary"
-          >
-            <i class="fas fa-camera"></i>
-            Save Snapshot
-          </button>
+
+        <div class="date-chip">
+          <i class="fas fa-calendar-alt"></i>
+          <span>04/06/2026 - 08/06/2026</span>
         </div>
       </div>
-  
-      <div class="graph-grid">
-        <section
-          class="graph-card"
-          *ngFor="
-            let card of graphCards;
-            trackBy: trackByCard
-          "
+    </div>
+
+    <!-- =========================
+         TOOLBAR
+    ========================== -->
+    <div class="graph-toolbar">
+      <div class="toolbar-title">
+        <i class="fas fa-chart-bar"></i>
+        <span>Inventory Summary</span>
+      </div>
+
+      <div class="toolbar-actions">
+        <button
+          type="button"
+          class="toolbar-btn"
         >
-          <div class="graph-card-head">
-            <div>
-              <div class="graph-card-title">
-                {{ card.title }}
-              </div>
-  
-              <div
-                class="graph-card-subtitle"
-                *ngIf="card.subtitle"
-              >
-                {{ card.subtitle }}
-                <span *ngIf="card.unit">
-                  ({{ card.unit }})
+          <i class="fas fa-sync-alt"></i>
+          Refresh
+        </button>
+
+        <button
+          type="button"
+          class="toolbar-btn toolbar-btn-primary"
+        >
+          <i class="fas fa-camera"></i>
+          Save Snapshot
+        </button>
+      </div>
+    </div>
+
+    <!-- =========================
+         GRAPH GRID
+    ========================== -->
+    <div class="graph-grid">
+      <section
+        class="graph-card"
+        *ngFor="
+          let card of graphCards;
+          trackBy: trackByCard
+        "
+        [class.graph-card-movement]="card.chartType === 'movement'"
+        [class.graph-card-pallet]="card.chartType === 'pallet'"
+      >
+
+        <!-- CARD HEADER -->
+        <div class="graph-card-head">
+          <div class="graph-card-heading">
+            <div class="graph-card-title">
+              {{ card.title }}
+            </div>
+
+            <div
+              class="graph-card-subtitle"
+              *ngIf="card.subtitle"
+            >
+              {{ card.subtitle }}
+
+              <span *ngIf="card.unit">
+                ({{ card.unit }})
+              </span>
+            </div>
+          </div>
+
+          <div class="graph-legend">
+            <div
+              class="legend-item"
+              *ngFor="
+                let legend of getLegendItems(card);
+                trackBy: trackByValue
+              "
+            >
+              <span
+                class="legend-color"
+                [style.background-color]="legend.color"
+              ></span>
+
+              <span class="legend-label">
+                {{ legend.label }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHART -->
+        <div
+          class="chart-area"
+          [class.chart-area-single]="card.days.length === 1"
+          [class.chart-area-movement]="card.chartType === 'movement'"
+          [class.chart-area-pallet]="card.chartType === 'pallet'"
+        >
+          <!-- Background grid -->
+          <div class="chart-grid-lines">
+            <div class="grid-line grid-line-100"></div>
+            <div class="grid-line grid-line-75"></div>
+            <div class="grid-line grid-line-50"></div>
+            <div class="grid-line grid-line-25"></div>
+            <div class="grid-line grid-line-0"></div>
+          </div>
+
+          <!-- Columns -->
+          <div
+            class="chart-columns"
+            [style.--column-count]="card.days.length"
+          >
+            <div
+              class="chart-column"
+              *ngFor="
+                let day of card.days;
+                trackBy: trackByDay
+              "
+            >
+              <!-- Total -->
+              <div class="bar-value-total">
+                <span *ngIf="getTotal(day) > 0">
+                  {{
+                    formatValue(
+                      getTotal(day),
+                      card.decimals
+                    )
+                  }}
+                </span>
+
+                <span
+                  class="bar-empty-value"
+                  *ngIf="getTotal(day) <= 0"
+                >
+                  -
                 </span>
               </div>
-            </div>
-  
-            <div class="graph-legend">
-              <div
-                class="legend-item"
-                *ngFor="
-                  let legend of getLegendItems(card);
-                  trackBy: trackByValue
-                "
-              >
-                <span
-                  class="legend-color"
-                  [style.background]="legend.color"
-                ></span>
-  
-                <span>{{ legend.label }}</span>
-              </div>
-            </div>
-          </div>
-  
-          <div
-            class="chart-area"
-            [class.chart-area-single]="card.days.length === 1"
-          >
-            <div class="chart-grid-lines">
-              <div class="grid-line grid-line-100"></div>
-              <div class="grid-line grid-line-75"></div>
-              <div class="grid-line grid-line-50"></div>
-              <div class="grid-line grid-line-25"></div>
-              <div class="grid-line grid-line-0"></div>
-            </div>
-  
-            <div
-              class="chart-columns"
-              [style.--column-count]="card.days.length"
-            >
-              <div
-                class="chart-column"
-                *ngFor="
-                  let day of card.days;
-                  trackBy: trackByDay
-                "
-              >
-                <div class="bar-value-total">
-                  <span *ngIf="getTotal(day) > 0">
-                    {{
-                      formatValue(
-                        getTotal(day),
-                        card.decimals
-                      )
-                    }}
-                  </span>
-                </div>
-  
+
+              <!-- Bar -->
+              <div class="bar-container">
                 <div class="bar-track">
                   <div
                     class="bar-segment"
@@ -148,13 +180,18 @@
                       let item of day.values;
                       trackBy: trackByValue
                     "
+                    [class.dark-segment]="
+                      item.color === '#082f49' ||
+                      item.color === '#0f172a' ||
+                      item.color === '#000000'
+                    "
                     [style.height.%]="
                       getSegmentHeight(
                         item.value,
                         card.maxValue
                       )
                     "
-                    [style.background]="item.color"
+                    [style.background-color]="item.color"
                     [title]="
                       item.label +
                       ': ' +
@@ -177,39 +214,46 @@
                     </span>
                   </div>
                 </div>
-  
-                <div class="chart-date">
-                  {{ day.date }}
-                </div>
+              </div>
+
+              <!-- Date -->
+              <div class="chart-date">
+                {{ day.date }}
               </div>
             </div>
           </div>
-  
-          <div class="graph-card-footer">
-            <div class="footer-stat">
-              <span class="footer-label">
-                Latest Total
+        </div>
+
+        <!-- CARD FOOTER -->
+        <div class="graph-card-footer">
+          <div class="footer-stat">
+            <span class="footer-label">
+              Latest Total
+            </span>
+
+            <span class="footer-value">
+              {{
+                formatValue(
+                  getTotal(
+                    card.days[card.days.length - 1]
+                  ),
+                  card.decimals
+                )
+              }}
+
+              <span *ngIf="card.unit">
+                {{ card.unit }}
               </span>
-  
-              <span class="footer-value">
-                {{
-                  formatValue(
-                    getTotal(
-                      card.days[card.days.length - 1]
-                    ),
-                    card.decimals
-                  )
-                }}
-                {{ card.unit || '' }}
-              </span>
-            </div>
-  
-            <div class="footer-status">
-              <i class="fas fa-circle-check"></i>
-              Updated
-            </div>
+            </span>
           </div>
-        </section>
-      </div>
+
+          <div class="footer-status">
+            <i class="fas fa-circle-check"></i>
+            <span>Updated</span>
+          </div>
+        </div>
+
+      </section>
     </div>
   </div>
+</div>

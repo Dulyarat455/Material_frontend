@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 
+import { HttpClient } from '@angular/common/http';
+import config from '../../config';
+
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
