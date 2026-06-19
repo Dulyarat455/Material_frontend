@@ -29,7 +29,7 @@ type InventoryReportRow = {
   lastReturn: string | null;
   lastReturnRef: string
   reInspectionDate: string | null;
-
+  lineNo: string;
 
    // ui state
   isEditingStockNote?: boolean;

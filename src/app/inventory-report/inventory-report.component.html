@@ -514,6 +514,7 @@
               <th style="width: 140px;">Area</th>
               <th style="width: 220px;">Remark</th>
               <th style="width: 220px;">Stock Note</th>
+              <th style="width: 120px;">Line No</th>
               <th style="width: 130px;">Not Control</th>
               <th style="width: 190px;">Time</th>
               <th style="width: 150px;">Received Date</th>
@@ -707,6 +708,13 @@
                       </div>
                     </div>
                   </ng-template>
+                </div>
+              </td>
+
+              <!-- Line No -->
+              <td class="text-center">
+                <div class="line-no-value">
+                  {{ row.lineNo || '-' }}
                 </div>
               </td>
 
