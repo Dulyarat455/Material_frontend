@@ -713,7 +713,11 @@
 
               <!-- Line No -->
               <td class="text-center">
-                <div class="line-no-value">
+                <div
+                  class="line-no-value"
+                  [class.line-lam]="row.lineNo === 'LAM'"
+                  [class.line-gen]="row.lineNo === 'GEN'"
+                >
                   {{ row.lineNo || '-' }}
                 </div>
               </td>
