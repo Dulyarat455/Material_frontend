@@ -839,4 +839,5 @@ export class GraphComponent {
   ): string {
     return `${value.label}-${index}`;
   }
+  
 }
