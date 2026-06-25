@@ -1,5 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import config from '../../config';
+
+type GraphCardId =
+  | 'stockAmountByItem'
+  | 'stockQtyByGroup'
+  | 'stockAmountByGroup'
+  | 'palletStorageTotal'
+  | 'palletStorageGeneral'
+  | 'palletStorageLamination'
+  | 'palletMovementStockIn'
+  | 'palletMovementIssueReturn'
+  | 'palletMovementMoveArea';
 
 type StackValue = {
   label: string;
@@ -13,487 +28,774 @@ type GraphDay = {
 };
 
 type GraphCard = {
+  id: GraphCardId;
   title: string;
   subtitle?: string;
   unit?: string;
   decimals: number;
   maxValue: number;
-  chartType: 'amount' | 'quantity' | 'pallet' |'movement';
+  target?: number | null;
+  chartType: 'amount' | 'quantity' | 'pallet' | 'movement';
   days: GraphDay[];
 };
+
+type InventoryApiRow = {
+  incomingId: number;
+  jobNo: string;
+  notControl: string;
+  storeId: number;
+  storeName: string;
+  coil: number;
+  qty: number;
+  totalPrice: number;
+  lineNo: string;
+  timeStmp: string;
+};
+
+type TransactionApiRow = {
+  incomingId: number;
+  jobNo: string;
+  lineNo: string;
+  type: string;
+  timeStmp: string;
+};
+
+type NotControlFilter = 'all' | 'Control' | 'Not Control';
 
 @Component({
   selector: 'app-graph',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './graph.component.html',
   styleUrl: './graph.component.css'
 })
 export class GraphComponent {
-  readonly graphCards: GraphCard[] = [
-    {
+  constructor(private http: HttpClient) {}
+
+  isLoading = false;
+  isError = false;
+
+  startDate = '';
+  endDate = '';
+  notControlFilter: NotControlFilter = 'all';
+
+  inventoryRows: InventoryApiRow[] = [];
+  transactionRows: TransactionApiRow[] = [];
+
+  graphCards: GraphCard[] = [];
+
+  private targetMap: Record<GraphCardId, number | null> = {
+    stockAmountByItem: null,
+    stockQtyByGroup: null,
+    stockAmountByGroup: null,
+    palletStorageTotal: null,
+    palletStorageGeneral: null,
+    palletStorageLamination: null,
+    palletMovementStockIn: null,
+    palletMovementIssueReturn: null,
+    palletMovementMoveArea: null
+  };
+
+  readonly color = {
+    control: '#1479bd',
+    notControl: '#dce7f3',
+
+    gen: '#28b9e8',
+    lam: '#89f28d',
+
+    palletAll: '#f3a264',
+    palletPending: '#f8dfce',
+
+    returnDark: '#082f49'
+  };
+
+  ngOnInit() {
+    this.setDefaultDateRange();
+    this.fetchGraphData();
+  }
+
+  // =============================
+  // API
+  // =============================
+
+  fetchGraphData() {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
+    this.isError = false;
+
+    forkJoin({
+      inventory: this.http.get<any>(
+        `${config.apiServer}/api/graph/listInventory`
+      ),
+      transaction: this.http.get<any>(
+        `${config.apiServer}/api/graph/listTransaction`
+      )
+    }).subscribe({
+      next: (res) => {
+        this.inventoryRows = Array.isArray(res.inventory?.results)
+          ? res.inventory.results
+          : [];
+
+        this.transactionRows = Array.isArray(res.transaction?.results)
+          ? res.transaction.results
+          : [];
+
+        this.buildGraphCards();
+
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('fetchGraphData error:', err);
+
+        this.inventoryRows = [];
+        this.transactionRows = [];
+        this.graphCards = [];
+        this.isLoading = false;
+        this.isError = true;
+      }
+    });
+  }
+
+  refresh() {
+    this.fetchGraphData();
+  }
+
+  onFilterChange() {
+    this.buildGraphCards();
+  }
+
+  onTargetChange(card: GraphCard, value: number | string | null) {
+    const targetValue = Number(value);
+
+    this.targetMap[card.id] =
+      value === null ||
+      value === '' ||
+      Number.isNaN(targetValue) ||
+      targetValue < 0
+        ? null
+        : targetValue;
+
+    this.buildGraphCards();
+  }
+
+  // =============================
+  // Date
+  // =============================
+
+  private setDefaultDateRange() {
+    const today = new Date();
+
+    const firstDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
+    this.startDate = this.toInputDate(firstDay);
+    this.endDate = this.toInputDate(today);
+  }
+
+  private toInputDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private toDateKey(value: string | Date | null | undefined): string {
+    if (!value) return '';
+
+    const date = value instanceof Date
+      ? value
+      : new Date(value);
+
+    if (Number.isNaN(date.getTime())) return '';
+
+    return this.toInputDate(date);
+  }
+
+  private toDisplayDate(dateKey: string): string {
+    if (!dateKey) return '';
+
+    const [year, month, day] = dateKey.split('-');
+
+    return `${day}/${month}/${year}`;
+  }
+
+  private getDateKeysBetween(
+    startDate: string,
+    endDate: string
+  ): string[] {
+    const start = new Date(`${startDate}T00:00:00`);
+    const end = new Date(`${endDate}T00:00:00`);
+
+    if (
+      Number.isNaN(start.getTime()) ||
+      Number.isNaN(end.getTime()) ||
+      start > end
+    ) {
+      return [];
+    }
+
+    const result: string[] = [];
+    const cursor = new Date(start);
+
+    while (cursor <= end) {
+      result.push(this.toInputDate(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return result;
+  }
+
+  // =============================
+  // Number helpers
+  // =============================
+
+  private roundExcel(
+    value: number,
+    decimals: number
+  ): number {
+    const factor = Math.pow(10, decimals);
+
+    return Math.round(Number(value || 0) * factor) / factor;
+  }
+
+  private toMillionBaht(value: number): number {
+    return this.roundExcel(
+      Number(value || 0) / 1_000_000,
+      1
+    );
+  }
+
+  private toTon(value: number): number {
+    return this.roundExcel(
+      Number(value || 0) / 1000,
+      0
+    );
+  }
+
+  private sum(
+    rows: any[],
+    key: string
+  ): number {
+    return rows.reduce((total, row) => {
+      return total + Number(row?.[key] || 0);
+    }, 0);
+  }
+
+  private countUniqueIncoming(
+    rows: { incomingId: number }[]
+  ): number {
+    return new Set(
+      rows
+        .map(row => Number(row.incomingId || 0))
+        .filter(id => id > 0)
+    ).size;
+  }
+
+  // =============================
+  // Filter helpers
+  // =============================
+
+  private isNotControl(row: { notControl?: string }): boolean {
+    return String(row.notControl || '')
+      .trim()
+      .toLowerCase() === 'yes';
+  }
+
+  private applyNotControlFilter(
+    rows: InventoryApiRow[]
+  ): InventoryApiRow[] {
+    if (this.notControlFilter === 'Control') {
+      return rows.filter(row => !this.isNotControl(row));
+    }
+
+    if (this.notControlFilter === 'Not Control') {
+      return rows.filter(row => this.isNotControl(row));
+    }
+
+    return rows;
+  }
+
+  private normalizeLineNo(value: string): string {
+    return String(value || '')
+      .trim()
+      .toUpperCase();
+  }
+
+  private normalizeType(value: string): string {
+    return String(value || '').trim();
+  }
+
+  private getInventoryRowsByDate(
+    dateKey: string
+  ): InventoryApiRow[] {
+    return this.inventoryRows.filter(row => {
+      return this.toDateKey(row.timeStmp) === dateKey;
+    });
+  }
+
+  private getTransactionRowsByDate(
+    dateKey: string
+  ): TransactionApiRow[] {
+    return this.transactionRows.filter(row => {
+      return this.toDateKey(row.timeStmp) === dateKey;
+    });
+  }
+
+  private isStoreName(
+    row: InventoryApiRow,
+    storeName: string
+  ): boolean {
+    return String(row.storeName || '')
+      .trim()
+      .toLowerCase() === storeName.toLowerCase();
+  }
+
+  private isGen(row: { lineNo: string }): boolean {
+    return this.normalizeLineNo(row.lineNo) === 'GEN';
+  }
+
+  private isLam(row: { lineNo: string }): boolean {
+    return this.normalizeLineNo(row.lineNo) === 'LAM';
+  }
+
+  // =============================
+  // Build graph
+  // =============================
+
+  private buildGraphCards() {
+    const dateKeys = this.getDateKeysBetween(
+      this.startDate,
+      this.endDate
+    );
+
+    const cards: GraphCard[] = [
+      this.buildStockAmountByItem(dateKeys),
+      this.buildStockQtyByGroup(dateKeys),
+      this.buildStockAmountByGroup(dateKeys),
+      this.buildPalletStorageTotal(dateKeys),
+      this.buildPalletStorageByLine(dateKeys, 'GEN'),
+      this.buildPalletStorageByLine(dateKeys, 'LAM'),
+      this.buildPalletMovementStockIn(dateKeys),
+      this.buildPalletMovementIssueReturn(dateKeys),
+      this.buildPalletMovementMoveArea(dateKeys)
+    ];
+
+    this.graphCards = cards.map(card => {
+      return {
+        ...card,
+        maxValue: this.getAutoMaxValue(card)
+      };
+    });
+  }
+
+  private buildStockAmountByItem(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.getInventoryRowsByDate(dateKey);
+
+      const controlRows = rows.filter(row => {
+        return !this.isNotControl(row);
+      });
+
+      const notControlRows = rows.filter(row => {
+        return this.isNotControl(row);
+      });
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'Control',
+            value: this.toMillionBaht(
+              this.sum(controlRows, 'totalPrice')
+            ),
+            color: this.color.control
+          },
+          {
+            label: 'Not Control',
+            value: this.toMillionBaht(
+              this.sum(notControlRows, 'totalPrice')
+            ),
+            color: this.color.notControl
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'stockAmountByItem',
       title: 'Stock Amount by Item',
       subtitle: 'Control - Not Control',
       unit: 'Mbaht',
       decimals: 1,
+      target: this.targetMap.stockAmountByItem,
       maxValue: 10,
       chartType: 'amount',
-      days: [
-        {
-          date: '04/06/2026',
-          values: [
-            { label: 'Control', value: 0, color: '#1479bd' },
-            { label: 'Not Control', value: 0, color: '#dce7f3' }
-          ]
-        },
-        {
-          date: '05/06/2026',
-          values: [
-            { label: 'Control', value: 0, color: '#1479bd' },
-            { label: 'Not Control', value: 0, color: '#dce7f3' }
-          ]
-        },
-        {
-          date: '06/06/2026',
-          values: [
-            { label: 'Control', value: 0, color: '#1479bd' },
-            { label: 'Not Control', value: 0, color: '#dce7f3' }
-          ]
-        },
-        {
-          date: '07/06/2026',
-          values: [
-            { label: 'Control', value: 0, color: '#1479bd' },
-            { label: 'Not Control', value: 0, color: '#dce7f3' }
-          ]
-        },
-        {
-          date: '08/06/2026',
-          values: [
-            { label: 'Control', value: 6.5, color: '#1479bd' },
-            { label: 'Not Control', value: 1.1, color: '#dce7f3' }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildStockQtyByGroup(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.applyNotControlFilter(
+        this.getInventoryRowsByDate(dateKey)
+      );
+
+      const genRows = rows.filter(row => this.isGen(row));
+      const lamRows = rows.filter(row => this.isLam(row));
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'GEN',
+            value: this.toTon(
+              this.sum(genRows, 'qty')
+            ),
+            color: this.color.gen
+          },
+          {
+            label: 'LAM',
+            value: this.toTon(
+              this.sum(lamRows, 'qty')
+            ),
+            color: this.color.lam
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'stockQtyByGroup',
       title: 'Stock Qty by Group',
       subtitle: 'General - Lamination',
       unit: 'ton',
-      decimals: 1,
+      decimals: 0,
+      target: this.targetMap.stockQtyByGroup,
       maxValue: 10,
       chartType: 'quantity',
-      days: [
-        {
-          date: '04/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '05/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '06/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '07/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '08/06/2026',
-          values: [
-            { label: 'GEN', value: 4.3, color: '#28b9e8' },
-            { label: 'LAM', value: 3.3, color: '#89f28d' }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildStockAmountByGroup(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.applyNotControlFilter(
+        this.getInventoryRowsByDate(dateKey)
+      );
+
+      const genRows = rows.filter(row => this.isGen(row));
+      const lamRows = rows.filter(row => this.isLam(row));
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'GEN',
+            value: this.toMillionBaht(
+              this.sum(genRows, 'totalPrice')
+            ),
+            color: this.color.gen
+          },
+          {
+            label: 'LAM',
+            value: this.toMillionBaht(
+              this.sum(lamRows, 'totalPrice')
+            ),
+            color: this.color.lam
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'stockAmountByGroup',
       title: 'Stock Amount by Group',
       subtitle: 'General - Lamination',
       unit: 'Mbaht',
       decimals: 1,
+      target: this.targetMap.stockAmountByGroup,
       maxValue: 10,
       chartType: 'amount',
-      days: [
-        {
-          date: '04/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '05/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '06/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '07/06/2026',
-          values: [
-            { label: 'GEN', value: 0, color: '#28b9e8' },
-            { label: 'LAM', value: 0, color: '#89f28d' }
-          ]
-        },
-        {
-          date: '08/06/2026',
-          values: [
-            { label: 'GEN', value: 4.3, color: '#28b9e8' },
-            { label: 'LAM', value: 3.3, color: '#89f28d' }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildPalletStorageTotal(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.applyNotControlFilter(
+        this.getInventoryRowsByDate(dateKey)
+      );
+
+      const nonChemicalRows = rows.filter(row => {
+        return !this.isStoreName(row, 'Chemical');
+      });
+
+      const pendingRows = nonChemicalRows.filter(row => {
+        return this.isStoreName(row, 'Pending');
+      });
+
+      const allRows = nonChemicalRows.filter(row => {
+        return !this.isStoreName(row, 'Pending');
+      });
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'All-T',
+            value: this.countUniqueIncoming(allRows),
+            color: this.color.palletAll
+          },
+          {
+            label: 'Pending-T',
+            value: this.countUniqueIncoming(pendingRows),
+            color: this.color.palletPending
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'palletStorageTotal',
       title: 'Pallet Storage',
       subtitle: 'Total',
       decimals: 0,
+      target: this.targetMap.palletStorageTotal,
       maxValue: 260,
       chartType: 'pallet',
-      days: [
-        {
-          date: '08/06/2026',
-          values: [
-            { label: 'All-T', value: 208, color: '#f3a264' },
-            { label: 'Pending-T', value: 21, color: '#f8dfce' }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildPalletStorageByLine(
+    dateKeys: string[],
+    lineNo: 'GEN' | 'LAM'
+  ): GraphCard {
+    const cardId: GraphCardId =
+      lineNo === 'GEN'
+        ? 'palletStorageGeneral'
+        : 'palletStorageLamination';
+
+    const days = dateKeys.map(dateKey => {
+      const rows = this.applyNotControlFilter(
+        this.getInventoryRowsByDate(dateKey)
+      ).filter(row => {
+        return this.normalizeLineNo(row.lineNo) === lineNo;
+      });
+
+      const nonChemicalRows = rows.filter(row => {
+        return !this.isStoreName(row, 'Chemical');
+      });
+
+      const pendingRows = nonChemicalRows.filter(row => {
+        return this.isStoreName(row, 'Pending');
+      });
+
+      const allRows = nonChemicalRows.filter(row => {
+        return !this.isStoreName(row, 'Pending');
+      });
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: lineNo === 'GEN' ? 'All-G' : 'All-L',
+            value: this.countUniqueIncoming(allRows),
+            color: lineNo === 'GEN'
+              ? this.color.gen
+              : this.color.lam
+          },
+          {
+            label: lineNo === 'GEN' ? 'Pending-G' : 'Pending-L',
+            value: this.countUniqueIncoming(pendingRows),
+            color: lineNo === 'GEN'
+              ? this.color.notControl
+              : this.color.palletPending
+          }
+        ]
+      };
+    });
+
+    return {
+      id: cardId,
       title: 'Pallet Storage',
-      subtitle: 'General',
+      subtitle: lineNo === 'GEN'
+        ? 'General'
+        : 'Lamination',
       decimals: 0,
-      maxValue: 180,
+      target: this.targetMap[cardId],
+      maxValue: lineNo === 'GEN' ? 180 : 120,
       chartType: 'pallet',
-      days: [
-        {
-          date: '08/06/2026',
-          values: [
-            { label: 'All-G', value: 137, color: '#28b9e8' },
-            { label: 'Pending-G', value: 7, color: '#dce7f3' }
-          ]
-        }
-      ]
-    },
-    {
-      title: 'Pallet Storage',
-      subtitle: 'Lamination',
-      decimals: 0,
-      maxValue: 120,
-      chartType: 'pallet',
-      days: [
-        {
-          date: '08/06/2026',
-          values: [
-            { label: 'All-L', value: 71, color: '#89f28d' },
-            { label: 'Pending-L', value: 14, color: '#f8dfce' }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildPalletMovementStockIn(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.getTransactionRowsByDate(dateKey).filter(row => {
+        return this.normalizeType(row.type) === 'StockIn';
+      });
+
+      const genRows = rows.filter(row => this.isGen(row));
+      const lamRows = rows.filter(row => this.isLam(row));
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'StockIn-G',
+            value: this.countUniqueIncoming(genRows),
+            color: this.color.gen
+          },
+          {
+            label: 'StockIn-L',
+            value: this.countUniqueIncoming(lamRows),
+            color: this.color.lam
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'palletMovementStockIn',
       title: 'Pallet Movement',
       subtitle: 'Stock In',
       decimals: 0,
+      target: this.targetMap.palletMovementStockIn,
       maxValue: 150,
       chartType: 'movement',
-      days: [
-        {
-          date: '04/06/2026',
-          values: [
-            {
-              label: 'StockIn-G',
-              value: 97,
-              color: '#28b9e8'
-            },
-            {
-              label: 'StockIn-L',
-              value: 33,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '05/06/2026',
-          values: [
-            {
-              label: 'StockIn-G',
-              value: 73,
-              color: '#28b9e8'
-            },
-            {
-              label: 'StockIn-L',
-              value: 60,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '06/06/2026',
-          values: [
-            {
-              label: 'StockIn-G',
-              value: 26,
-              color: '#28b9e8'
-            },
-            {
-              label: 'StockIn-L',
-              value: 54,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '07/06/2026',
-          values: [
-            {
-              label: 'StockIn-G',
-              value: 0,
-              color: '#28b9e8'
-            },
-            {
-              label: 'StockIn-L',
-              value: 0,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '08/06/2026',
-          values: [
-            {
-              label: 'StockIn-G',
-              value: 11,
-              color: '#28b9e8'
-            },
-            {
-              label: 'StockIn-L',
-              value: 0,
-              color: '#89f28d'
-            }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildPalletMovementIssueReturn(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.getTransactionRowsByDate(dateKey);
+
+      const issueRows = rows.filter(row => {
+        return this.normalizeType(row.type) === 'Issue';
+      });
+
+      const returnRows = rows.filter(row => {
+        return this.normalizeType(row.type) === 'ReturnStockIn';
+      });
+
+      const issueGenRows = issueRows.filter(row => this.isGen(row));
+      const issueLamRows = issueRows.filter(row => this.isLam(row));
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'Issue-G',
+            value: this.countUniqueIncoming(issueGenRows),
+            color: this.color.gen
+          },
+          {
+            label: 'Issue-L',
+            value: this.countUniqueIncoming(issueLamRows),
+            color: this.color.lam
+          },
+          {
+            label: 'Return',
+            value: this.countUniqueIncoming(returnRows),
+            color: this.color.returnDark
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'palletMovementIssueReturn',
       title: 'Pallet Movement',
       subtitle: 'Issue - Return',
       decimals: 0,
+      target: this.targetMap.palletMovementIssueReturn,
       maxValue: 80,
       chartType: 'movement',
-      days: [
-        {
-          date: '04/06/2026',
-          values: [
-            {
-              label: 'Issue-G',
-              value: 30,
-              color: '#28b9e8'
-            },
-            {
-              label: 'Issue-L',
-              value: 30,
-              color: '#89f28d'
-            },
-            {
-              label: 'Return',
-              value: 0,
-              color: '#082f49'
-            }
-          ]
-        },
-        {
-          date: '05/06/2026',
-          values: [
-            {
-              label: 'Issue-G',
-              value: 33,
-              color: '#28b9e8'
-            },
-            {
-              label: 'Issue-L',
-              value: 36,
-              color: '#89f28d'
-            },
-            {
-              label: 'Return',
-              value: 0,
-              color: '#082f49'
-            }
-          ]
-        },
-        {
-          date: '06/06/2026',
-          values: [
-            {
-              label: 'Issue-G',
-              value: 32,
-              color: '#28b9e8'
-            },
-            {
-              label: 'Issue-L',
-              value: 33,
-              color: '#89f28d'
-            },
-            {
-              label: 'Return',
-              value: 0,
-              color: '#082f49'
-            }
-          ]
-        },
-        {
-          date: '07/06/2026',
-          values: [
-            {
-              label: 'Issue-G',
-              value: 6,
-              color: '#28b9e8'
-            },
-            {
-              label: 'Issue-L',
-              value: 9,
-              color: '#89f28d'
-            },
-            {
-              label: 'Return',
-              value: 1,
-              color: '#082f49'
-            }
-          ]
-        },
-        {
-          date: '08/06/2026',
-          values: [
-            {
-              label: 'Issue-G',
-              value: 11,
-              color: '#28b9e8'
-            },
-            {
-              label: 'Issue-L',
-              value: 11,
-              color: '#89f28d'
-            },
-            {
-              label: 'Return',
-              value: 1,
-              color: '#082f49'
-            }
-          ]
-        }
-      ]
-    },
-    {
+      days
+    };
+  }
+
+  private buildPalletMovementMoveArea(
+    dateKeys: string[]
+  ): GraphCard {
+    const days = dateKeys.map(dateKey => {
+      const rows = this.getTransactionRowsByDate(dateKey).filter(row => {
+        return this.normalizeType(row.type) === 'MoveArea';
+      });
+
+      const genRows = rows.filter(row => this.isGen(row));
+      const lamRows = rows.filter(row => this.isLam(row));
+
+      return {
+        date: this.toDisplayDate(dateKey),
+        values: [
+          {
+            label: 'MoveArea-G',
+            value: this.countUniqueIncoming(genRows),
+            color: this.color.gen
+          },
+          {
+            label: 'MoveArea-L',
+            value: this.countUniqueIncoming(lamRows),
+            color: this.color.lam
+          }
+        ]
+      };
+    });
+
+    return {
+      id: 'palletMovementMoveArea',
       title: 'Pallet Movement',
       subtitle: 'Move Area',
       decimals: 0,
+      target: this.targetMap.palletMovementMoveArea,
       maxValue: 110,
       chartType: 'movement',
-      days: [
-        {
-          date: '04/06/2026',
-          values: [
-            {
-              label: 'MoveArea-G',
-              value: 32,
-              color: '#28b9e8'
-            },
-            {
-              label: 'MoveArea-L',
-              value: 10,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '05/06/2026',
-          values: [
-            {
-              label: 'MoveArea-G',
-              value: 34,
-              color: '#28b9e8'
-            },
-            {
-              label: 'MoveArea-L',
-              value: 63,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '06/06/2026',
-          values: [
-            {
-              label: 'MoveArea-G',
-              value: 70,
-              color: '#28b9e8'
-            },
-            {
-              label: 'MoveArea-L',
-              value: 24,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '07/06/2026',
-          values: [
-            {
-              label: 'MoveArea-G',
-              value: 3,
-              color: '#28b9e8'
-            },
-            {
-              label: 'MoveArea-L',
-              value: 11,
-              color: '#89f28d'
-            }
-          ]
-        },
-        {
-          date: '08/06/2026',
-          values: [
-            {
-              label: 'MoveArea-G',
-              value: 5,
-              color: '#28b9e8'
-            },
-            {
-              label: 'MoveArea-L',
-              value: 6,
-              color: '#89f28d'
-            }
-          ]
-        }
-      ]
-    }
+      days
+    };
+  }
 
+  private getAutoMaxValue(card: GraphCard): number {
+    const maxTotal = Math.max(
+      0,
+      ...card.days.map(day => this.getTotal(day))
+    );
 
-  ];
+    const targetValue = Number(card.target || 0);
+
+    const maxValue = Math.max(
+      maxTotal,
+      targetValue,
+      card.maxValue || 0
+    );
+
+    if (maxValue <= 0) return 1;
+
+    return Math.ceil(maxValue * 1.15);
+  }
+
+  // =============================
+  // Template helpers
+  // =============================
 
   getLegendItems(card: GraphCard): StackValue[] {
     const firstDay = card.days[0];
@@ -521,6 +823,19 @@ export class GraphComponent {
     );
   }
 
+  getTargetBottom(card: GraphCard): number | null {
+    const target = Number(card.target || 0);
+
+    if (!target || !card.maxValue) {
+      return null;
+    }
+
+    return Math.min(
+      100,
+      (target / card.maxValue) * 100
+    );
+  }
+
   formatValue(
     value: number,
     decimals: number
@@ -532,7 +847,7 @@ export class GraphComponent {
     index: number,
     card: GraphCard
   ): string {
-    return `${card.title}-${card.subtitle}-${index}`;
+    return `${card.id}-${index}`;
   }
 
   trackByDay(

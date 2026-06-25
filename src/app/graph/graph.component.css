@@ -174,7 +174,7 @@ TOOLBAR
 
 .graph-toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
 
@@ -196,16 +196,55 @@ TOOLBAR
   color: #0f172a;
   font-size: 15px;
   font-weight: 900;
+  padding-bottom: 8px;
 }
 
 .toolbar-title i {
   color: #2563eb;
 }
 
-.toolbar-actions {
+.graph-filter-panel {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.graph-filter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.graph-filter-box label {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.graph-filter-input {
+  min-height: 38px;
+  min-width: 150px;
+  padding: 7px 10px;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+
+  color: #0f172a;
+  background: #ffffff;
+
+  font-size: 12px;
+  font-weight: 800;
+  outline: none;
+}
+
+.graph-filter-input:focus {
+  border-color: #93c5fd;
+  box-shadow:
+    0 0 0 0.18rem rgba(37, 99, 235, 0.12);
 }
 
 .toolbar-btn {
@@ -236,22 +275,45 @@ TOOLBAR
     transform 0.15s ease;
 }
 
-.toolbar-btn:hover {
+.toolbar-btn:hover:not(:disabled) {
   background: #f8fafc;
   border-color: #bfdbfe;
   transform: translateY(-1px);
 }
 
-.toolbar-btn-primary {
-  color: #ffffff;
-  background: #2563eb;
-  border-color: #2563eb;
+.toolbar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.toolbar-btn-primary:hover {
-  color: #ffffff;
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+/* =========================
+LOADING / ERROR
+========================= */
+
+.graph-state {
+  min-height: 120px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+
+  color: #334155;
+  font-size: 14px;
+  font-weight: 900;
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.graph-state-error {
+  color: #dc2626;
+  background: #fff7f7;
+  border-color: rgba(220, 38, 38, 0.18);
 }
 
 /* =========================
@@ -423,6 +485,38 @@ CHART AREA
 
   border-top:
     1px solid rgba(100, 116, 139, 0.36);
+}
+
+/* =========================
+TARGET LINE
+========================= */
+
+.target-line {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  z-index: 3;
+
+  border-top: 2px dashed #dc2626;
+
+  pointer-events: none;
+}
+
+.target-line span {
+  position: absolute;
+  right: 0;
+  top: -22px;
+
+  padding: 3px 7px;
+
+  border-radius: 999px;
+
+  color: #dc2626;
+  background: #fee2e2;
+
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 /* =========================
@@ -645,6 +739,46 @@ CARD FOOTER
   line-height: 1.1;
 }
 
+.target-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 92px;
+}
+
+.target-control label {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.target-input {
+  width: 92px;
+  min-height: 30px;
+
+  padding: 4px 8px;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+
+  color: #0f172a;
+  background: #ffffff;
+
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
+  outline: none;
+}
+
+.target-input:focus {
+  border-color: #93c5fd;
+  box-shadow:
+    0 0 0 0.14rem rgba(37, 99, 235, 0.12);
+}
+
 .footer-status {
   display: inline-flex;
   align-items: center;
@@ -696,6 +830,19 @@ RESPONSIVE: TABLET
   .page-header-right {
     flex-wrap: wrap;
   }
+
+  .graph-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-title {
+    padding-bottom: 0;
+  }
+
+  .graph-filter-panel {
+    justify-content: flex-start;
+  }
 }
 
 /* =========================
@@ -721,12 +868,30 @@ RESPONSIVE: SMALL TABLET
     width: 100%;
   }
 
+  .graph-filter-panel {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .graph-filter-box,
+  .graph-filter-input {
+    width: 100%;
+  }
+
   .graph-grid {
     grid-template-columns: 1fr;
   }
 
   .chart-area {
     height: 300px;
+  }
+
+  .target-control {
+    min-width: 80px;
+  }
+
+  .target-input {
+    width: 80px;
   }
 }
 
@@ -780,10 +945,9 @@ RESPONSIVE: MOBILE
     padding: 12px;
   }
 
-  .toolbar-actions {
+  .graph-filter-panel {
     display: grid;
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .toolbar-btn {
@@ -817,6 +981,11 @@ RESPONSIVE: MOBILE
 
     overflow-x: auto;
     overflow-y: hidden;
+  }
+
+  .target-line {
+    left: 8px;
+    right: 8px;
   }
 
   .chart-grid-lines {
@@ -859,15 +1028,15 @@ RESPONSIVE: VERY SMALL
 ========================= */
 
 @media (max-width: 390px) {
-  .toolbar-actions {
-    grid-template-columns: 1fr;
-  }
-
   .date-chip {
     font-size: 11px;
   }
 
   .chart-area {
     height: 270px;
+  }
+
+  .graph-card-footer {
+    flex-wrap: wrap;
   }
 }

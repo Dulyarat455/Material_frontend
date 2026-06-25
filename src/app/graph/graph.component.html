@@ -31,20 +31,20 @@
             </div>
 
             <div class="status-value">
-              Dummy Data
+              {{ isLoading ? 'Loading...' : 'API Data' }}
             </div>
           </div>
         </div>
 
         <div class="date-chip">
           <i class="fas fa-calendar-alt"></i>
-          <span>04/06/2026 - 08/06/2026</span>
+          <span>{{ startDate }} - {{ endDate }}</span>
         </div>
       </div>
     </div>
 
     <!-- =========================
-         TOOLBAR
+         TOOLBAR / FILTER
     ========================== -->
     <div class="graph-toolbar">
       <div class="toolbar-title">
@@ -52,29 +52,84 @@
         <span>Inventory Summary</span>
       </div>
 
-      <div class="toolbar-actions">
-        <button
-          type="button"
-          class="toolbar-btn"
-        >
-          <i class="fas fa-sync-alt"></i>
-          Refresh
-        </button>
+      <div class="graph-filter-panel">
+        <div class="graph-filter-box">
+          <label>Start Date</label>
+
+          <input
+            type="date"
+            class="graph-filter-input"
+            [(ngModel)]="startDate"
+            (change)="onFilterChange()"
+          />
+        </div>
+
+        <div class="graph-filter-box">
+          <label>End Date</label>
+
+          <input
+            type="date"
+            class="graph-filter-input"
+            [(ngModel)]="endDate"
+            (change)="onFilterChange()"
+          />
+        </div>
+
+        <div class="graph-filter-box">
+          <label>Control Filter</label>
+
+          <select
+            class="graph-filter-input"
+            [(ngModel)]="notControlFilter"
+            (change)="onFilterChange()"
+          >
+            <option value="all">All</option>
+            <option value="Control">Control</option>
+            <option value="Not Control">Not Control</option>
+          </select>
+        </div>
 
         <button
           type="button"
-          class="toolbar-btn toolbar-btn-primary"
+          class="toolbar-btn"
+          [disabled]="isLoading"
+          (click)="refresh()"
         >
-          <i class="fas fa-camera"></i>
-          Save Snapshot
+          <i
+            class="fas fa-sync-alt"
+            [class.fa-spin]="isLoading"
+          ></i>
+          Refresh
         </button>
       </div>
     </div>
 
     <!-- =========================
+         LOADING / ERROR
+    ========================== -->
+    <div
+      class="graph-state"
+      *ngIf="isLoading"
+    >
+      <i class="fas fa-spinner fa-spin"></i>
+      Loading graph data...
+    </div>
+
+    <div
+      class="graph-state graph-state-error"
+      *ngIf="!isLoading && isError"
+    >
+      <i class="fas fa-triangle-exclamation"></i>
+      Cannot load graph data
+    </div>
+
+    <!-- =========================
          GRAPH GRID
     ========================== -->
-    <div class="graph-grid">
+    <div
+      class="graph-grid"
+      *ngIf="!isLoading && !isError"
+    >
       <section
         class="graph-card"
         *ngFor="
@@ -85,7 +140,9 @@
         [class.graph-card-pallet]="card.chartType === 'pallet'"
       >
 
-        <!-- CARD HEADER -->
+        <!-- =========================
+             CARD HEADER
+        ========================== -->
         <div class="graph-card-head">
           <div class="graph-card-heading">
             <div class="graph-card-title">
@@ -124,7 +181,9 @@
           </div>
         </div>
 
-        <!-- CHART -->
+        <!-- =========================
+             CHART
+        ========================== -->
         <div
           class="chart-area"
           [class.chart-area-single]="card.days.length === 1"
@@ -138,6 +197,17 @@
             <div class="grid-line grid-line-50"></div>
             <div class="grid-line grid-line-25"></div>
             <div class="grid-line grid-line-0"></div>
+          </div>
+
+          <!-- Target line -->
+          <div
+            class="target-line"
+            *ngIf="getTargetBottom(card) !== null"
+            [style.bottom.%]="getTargetBottom(card)"
+          >
+            <span>
+              Target {{ formatValue(card.target || 0, card.decimals) }}
+            </span>
           </div>
 
           <!-- Columns -->
@@ -224,7 +294,9 @@
           </div>
         </div>
 
-        <!-- CARD FOOTER -->
+        <!-- =========================
+             CARD FOOTER
+        ========================== -->
         <div class="graph-card-footer">
           <div class="footer-stat">
             <span class="footer-label">
@@ -245,6 +317,19 @@
                 {{ card.unit }}
               </span>
             </span>
+          </div>
+
+          <div class="target-control">
+            <label>Target</label>
+
+            <input
+              type="number"
+              min="0"
+              class="target-input"
+              [ngModel]="card.target"
+              (ngModelChange)="onTargetChange(card, $event)"
+              placeholder="-"
+            />
           </div>
 
           <div class="footer-status">
