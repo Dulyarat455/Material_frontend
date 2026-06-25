@@ -114,10 +114,6 @@ export class GraphComponent {
     this.fetchGraphData();
   }
 
-  // =============================
-  // API
-  // =============================
-
   fetchGraphData() {
     if (this.isLoading) return;
 
@@ -178,10 +174,6 @@ export class GraphComponent {
 
     this.buildGraphCards();
   }
-
-  // =============================
-  // Date
-  // =============================
 
   private setDefaultDateRange() {
     const today = new Date();
@@ -250,14 +242,7 @@ export class GraphComponent {
     return result;
   }
 
-  // =============================
-  // Number helpers
-  // =============================
-
-  private roundExcel(
-    value: number,
-    decimals: number
-  ): number {
+  private roundExcel(value: number, decimals: number): number {
     const factor = Math.pow(10, decimals);
 
     return Math.round(Number(value || 0) * factor) / factor;
@@ -277,28 +262,19 @@ export class GraphComponent {
     );
   }
 
-  private sum(
-    rows: any[],
-    key: string
-  ): number {
+  private sum(rows: any[], key: string): number {
     return rows.reduce((total, row) => {
       return total + Number(row?.[key] || 0);
     }, 0);
   }
 
-  private countUniqueIncoming(
-    rows: { incomingId: number }[]
-  ): number {
+  private countUniqueIncoming(rows: { incomingId: number }[]): number {
     return new Set(
       rows
         .map(row => Number(row.incomingId || 0))
         .filter(id => id > 0)
     ).size;
   }
-
-  // =============================
-  // Filter helpers
-  // =============================
 
   private isNotControl(row: { notControl?: string }): boolean {
     return String(row.notControl || '')
@@ -362,10 +338,6 @@ export class GraphComponent {
   private isLam(row: { lineNo: string }): boolean {
     return this.normalizeLineNo(row.lineNo) === 'LAM';
   }
-
-  // =============================
-  // Build graph
-  // =============================
 
   private buildGraphCards() {
     const dateKeys = this.getDateKeysBetween(
@@ -793,10 +765,6 @@ export class GraphComponent {
     return Math.ceil(maxValue * 1.15);
   }
 
-  // =============================
-  // Template helpers
-  // =============================
-
   getLegendItems(card: GraphCard): StackValue[] {
     const firstDay = card.days[0];
 
@@ -823,17 +791,25 @@ export class GraphComponent {
     );
   }
 
-  getTargetBottom(card: GraphCard): number | null {
+  getTargetRatio(card: GraphCard): number | null {
     const target = Number(card.target || 0);
+    const maxValue = Number(card.maxValue || 0);
 
-    if (!target || !card.maxValue) {
+    if (!target || !maxValue) {
       return null;
     }
 
     return Math.min(
-      100,
-      (target / card.maxValue) * 100
+      1,
+      Math.max(
+        0,
+        target / maxValue
+      )
     );
+  }
+
+  isChartScrollable(card: GraphCard): boolean {
+    return card.days.length > 31;
   }
 
   formatValue(

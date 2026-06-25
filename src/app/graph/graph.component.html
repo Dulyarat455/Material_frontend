@@ -190,105 +190,112 @@
           [class.chart-area-movement]="card.chartType === 'movement'"
           [class.chart-area-pallet]="card.chartType === 'pallet'"
         >
-          <!-- Background grid -->
-          <div class="chart-grid-lines">
-            <div class="grid-line grid-line-100"></div>
-            <div class="grid-line grid-line-75"></div>
-            <div class="grid-line grid-line-50"></div>
-            <div class="grid-line grid-line-25"></div>
-            <div class="grid-line grid-line-0"></div>
-          </div>
-
-          <!-- Target line -->
           <div
-            class="target-line"
-            *ngIf="getTargetBottom(card) !== null"
-            [style.bottom.%]="getTargetBottom(card)"
-          >
-            <span>
-              Target {{ formatValue(card.target || 0, card.decimals) }}
-            </span>
-          </div>
-
-          <!-- Columns -->
-          <div
-            class="chart-columns"
-            [style.--column-count]="card.days.length"
+            class="chart-scroll-viewport"
+            [class.chart-scrollable]="isChartScrollable(card)"
           >
             <div
-              class="chart-column"
-              *ngFor="
-                let day of card.days;
-                trackBy: trackByDay
-              "
+              class="chart-plot"
+              [style.--column-count]="card.days.length"
+              [style.--target-ratio]="getTargetRatio(card) ?? 0"
             >
-              <!-- Total -->
-              <div class="bar-value-total">
-                <span *ngIf="getTotal(day) > 0">
-                  {{
-                    formatValue(
-                      getTotal(day),
-                      card.decimals
-                    )
-                  }}
-                </span>
+              <!-- Background grid -->
+              <div class="chart-grid-lines">
+                <div class="grid-line grid-line-100"></div>
+                <div class="grid-line grid-line-75"></div>
+                <div class="grid-line grid-line-50"></div>
+                <div class="grid-line grid-line-25"></div>
+                <div class="grid-line grid-line-0"></div>
+              </div>
 
-                <span
-                  class="bar-empty-value"
-                  *ngIf="getTotal(day) <= 0"
-                >
-                  -
+              <!-- Target line -->
+              <div
+                class="target-line"
+                *ngIf="getTargetRatio(card) !== null"
+              >
+                <span>
+                  Target {{ formatValue(card.target || 0, card.decimals) }}
                 </span>
               </div>
 
-              <!-- Bar -->
-              <div class="bar-container">
-                <div class="bar-track">
-                  <div
-                    class="bar-segment"
-                    *ngFor="
-                      let item of day.values;
-                      trackBy: trackByValue
-                    "
-                    [class.dark-segment]="
-                      item.color === '#082f49' ||
-                      item.color === '#0f172a' ||
-                      item.color === '#000000'
-                    "
-                    [style.height.%]="
-                      getSegmentHeight(
-                        item.value,
-                        card.maxValue
-                      )
-                    "
-                    [style.background-color]="item.color"
-                    [title]="
-                      item.label +
-                      ': ' +
-                      formatValue(
-                        item.value,
-                        card.decimals
-                      )
-                    "
-                  >
-                    <span
-                      class="bar-segment-value"
-                      *ngIf="item.value > 0"
-                    >
+              <!-- Columns -->
+              <div class="chart-columns">
+                <div
+                  class="chart-column"
+                  *ngFor="
+                    let day of card.days;
+                    trackBy: trackByDay
+                  "
+                >
+                  <!-- Total -->
+                  <div class="bar-value-total">
+                    <span *ngIf="getTotal(day) > 0">
                       {{
                         formatValue(
-                          item.value,
+                          getTotal(day),
                           card.decimals
                         )
                       }}
                     </span>
+
+                    <span
+                      class="bar-empty-value"
+                      *ngIf="getTotal(day) <= 0"
+                    >
+                      -
+                    </span>
+                  </div>
+
+                  <!-- Bar -->
+                  <div class="bar-container">
+                    <div class="bar-track">
+                      <div
+                        class="bar-segment"
+                        *ngFor="
+                          let item of day.values;
+                          trackBy: trackByValue
+                        "
+                        [class.dark-segment]="
+                          item.color === '#082f49' ||
+                          item.color === '#0f172a' ||
+                          item.color === '#000000'
+                        "
+                        [style.height.%]="
+                          getSegmentHeight(
+                            item.value,
+                            card.maxValue
+                          )
+                        "
+                        [style.background-color]="item.color"
+                        [title]="
+                          item.label +
+                          ': ' +
+                          formatValue(
+                            item.value,
+                            card.decimals
+                          )
+                        "
+                      >
+                        <span
+                          class="bar-segment-value"
+                          *ngIf="item.value > 0"
+                        >
+                          {{
+                            formatValue(
+                              item.value,
+                              card.decimals
+                            )
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Date -->
+                  <div class="chart-date">
+                    {{ day.date }}
                   </div>
                 </div>
-              </div>
-
-              <!-- Date -->
-              <div class="chart-date">
-                {{ day.date }}
               </div>
             </div>
           </div>
