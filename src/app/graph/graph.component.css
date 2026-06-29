@@ -697,6 +697,9 @@ CHART COLUMNS
   writing-mode: vertical-rl;
   text-orientation: mixed;
   transform: rotate(180deg) translateY(-4px);
+
+  position: relative;
+  top: -14px;
 }
 
 /* =========================
