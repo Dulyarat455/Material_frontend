@@ -177,14 +177,11 @@ export class GraphComponent {
 
   private setDefaultDateRange() {
     const today = new Date();
-
-    const firstDay = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1
-    );
-
-    this.startDate = this.toInputDate(firstDay);
+  
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 11);
+  
+    this.startDate = this.toInputDate(startDate);
     this.endDate = this.toInputDate(today);
   }
 

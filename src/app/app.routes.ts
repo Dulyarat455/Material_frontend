@@ -13,6 +13,7 @@ import { StockOutReportComponent } from './stock-out-report/stock-out-report.com
 import { RegisterComponent } from './register/register.component';
 import { TransactionAllReportComponent } from './transaction-all-report/transaction-all-report.component';
 import { GraphComponent } from './graph/graph.component';
+import { StockInComponent } from './stock-in/stock-in.component';
 
 export const routes: Routes = [
 
@@ -98,6 +99,12 @@ export const routes: Routes = [
   {
     path: 'graph',
     component: GraphComponent,
+  },
+
+
+  {
+    path: 'stockIn',
+    component: StockInComponent
   },
 
 
