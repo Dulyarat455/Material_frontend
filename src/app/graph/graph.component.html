@@ -224,8 +224,12 @@
                   class="chart-column"
                   *ngFor="
                     let day of card.days;
+                    let dayIndex = index;
                     trackBy: trackByDay
                   "
+                   [class.chart-column-hover]="isTooltipActive(card, day)"
+                   (mouseenter)="showDayTooltip(card, day)"
+                   (mouseleave)="hideDayTooltip()"
                 >
                   <!-- Total -->
                   <div class="bar-value-total">
@@ -248,6 +252,62 @@
 
                   <!-- Bar -->
                   <div class="bar-container">
+                    <div
+                      class="bar-tooltip"
+                      *ngIf="isTooltipActive(card, day)"
+                      [class.bar-tooltip-left]="dayIndex <= 1"
+                      [class.bar-tooltip-right]="dayIndex >= card.days.length - 2"
+                    >
+                      <div class="tooltip-date">
+                        {{ day.date }}
+                      </div>
+
+                      <div
+                        class="tooltip-row"
+                        *ngFor="
+                          let item of getTooltipRows(day);
+                          trackBy: trackByValue
+                        "
+                      >
+                        <span class="tooltip-left">
+                          <span
+                            class="tooltip-color"
+                            [style.background-color]="item.color"
+                          ></span>
+
+                          <span class="tooltip-label">
+                            {{ item.label }}
+                          </span>
+                        </span>
+
+                        <span class="tooltip-value">
+                          {{
+                            formatValue(
+                              item.value,
+                              card.decimals
+                            )
+                          }}
+                        </span>
+                      </div>
+
+                      <div class="tooltip-total">
+                        <span>Total</span>
+
+                        <strong>
+                          {{
+                            formatValue(
+                              getTotal(day),
+                              card.decimals
+                            )
+                          }}
+
+                          <span *ngIf="card.unit">
+                            {{ card.unit }}
+                          </span>
+                        </strong>
+                      </div>
+                    </div>
+
                     <div class="bar-track">
                       <div
                         class="bar-segment"
@@ -267,14 +327,6 @@
                           )
                         "
                         [style.background-color]="item.color"
-                        [title]="
-                          item.label +
-                          ': ' +
-                          formatValue(
-                            item.value,
-                            card.decimals
-                          )
-                        "
                       >
                         <span
                           class="bar-segment-value"

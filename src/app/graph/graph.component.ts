@@ -84,6 +84,13 @@ export class GraphComponent {
 
   graphCards: GraphCard[] = [];
 
+
+  activeTooltip: {
+    cardId: GraphCardId;
+    date: string;
+  } | null = null;
+
+
   private targetMap: Record<GraphCardId, number | null> = {
     stockAmountByItem: null,
     stockQtyByGroup: null,
@@ -835,6 +842,29 @@ export class GraphComponent {
     value: StackValue
   ): string {
     return `${value.label}-${index}`;
+  }
+
+
+  showDayTooltip(card: GraphCard, day: GraphDay) {
+    this.activeTooltip = {
+      cardId: card.id,
+      date: day.date
+    };
+  }
+  
+  hideDayTooltip() {
+    this.activeTooltip = null;
+  }
+  
+  isTooltipActive(card: GraphCard, day: GraphDay): boolean {
+    return (
+      this.activeTooltip?.cardId === card.id &&
+      this.activeTooltip?.date === day.date
+    );
+  }
+  
+  getTooltipRows(day: GraphDay): StackValue[] {
+    return day.values;
   }
   
 }
