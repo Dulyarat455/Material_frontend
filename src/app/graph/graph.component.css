@@ -434,8 +434,12 @@ CHART AREA
 .chart-area {
   position: relative;
 
-  height: 320px;
-  padding: 22px 14px 12px;
+  /*
+    เพิ่มความสูงกล่องลงด้านล่าง
+    แต่ไม่ขยายพื้นที่ plot จริง
+  */
+  height: 380px;
+  padding: 22px 14px 18px;
 
   background:
     linear-gradient(
@@ -451,13 +455,15 @@ CHART AREA
 .chart-scroll-viewport {
   width: 100%;
   height: 100%;
+
   overflow-x: hidden;
   overflow-y: hidden;
 }
 
 .chart-scroll-viewport.chart-scrollable {
-  overflow-x: auto;
-  padding-bottom: 4px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding-bottom: 0;
 }
 
 .chart-plot {
@@ -473,7 +479,7 @@ CHART AREA
 
 .chart-grid-lines {
   position: absolute;
-  inset: 22px 0 64px;
+  inset: 22px 0 92px;
 
   pointer-events: none;
 }
@@ -519,13 +525,8 @@ TARGET LINE
   left: 0;
   right: 0;
 
-  /*
-    64px คือพื้นที่วันที่ด้านล่าง
-    22px คือพื้นที่ตัวเลข Total ด้านบน
-    target จะคำนวณเฉพาะพื้นที่แท่งกราฟจริง
-  */
   bottom: calc(
-    64px + (var(--target-ratio, 0) * (100% - 86px))
+    92px + (var(--target-ratio, 0) * (100% - 114px))
   );
 
   z-index: 3;
@@ -587,7 +588,7 @@ CHART COLUMNS
 
   display: grid;
   grid-template-rows:
-    22px minmax(0, 1fr) 64px;
+    22px minmax(0, 1fr) 92px;
 
   justify-items: center;
 }
@@ -677,7 +678,7 @@ CHART COLUMNS
   align-self: end;
   justify-self: center;
 
-  height: 58px;
+  height: 86px;
   width: 18px;
 
   display: flex;
@@ -695,7 +696,7 @@ CHART COLUMNS
 
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  transform: rotate(180deg) translateY(-6px);
+  transform: rotate(180deg) translateY(-4px);
 }
 
 /* =========================
@@ -858,7 +859,7 @@ RESPONSIVE
   }
 
   .chart-area {
-    height: 310px;
+    height: 370px;
   }
 
   .chart-area-movement .bar-track {
@@ -928,7 +929,7 @@ RESPONSIVE
   }
 
   .chart-area {
-    height: 340px;
+    height: 390px;
   }
 
   .target-control {
@@ -1017,12 +1018,12 @@ RESPONSIVE
   }
 
   .chart-area {
-    height: 330px;
-    padding: 20px 8px 10px;
+    height: 390px;
+    padding: 20px 8px 18px;
   }
 
   .chart-grid-lines {
-    inset: 22px 0 64px;
+    inset: 22px 0 92px;
   }
 
   .chart-scrollable .chart-plot {
