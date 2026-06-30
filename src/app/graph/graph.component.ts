@@ -876,16 +876,20 @@ export class GraphComponent {
   getBarWidth(card: GraphCard): number {
     const dayCount = card.days.length;
   
+    /*
+      ช่วง 25-31 วัน ต้องเล็กมาก
+      เพราะยังไม่ให้ scroll และต้องไม่ให้แท่งซ้อนกัน
+    */
     if (dayCount > 24) {
-      return card.chartType === 'movement' ? 22 : 24;
+      return card.chartType === 'movement' ? 8 : 9;
     }
   
     if (dayCount > 18) {
-      return card.chartType === 'movement' ? 24 : 26;
+      return card.chartType === 'movement' ? 12 : 13;
     }
   
     if (dayCount > 12) {
-      return card.chartType === 'movement' ? 28 : 30;
+      return card.chartType === 'movement' ? 16 : 18;
     }
   
     return card.chartType === 'movement' ? 34 : 36;
@@ -895,15 +899,15 @@ export class GraphComponent {
     const dayCount = card.days.length;
   
     if (dayCount > 24) {
-      return 6;
+      return 5;
     }
   
     if (dayCount > 18) {
-      return 8;
+      return 6;
     }
   
     if (dayCount > 12) {
-      return 10;
+      return 8;
     }
   
     return card.chartType === 'movement' ? 14 : 8;
@@ -912,16 +916,20 @@ export class GraphComponent {
   getColumnMinWidth(card: GraphCard): number {
     const dayCount = card.days.length;
   
+    /*
+      ไม่ให้ scroll ถ้ายังไม่เกิน 31 วัน
+      ใช้ขนาด column เล็กลงแทน
+    */
     if (dayCount > 24) {
-      return 44;
+      return 14;
     }
   
     if (dayCount > 18) {
-      return 50;
+      return 20;
     }
   
     if (dayCount > 12) {
-      return 54;
+      return 28;
     }
   
     return 64;
@@ -929,6 +937,6 @@ export class GraphComponent {
 
 
 
-  
+
   
 }

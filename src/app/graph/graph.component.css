@@ -875,7 +875,7 @@ RESPONSIVE
   }
 
   .chart-area-movement .bar-track {
-    width: 42px;
+    width: var(--bar-width, 34px);
   }
 }
 
@@ -1264,4 +1264,27 @@ LONG DATE RANGE
 .chart-area-long-range .chart-column-hover .bar-track {
   outline: 2px solid rgba(37, 99, 235, 0.36);
   outline-offset: 2px;
+}
+
+
+
+
+
+
+/* =========================
+DENSE DATE RANGE BAR CONTROL
+13-31 days
+========================= */
+
+.chart-area-long-range .bar-container {
+  min-width: 0;
+  overflow: visible;
+}
+
+.chart-area-long-range .bar-track {
+  max-width: 100%;
+}
+
+.chart-area-long-range .chart-column {
+  min-width: 0;
 }
