@@ -741,12 +741,18 @@ MOVEMENT CHART
     );
 }
 
+/* เพิ่ม gap เฉพาะกราฟ 7,8,9 */
+.chart-area-movement .chart-columns {
+  gap: 14px;
+}
+
+/* ลดความกว้างแท่ง เพื่อให้มีช่องว่างระหว่างวัน */
 .chart-area-movement .bar-track {
-  width: 48px;
+  width: 34px;
 }
 
 .chart-area-movement .bar-segment-value {
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .chart-area-movement .chart-date {
@@ -1040,7 +1046,11 @@ RESPONSIVE
   }
 
   .chart-area-movement .bar-track {
-    width: 42px;
+    width: 32px;
+  }
+  
+  .chart-area-movement .chart-columns {
+    gap: 12px;
   }
 
   .graph-card-footer {
