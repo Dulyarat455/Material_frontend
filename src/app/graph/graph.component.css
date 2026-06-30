@@ -629,7 +629,7 @@ CHART COLUMNS
   flex-direction: column-reverse;
   justify-content: flex-start;
 
-  background: rgba(226, 232, 240, 0.22);
+  background: transparent;
 
   border-radius: 5px 5px 0 0;
 
