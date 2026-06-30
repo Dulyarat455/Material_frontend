@@ -261,8 +261,8 @@
                     <div
                       class="bar-tooltip"
                       *ngIf="isTooltipActive(card, day)"
-                      [class.bar-tooltip-left]="dayIndex <= 1"
-                      [class.bar-tooltip-right]="dayIndex >= card.days.length - 2"
+                      [class.bar-tooltip-shift-right]="isTooltipShiftRight(card, dayIndex)"
+                      [class.bar-tooltip-shift-left]="isTooltipShiftLeft(card, dayIndex)"
                     >
                       <div class="tooltip-date">
                         {{ day.date }}

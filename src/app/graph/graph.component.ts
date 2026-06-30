@@ -938,5 +938,28 @@ export class GraphComponent {
 
 
 
+  isTooltipShiftRight(card: GraphCard, dayIndex: number): boolean {
+    const dayCount = card.days.length;
+  
+    if (dayCount <= 1) {
+      return false;
+    }
+  
+    return dayIndex < Math.floor(dayCount / 2);
+  }
+  
+  isTooltipShiftLeft(card: GraphCard, dayIndex: number): boolean {
+    const dayCount = card.days.length;
+  
+    if (dayCount <= 1) {
+      return false;
+    }
+  
+    return dayIndex >= Math.floor(dayCount / 2);
+  }
+
+
+
+
   
 }

@@ -1214,32 +1214,34 @@ BAR TOOLTIP
 
 
 /* =========================
-TOOLTIP EDGE FIX
+TOOLTIP POSITION BY HALF
+ครึ่งซ้ายให้ tooltip เปิดไปทางขวา
+ครึ่งขวาให้ tooltip เปิดไปทางซ้าย
 ========================= */
 
-.bar-tooltip-left {
+.bar-tooltip-shift-right {
   left: 0;
   right: auto;
   transform: translateX(0);
 }
 
-.bar-tooltip-left::after {
+.bar-tooltip-shift-right::after {
   left: 18px;
+  right: auto;
   transform: rotate(45deg);
 }
 
-.bar-tooltip-right {
+.bar-tooltip-shift-left {
   left: auto;
   right: 0;
   transform: translateX(0);
 }
 
-.bar-tooltip-right::after {
+.bar-tooltip-shift-left::after {
   left: auto;
   right: 18px;
   transform: rotate(45deg);
 }
-
 
 
 
