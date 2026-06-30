@@ -474,7 +474,7 @@ CHART AREA
 }
 
 .chart-scrollable .chart-plot {
-  min-width: calc(var(--column-count) * 64px);
+  min-width: calc(var(--column-count) * var(--column-min-width, 64px));
 }
 
 .chart-grid-lines {
@@ -571,14 +571,14 @@ CHART COLUMNS
       minmax(0, 1fr)
     );
 
-  gap: 8px;
+  gap: var(--column-gap, 8px);
 }
 
 .chart-scrollable .chart-columns {
   grid-template-columns:
     repeat(
       var(--column-count),
-      minmax(56px, 1fr)
+      minmax(var(--column-min-width, 56px), 1fr)
     );
 }
 
@@ -622,7 +622,7 @@ CHART COLUMNS
 }
 
 .bar-track {
-  width: 36px;
+  width: var(--bar-width, 36px);
   height: 100%;
 
   display: flex;
@@ -742,13 +742,14 @@ MOVEMENT CHART
 }
 
 /* เพิ่ม gap เฉพาะกราฟ 7,8,9 */
+/* ใช้ค่าจาก graph.ts เพื่อปรับ gap ตามจำนวนวัน */
 .chart-area-movement .chart-columns {
-  gap: 14px;
+  gap: var(--column-gap, 14px);
 }
 
-/* ลดความกว้างแท่ง เพื่อให้มีช่องว่างระหว่างวัน */
+/* ใช้ค่าจาก graph.ts เพื่อปรับความกว้างแท่งตามจำนวนวัน */
 .chart-area-movement .bar-track {
-  width: 34px;
+  width: var(--bar-width, 34px);
 }
 
 .chart-area-movement .bar-segment-value {
@@ -1038,19 +1039,19 @@ RESPONSIVE
   }
 
   .chart-scrollable .chart-plot {
-    min-width: calc(var(--column-count) * 58px);
+    min-width: calc(var(--column-count) * var(--column-min-width, 58px));
   }
-
+  
   .bar-track {
-    width: 34px;
+    width: var(--bar-width, 34px);
   }
-
+  
   .chart-area-movement .bar-track {
-    width: 32px;
+    width: var(--bar-width, 32px);
   }
   
   .chart-area-movement .chart-columns {
-    gap: 12px;
+    gap: var(--column-gap, 12px);
   }
 
   .graph-card-footer {
@@ -1237,4 +1238,30 @@ TOOLTIP EDGE FIX
   left: auto;
   right: 18px;
   transform: rotate(45deg);
+}
+
+
+
+
+/* =========================
+LONG DATE RANGE
+มากกว่า 12 วัน: ซ่อนเลขบนแท่ง
+ใช้ tooltip แทน
+========================= */
+
+.chart-area-long-range .bar-value-total {
+  visibility: hidden;
+}
+
+.chart-area-long-range .bar-segment-value {
+  display: none;
+}
+
+.chart-area-long-range .bar-track {
+  border-radius: 4px 4px 0 0;
+}
+
+.chart-area-long-range .chart-column-hover .bar-track {
+  outline: 2px solid rgba(37, 99, 235, 0.36);
+  outline-offset: 2px;
 }

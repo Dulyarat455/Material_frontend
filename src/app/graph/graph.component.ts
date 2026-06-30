@@ -866,5 +866,69 @@ export class GraphComponent {
   getTooltipRows(day: GraphDay): StackValue[] {
     return day.values;
   }
+
+
+
+  isLongDateRange(card: GraphCard): boolean {
+    return card.days.length > 12;
+  }
+  
+  getBarWidth(card: GraphCard): number {
+    const dayCount = card.days.length;
+  
+    if (dayCount > 24) {
+      return card.chartType === 'movement' ? 22 : 24;
+    }
+  
+    if (dayCount > 18) {
+      return card.chartType === 'movement' ? 24 : 26;
+    }
+  
+    if (dayCount > 12) {
+      return card.chartType === 'movement' ? 28 : 30;
+    }
+  
+    return card.chartType === 'movement' ? 34 : 36;
+  }
+  
+  getColumnGap(card: GraphCard): number {
+    const dayCount = card.days.length;
+  
+    if (dayCount > 24) {
+      return 6;
+    }
+  
+    if (dayCount > 18) {
+      return 8;
+    }
+  
+    if (dayCount > 12) {
+      return 10;
+    }
+  
+    return card.chartType === 'movement' ? 14 : 8;
+  }
+  
+  getColumnMinWidth(card: GraphCard): number {
+    const dayCount = card.days.length;
+  
+    if (dayCount > 24) {
+      return 44;
+    }
+  
+    if (dayCount > 18) {
+      return 50;
+    }
+  
+    if (dayCount > 12) {
+      return 54;
+    }
+  
+    return 64;
+  }
+
+
+
+  
   
 }

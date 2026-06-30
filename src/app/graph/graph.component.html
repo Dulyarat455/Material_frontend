@@ -189,6 +189,7 @@
           [class.chart-area-single]="card.days.length === 1"
           [class.chart-area-movement]="card.chartType === 'movement'"
           [class.chart-area-pallet]="card.chartType === 'pallet'"
+          [class.chart-area-long-range]="isLongDateRange(card)"
         >
           <div
             class="chart-scroll-viewport"
@@ -198,6 +199,9 @@
               class="chart-plot"
               [style.--column-count]="card.days.length"
               [style.--target-ratio]="getTargetRatio(card) ?? 0"
+              [style.--bar-width.px]="getBarWidth(card)"
+              [style.--column-gap.px]="getColumnGap(card)"
+              [style.--column-min-width.px]="getColumnMinWidth(card)"
             >
               <!-- Background grid -->
               <div class="chart-grid-lines">
@@ -233,21 +237,23 @@
                 >
                   <!-- Total -->
                   <div class="bar-value-total">
-                    <span *ngIf="getTotal(day) > 0">
-                      {{
-                        formatValue(
-                          getTotal(day),
-                          card.decimals
-                        )
-                      }}
-                    </span>
-
-                    <span
-                      class="bar-empty-value"
-                      *ngIf="getTotal(day) <= 0"
-                    >
-                      -
-                    </span>
+                    <ng-container *ngIf="!isLongDateRange(card)">
+                      <span *ngIf="getTotal(day) > 0">
+                        {{
+                          formatValue(
+                            getTotal(day),
+                            card.decimals
+                          )
+                        }}
+                      </span>
+                  
+                      <span
+                        class="bar-empty-value"
+                        *ngIf="getTotal(day) <= 0"
+                      >
+                        -
+                      </span>
+                    </ng-container>
                   </div>
 
                   <!-- Bar -->
@@ -329,16 +335,16 @@
                         [style.background-color]="item.color"
                       >
                         <span
-                          class="bar-segment-value"
-                          *ngIf="item.value > 0"
-                        >
-                          {{
-                            formatValue(
-                              item.value,
-                              card.decimals
-                            )
-                          }}
-                        </span>
+                        class="bar-segment-value"
+                        *ngIf="item.value > 0 && !isLongDateRange(card)"
+                      >
+                        {{
+                          formatValue(
+                            item.value,
+                            card.decimals
+                          )
+                        }}
+                      </span>
                       </div>
                     </div>
                   </div>
