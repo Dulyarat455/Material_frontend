@@ -390,10 +390,50 @@
                   </div>
                 </td>
   
-                <td class="cell-long">
-                  <div class="material-spec">
-                    {{ row.invoiceOne || '-' }}
-                  </div>
+                <td
+                    class="cell-long editable-cell"
+                    (click)="startEditCell(row, 'invoiceOne')"
+                    >
+                    <ng-container *ngIf="!isEditingCell(row, 'invoiceOne')">
+                        <div class="material-spec editable-text">
+                        {{ row.invoiceOne || '-' }}
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="isEditingCell(row, 'invoiceOne')">
+                        <div
+                        class="inline-edit-box"
+                        (click)="$event.stopPropagation()"
+                        >
+                        <input
+                            type="text"
+                            class="inline-edit-input"
+                            [(ngModel)]="editValue"
+                            [disabled]="isSavingEdit"
+                            autofocus
+                        />
+
+                        <div class="inline-edit-actions">
+                            <button
+                            type="button"
+                            class="inline-edit-btn inline-edit-confirm"
+                            [disabled]="isSavingEdit"
+                            (click)="confirmEditCell(row, 'invoiceOne')"
+                            >
+                            <i class="fa fa-check"></i>
+                            </button>
+
+                            <button
+                            type="button"
+                            class="inline-edit-btn inline-edit-cancel"
+                            [disabled]="isSavingEdit"
+                            (click)="cancelEditCell()"
+                            >
+                            <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        </div>
+                    </ng-container>
                 </td>
   
                 <td class="cell-long">
@@ -460,10 +500,50 @@
                   </div>
                 </td>
   
-                <td class="cell-long">
-                  <div class="time-text">
-                    {{ row.remark || '-' }}
-                  </div>
+                <td
+                    class="cell-long editable-cell"
+                    (click)="startEditCell(row, 'remark')"
+                    >
+                    <ng-container *ngIf="!isEditingCell(row, 'remark')">
+                        <div class="time-text editable-text">
+                        {{ row.remark || '-' }}
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="isEditingCell(row, 'remark')">
+                        <div
+                        class="inline-edit-box"
+                        (click)="$event.stopPropagation()"
+                        >
+                        <input
+                            type="text"
+                            class="inline-edit-input"
+                            [(ngModel)]="editValue"
+                            [disabled]="isSavingEdit"
+                            autofocus
+                        />
+
+                        <div class="inline-edit-actions">
+                            <button
+                            type="button"
+                            class="inline-edit-btn inline-edit-confirm"
+                            [disabled]="isSavingEdit"
+                            (click)="confirmEditCell(row, 'remark')"
+                            >
+                            <i class="fa fa-check"></i>
+                            </button>
+
+                            <button
+                            type="button"
+                            class="inline-edit-btn inline-edit-cancel"
+                            [disabled]="isSavingEdit"
+                            (click)="cancelEditCell()"
+                            >
+                            <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        </div>
+                    </ng-container>
                 </td>
   
                 <td class="cell-long">
@@ -484,11 +564,51 @@
                   </div>
                 </td>
   
-                <td class="cell-long">
-                  <div class="material-spec">
+                <td
+                class="cell-long editable-cell"
+                (click)="startEditCell(row, 'lotNo')"
+              >
+                <ng-container *ngIf="!isEditingCell(row, 'lotNo')">
+                  <div class="material-spec editable-text">
                     {{ row.lotNo || '-' }}
                   </div>
-                </td>
+                </ng-container>
+              
+                <ng-container *ngIf="isEditingCell(row, 'lotNo')">
+                  <div
+                    class="inline-edit-box"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <input
+                      type="text"
+                      class="inline-edit-input"
+                      [(ngModel)]="editValue"
+                      [disabled]="isSavingEdit"
+                      autofocus
+                    />
+              
+                    <div class="inline-edit-actions">
+                      <button
+                        type="button"
+                        class="inline-edit-btn inline-edit-confirm"
+                        [disabled]="isSavingEdit"
+                        (click)="confirmEditCell(row, 'lotNo')"
+                      >
+                        <i class="fa fa-check"></i>
+                      </button>
+              
+                      <button
+                        type="button"
+                        class="inline-edit-btn inline-edit-cancel"
+                        [disabled]="isSavingEdit"
+                        (click)="cancelEditCell()"
+                      >
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+              </td>
   
                 <td class="cell-short">
                   <div class="time-text">

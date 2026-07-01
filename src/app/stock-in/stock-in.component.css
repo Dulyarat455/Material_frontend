@@ -585,3 +585,128 @@
       min-width: 4200px;
     }
   }
+
+
+
+
+  /* =========================
+INLINE EDIT CELL
+========================= */
+
+.editable-cell {
+    cursor: pointer;
+  }
+  
+  .editable-cell:hover {
+    background: rgba(250, 204, 21, 0.18) !important;
+  }
+  
+  .editable-text {
+    min-height: 22px;
+    padding: 3px 6px;
+  
+    border-radius: 8px;
+  
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  
+  .editable-cell:hover .editable-text {
+    background: rgba(255, 255, 255, 0.65);
+    color: #92400e;
+  }
+  
+  .inline-edit-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .inline-edit-input {
+    width: 100%;
+    min-width: 120px;
+    min-height: 32px;
+  
+    padding: 5px 8px;
+  
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+  
+    color: #0f172a;
+    background: #ffffff;
+  
+    font-size: 13px;
+    font-weight: 700;
+  
+    outline: none;
+  
+    box-shadow:
+      0 0 0 0.14rem rgba(37, 99, 235, 0.12);
+  }
+  
+  .inline-edit-input:disabled {
+    background: #f8fafc;
+    opacity: 0.8;
+  }
+  
+  .inline-edit-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .inline-edit-btn {
+    width: 28px;
+    height: 28px;
+  
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+  
+    background: #ffffff;
+  
+    font-size: 12px;
+    font-weight: 900;
+  
+    cursor: pointer;
+  
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      transform 0.15s ease;
+  }
+  
+  .inline-edit-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  
+  .inline-edit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .inline-edit-confirm {
+    color: #16a34a;
+    border-color: rgba(22, 163, 74, 0.28);
+    background: #f0fdf4;
+  }
+  
+  .inline-edit-confirm:hover:not(:disabled) {
+    background: #dcfce7;
+    border-color: rgba(22, 163, 74, 0.45);
+  }
+  
+  .inline-edit-cancel {
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.25);
+    background: #fff7f7;
+  }
+  
+  .inline-edit-cancel:hover:not(:disabled) {
+    background: #fee2e2;
+    border-color: rgba(220, 38, 38, 0.42);
+  }

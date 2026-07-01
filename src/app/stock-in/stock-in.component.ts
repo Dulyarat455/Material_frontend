@@ -44,6 +44,11 @@ type FilterKey =
   | 'supplier'
   | 'notControl';
 
+type EditableField =
+  | 'invoiceOne'
+  | 'lotNo'
+  | 'remark';
+
 @Component({
   selector: 'app-stock-in',
   standalone: true,
@@ -55,6 +60,15 @@ export class StockInComponent {
   constructor(private http: HttpClient) {}
 
   isLoading = false;
+
+  isSavingEdit = false;
+
+  editingCell: {
+    rowId: number;
+    field: EditableField;
+  } | null = null;
+
+  editValue = '';
 
   startDate = '';
   endDate = '';
@@ -524,6 +538,77 @@ export class StockInComponent {
       ? 'Not Control'
       : '';
   }
+
+
+
+
+  isEditingCell(row: StockInRow, field: EditableField): boolean {
+    return (
+      this.editingCell?.rowId === row.id &&
+      this.editingCell?.field === field
+    );
+  }
+  
+  startEditCell(row: StockInRow, field: EditableField) {
+    if (this.isSavingEdit) return;
+  
+    this.editingCell = {
+      rowId: row.id,
+      field
+    };
+  
+    this.editValue = String(row[field] || '');
+  }
+  
+  cancelEditCell() {
+    if (this.isSavingEdit) return;
+  
+    this.editingCell = null;
+    this.editValue = '';
+  }
+  
+  confirmEditCell(row: StockInRow, field: EditableField) {
+    if (this.isSavingEdit) return;
+  
+    const nextValue = String(this.editValue ?? '');
+  
+    this.isSavingEdit = true;
+  
+    this.http.post<any>(
+      `${config.apiServer}/api/incoming/updateReportField`,
+      {
+        id: row.id,
+        field,
+        value: nextValue
+      }
+    ).subscribe({
+      next: () => {
+        row[field] = nextValue;
+  
+        const rowInRows = this.rows.find(x => x.id === row.id);
+        if (rowInRows) {
+          rowInRows[field] = nextValue;
+        }
+  
+        const rowInFiltered = this.filteredRows.find(x => x.id === row.id);
+        if (rowInFiltered) {
+          rowInFiltered[field] = nextValue;
+        }
+  
+        this.editingCell = null;
+        this.editValue = '';
+        this.isSavingEdit = false;
+  
+        this.applyFilter();
+      },
+      error: (err) => {
+        console.error('confirmEditCell error:', err);
+  
+        this.isSavingEdit = false;
+      }
+    });
+  }
+  
 
   trackByRow(_index: number, row: StockInRow) {
     return row.id;
