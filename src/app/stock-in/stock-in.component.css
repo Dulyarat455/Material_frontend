@@ -618,8 +618,11 @@ INLINE EDIT CELL
   }
   
   .inline-edit-box {
+    width: 100%;
+
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 6px;
   }
   
@@ -651,9 +654,12 @@ INLINE EDIT CELL
   }
   
   .inline-edit-actions {
-    display: inline-flex;
+    width: 100%;
+  
+    display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: flex-start;
+    gap: 6px;
   }
   
   .inline-edit-btn {
@@ -709,4 +715,16 @@ INLINE EDIT CELL
   .inline-edit-cancel:hover:not(:disabled) {
     background: #fee2e2;
     border-color: rgba(220, 38, 38, 0.42);
+  }
+
+
+
+  .editable-cell {
+    cursor: pointer;
+    overflow: visible !important;
+  }
+  
+  .inline-edit-input {
+    width: 100%;
+    min-width: 0;
   }
