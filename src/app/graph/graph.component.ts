@@ -62,6 +62,14 @@ type TransactionApiRow = {
 
 type NotControlFilter = 'all' | 'Control' | 'Not Control';
 
+
+type TargetGraphApiRow = {
+  id: number;
+  graph: string;
+  target: number;
+  status: string;
+};
+
 @Component({
   selector: 'app-graph',
   standalone: true,
@@ -84,6 +92,8 @@ export class GraphComponent {
 
   graphCards: GraphCard[] = [];
 
+  targetDraftMap: Partial<Record<GraphCardId, string>> = {};
+
 
   activeTooltip: {
     cardId: GraphCardId;
@@ -102,6 +112,21 @@ export class GraphComponent {
     palletMovementIssueReturn: null,
     palletMovementMoveArea: null
   };
+
+
+  private graphNoMap: Record<GraphCardId, string> = {
+    stockAmountByItem: '1',
+    stockQtyByGroup: '2',
+    stockAmountByGroup: '3',
+    palletStorageTotal: '4',
+    palletStorageGeneral: '5',
+    palletStorageLamination: '6',
+    palletMovementStockIn: '7',
+    palletMovementIssueReturn: '8',
+    palletMovementMoveArea: '9'
+  };
+
+
 
   readonly color = {
     control: '#1479bd',
@@ -122,43 +147,54 @@ export class GraphComponent {
   }
 
   fetchGraphData() {
-    if (this.isLoading) return;
+  if (this.isLoading) return;
 
-    this.isLoading = true;
-    this.isError = false;
+  this.isLoading = true;
+  this.isError = false;
 
-    forkJoin({
-      inventory: this.http.get<any>(
-        `${config.apiServer}/api/graph/listInventory`
-      ),
-      transaction: this.http.get<any>(
-        `${config.apiServer}/api/graph/listTransaction`
+  forkJoin({
+    inventory: this.http.get<any>(
+      `${config.apiServer}/api/graph/listInventory`
+    ),
+    transaction: this.http.get<any>(
+      `${config.apiServer}/api/graph/listTransaction`
+    ),
+    targetGraph: this.http.get<any>(
+      `${config.apiServer}/api/graph/listTargetGraph`
+    )
+  }).subscribe({
+    next: (res) => {
+      this.inventoryRows = Array.isArray(res.inventory?.results)
+        ? res.inventory.results
+        : [];
+
+      this.transactionRows = Array.isArray(res.transaction?.results)
+        ? res.transaction.results
+        : [];
+
+      const targetRows: TargetGraphApiRow[] = Array.isArray(
+        res.targetGraph?.results
       )
-    }).subscribe({
-      next: (res) => {
-        this.inventoryRows = Array.isArray(res.inventory?.results)
-          ? res.inventory.results
-          : [];
+        ? res.targetGraph.results
+        : [];
 
-        this.transactionRows = Array.isArray(res.transaction?.results)
-          ? res.transaction.results
-          : [];
+      this.applyTargetGraphRows(targetRows);
 
-        this.buildGraphCards();
+      this.buildGraphCards();
 
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('fetchGraphData error:', err);
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('fetchGraphData error:', err);
 
-        this.inventoryRows = [];
-        this.transactionRows = [];
-        this.graphCards = [];
-        this.isLoading = false;
-        this.isError = true;
-      }
-    });
-  }
+      this.inventoryRows = [];
+      this.transactionRows = [];
+      this.graphCards = [];
+      this.isLoading = false;
+      this.isError = true;
+    }
+  });
+}
 
   refresh() {
     this.fetchGraphData();
@@ -170,16 +206,24 @@ export class GraphComponent {
 
   onTargetChange(card: GraphCard, value: number | string | null) {
     const targetValue = Number(value);
-
-    this.targetMap[card.id] =
+  
+    const nextTarget =
       value === null ||
       value === '' ||
       Number.isNaN(targetValue) ||
       targetValue < 0
         ? null
         : targetValue;
-
+  
+    this.targetMap[card.id] = nextTarget;
+  
     this.buildGraphCards();
+  
+    if (nextTarget === null) {
+      return;
+    }
+  
+    this.updateTargetGraph(card.id, nextTarget);
   }
 
   private setDefaultDateRange() {
@@ -960,6 +1004,111 @@ export class GraphComponent {
 
 
 
+
+  private applyTargetGraphRows(rows: TargetGraphApiRow[]) {
+    const targetByGraphNo = new Map<string, number>();
+  
+    for (const row of rows) {
+      const graphNo = String(row.graph || '').trim();
+      const targetValue = Number(row.target);
+  
+      if (!graphNo || Number.isNaN(targetValue)) {
+        continue;
+      }
+  
+      targetByGraphNo.set(graphNo, targetValue);
+    }
+  
+    const graphIds = Object.keys(this.graphNoMap) as GraphCardId[];
+  
+    for (const graphId of graphIds) {
+      const graphNo = this.graphNoMap[graphId];
+  
+      this.targetMap[graphId] = targetByGraphNo.has(graphNo)
+        ? targetByGraphNo.get(graphNo) ?? null
+        : null;
+    }
+  }
+
+
+  private updateTargetGraph(
+    graphId: GraphCardId,
+    target: number
+  ) {
+    const graphNo = this.graphNoMap[graphId];
+  
+    if (!graphNo) {
+      return;
+    }
+  
+    this.http.post<any>(
+      `${config.apiServer}/api/graph/updateTargetGraph`,
+      {
+        graph: graphNo,
+        target
+      }
+    ).subscribe({
+      next: () => {},
+      error: (err) => {
+        console.error('updateTargetGraph error:', err);
+      }
+    });
+  }
+
+
+
+  
+  getTargetInputValue(card: GraphCard): string {
+    const draftValue = this.targetDraftMap[card.id];
+  
+    if (draftValue !== undefined) {
+      return draftValue;
+    }
+  
+    if (card.target === null || card.target === undefined) {
+      return '';
+    }
+  
+    return String(card.target);
+  }
+  
+  onTargetDraftChange(card: GraphCard, value: string | number | null) {
+    this.targetDraftMap[card.id] =
+      value === null || value === undefined
+        ? ''
+        : String(value);
+  }
+  
+  hasTargetDraft(card: GraphCard): boolean {
+    const draftValue = this.targetDraftMap[card.id];
+  
+    if (draftValue === undefined) {
+      return false;
+    }
+  
+    const currentValue =
+      card.target === null || card.target === undefined
+        ? ''
+        : String(card.target);
+  
+    return String(draftValue) !== currentValue;
+  }
+  
+  confirmTargetChange(card: GraphCard) {
+    const draftValue = this.targetDraftMap[card.id];
+  
+    if (draftValue === undefined) {
+      return;
+    }
+  
+    this.onTargetChange(card, draftValue);
+  
+    delete this.targetDraftMap[card.id];
+  }
+  
+  cancelTargetChange(card: GraphCard) {
+    delete this.targetDraftMap[card.id];
+  }
 
   
 }

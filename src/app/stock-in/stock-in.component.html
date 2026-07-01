@@ -1,1 +1,567 @@
-<p>stock-in works!</p>
+<div class="material-page">
+    <div class="page-shell">
+  
+      <!-- =========================
+           PAGE HEADER
+      ========================== -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-header-icon">
+            <i class="fas fa-boxes"></i>
+          </div>
+  
+          <div class="page-header-text">
+            <div class="page-title">
+              Stock In Report
+            </div>
+  
+            <div class="page-subtitle">
+              Current incoming stock data from Incoming and Material Line
+            </div>
+          </div>
+        </div>
+  
+        <div class="page-header-right">
+          <div class="stat-chip">
+            <span class="stat-label">Total</span>
+            <span class="stat-value">{{ filteredRows.length }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <!-- =========================
+           TOOLBAR / FILTER
+      ========================== -->
+      <div class="toolbar-card">
+        <div class="toolbar-left">
+          <button
+            class="btn btn-outline-secondary action-btn"
+            type="button"
+            [disabled]="isLoading"
+            (click)="fetchStockInList()"
+          >
+            <i class="fa fa-refresh me-2" [class.spin]="isLoading"></i>
+            Refresh
+          </button>
+        </div>
+  
+        <div class="toolbar-right stockin-filter-grid">
+  
+          <!-- Start Date -->
+          <div class="filter-box">
+            <label class="filter-label">Start Date</label>
+  
+            <input
+              type="date"
+              class="form-control filter-input"
+              [(ngModel)]="startDate"
+              (change)="onFilterChange()"
+            />
+          </div>
+  
+          <!-- End Date -->
+          <div class="filter-box">
+            <label class="filter-label">End Date</label>
+  
+            <input
+              type="date"
+              class="form-control filter-input"
+              [(ngModel)]="endDate"
+              (change)="onFilterChange()"
+            />
+          </div>
+  
+          <!-- Incoming Job No -->
+          <div class="filter-box">
+            <label class="filter-label">Incoming Job No</label>
+  
+            <div class="smart-dropdown" (click)="$event.stopPropagation()">
+              <input
+                type="text"
+                class="form-control filter-input"
+                placeholder="Select Incoming Job No."
+                [ngModel]="getDisplayedInputValue('jobNo')"
+                (focus)="onDropdownFocus('jobNo')"
+                (ngModelChange)="onDropdownInput('jobNo', $event)"
+                (keydown)="onDropdownKeydown('jobNo', $event)"
+                (blur)="onDropdownBlur('jobNo')"
+              />
+  
+              <div class="dropdown-panel" *ngIf="dropdownOpen.jobNo">
+                <div
+                  class="dropdown-option dropdown-option-all"
+                  (mousedown)="clearDropdownSelection('jobNo')"
+                >
+                  All Incoming Job No
+                </div>
+  
+                <div
+                  class="dropdown-option"
+                  *ngFor="let x of getFilteredDropdownOptions('jobNo')"
+                  (mousedown)="selectDropdownOption('jobNo', x)"
+                >
+                  {{ x }}
+                </div>
+  
+                <div
+                  class="dropdown-empty"
+                  *ngIf="!getFilteredDropdownOptions('jobNo').length"
+                >
+                  No data
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Material No -->
+          <div class="filter-box">
+            <label class="filter-label">Material No</label>
+  
+            <div class="smart-dropdown" (click)="$event.stopPropagation()">
+              <input
+                type="text"
+                class="form-control filter-input"
+                placeholder="Select Material No."
+                [ngModel]="getDisplayedInputValue('materialNo')"
+                (focus)="onDropdownFocus('materialNo')"
+                (ngModelChange)="onDropdownInput('materialNo', $event)"
+                (keydown)="onDropdownKeydown('materialNo', $event)"
+                (blur)="onDropdownBlur('materialNo')"
+              />
+  
+              <div class="dropdown-panel" *ngIf="dropdownOpen.materialNo">
+                <div
+                  class="dropdown-option dropdown-option-all"
+                  (mousedown)="clearDropdownSelection('materialNo')"
+                >
+                  All Material No
+                </div>
+  
+                <div
+                  class="dropdown-option"
+                  *ngFor="let x of getFilteredDropdownOptions('materialNo')"
+                  (mousedown)="selectDropdownOption('materialNo', x)"
+                >
+                  {{ x }}
+                </div>
+  
+                <div
+                  class="dropdown-empty"
+                  *ngIf="!getFilteredDropdownOptions('materialNo').length"
+                >
+                  No data
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Line No -->
+          <div class="filter-box">
+            <label class="filter-label">Line</label>
+  
+            <div class="smart-dropdown" (click)="$event.stopPropagation()">
+              <input
+                type="text"
+                class="form-control filter-input"
+                placeholder="Select Line."
+                [ngModel]="getDisplayedInputValue('lineNo')"
+                (focus)="onDropdownFocus('lineNo')"
+                (ngModelChange)="onDropdownInput('lineNo', $event)"
+                (keydown)="onDropdownKeydown('lineNo', $event)"
+                (blur)="onDropdownBlur('lineNo')"
+              />
+  
+              <div class="dropdown-panel" *ngIf="dropdownOpen.lineNo">
+                <div
+                  class="dropdown-option dropdown-option-all"
+                  (mousedown)="clearDropdownSelection('lineNo')"
+                >
+                  All Line
+                </div>
+  
+                <div
+                  class="dropdown-option"
+                  *ngFor="let x of getFilteredDropdownOptions('lineNo')"
+                  (mousedown)="selectDropdownOption('lineNo', x)"
+                >
+                  {{ x }}
+                </div>
+  
+                <div
+                  class="dropdown-empty"
+                  *ngIf="!getFilteredDropdownOptions('lineNo').length"
+                >
+                  No data
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Supplier -->
+          <div class="filter-box">
+            <label class="filter-label">Supplier</label>
+  
+            <div class="smart-dropdown" (click)="$event.stopPropagation()">
+              <input
+                type="text"
+                class="form-control filter-input"
+                placeholder="Select Supplier."
+                [ngModel]="getDisplayedInputValue('supplier')"
+                (focus)="onDropdownFocus('supplier')"
+                (ngModelChange)="onDropdownInput('supplier', $event)"
+                (keydown)="onDropdownKeydown('supplier', $event)"
+                (blur)="onDropdownBlur('supplier')"
+              />
+  
+              <div class="dropdown-panel" *ngIf="dropdownOpen.supplier">
+                <div
+                  class="dropdown-option dropdown-option-all"
+                  (mousedown)="clearDropdownSelection('supplier')"
+                >
+                  All Supplier
+                </div>
+  
+                <div
+                  class="dropdown-option"
+                  *ngFor="let x of getFilteredDropdownOptions('supplier')"
+                  (mousedown)="selectDropdownOption('supplier', x)"
+                >
+                  {{ x }}
+                </div>
+  
+                <div
+                  class="dropdown-empty"
+                  *ngIf="!getFilteredDropdownOptions('supplier').length"
+                >
+                  No data
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Not Control -->
+            <div class="filter-box">
+                <label class="filter-label">NOT CONTROL</label>
+            
+                <div class="smart-dropdown" (click)="$event.stopPropagation()">
+                <input
+                    type="text"
+                    class="form-control filter-input"
+                    placeholder="Select Not Control."
+                    [ngModel]="getDisplayedInputValue('notControl')"
+                    (focus)="onDropdownFocus('notControl')"
+                    (ngModelChange)="onDropdownInput('notControl', $event)"
+                    (keydown)="onDropdownKeydown('notControl', $event)"
+                    (blur)="onDropdownBlur('notControl')"
+                />
+            
+                <div class="dropdown-panel" *ngIf="dropdownOpen.notControl">
+                    <div
+                    class="dropdown-option dropdown-option-all"
+                    (mousedown)="clearDropdownSelection('notControl')"
+                    >
+                    All NOT CONTROL
+                    </div>
+            
+                    <div
+                    class="dropdown-option"
+                    *ngFor="let x of getFilteredDropdownOptions('notControl')"
+                    (mousedown)="selectDropdownOption('notControl', x)"
+                    >
+                    {{ x }}
+                    </div>
+            
+                    <div
+                    class="dropdown-empty"
+                    *ngIf="!getFilteredDropdownOptions('notControl').length"
+                    >
+                    No data
+                    </div>
+                </div>
+                </div>
+            </div>
+  
+          <!-- Clear Filter -->
+          <div class="filter-box filter-action-box">
+            <label class="filter-label filter-label-hidden">Action</label>
+  
+            <button
+              class="btn btn-outline-dark action-btn clear-filter-btn"
+              type="button"
+              (click)="clearFilters()"
+            >
+              <i class="fa fa-times me-2"></i>
+              Clear Filter
+            </button>
+          </div>
+  
+        </div>
+      </div>
+  
+      <!-- =========================
+           TABLE
+      ========================== -->
+      <div class="table-card">
+        <div class="table-head">
+          <div class="table-title">
+            Stock In History
+          </div>
+  
+          <div class="table-subtitle">
+            แสดงข้อมูล Incoming ที่ยังไม่ถูก Stock Out และเพิ่ม Line No จาก Material
+          </div>
+        </div>
+  
+        <div class="table-wrap">
+          <table class="table table-hover align-middle mb-0 material-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Index</th>
+                <th style="width: 180px;">Job No</th>
+                <th style="width: 130px;">Year Month</th>
+                <th style="width: 150px;">Received Date</th>
+                <th style="width: 160px;">Inspector</th>
+                <th style="width: 160px;">Unload By</th>
+                <th style="width: 180px;">Invoice One</th>
+                <th style="width: 180px;">Tax Inv No</th>
+                <th style="width: 180px;">Material No</th>
+                <th style="width: 120px;">Line No</th>
+                <th style="width: 130px;">Unit Price</th>
+                <th style="width: 180px;">Qty Pallet Pack</th>
+                <th style="width: 90px;">Coil</th>
+                <th style="width: 150px;">Qty Kgs/Pcs</th>
+                <th style="width: 90px;">Unit</th>
+                <th style="width: 130px;">Kgs/Coil</th>
+                <th style="width: 130px;">OD Coil</th>
+                <th style="width: 260px;">Remark</th>
+                <th style="width: 160px;">Mill Sheet</th>
+                <th style="width: 280px;">Item Name</th>
+                <th style="width: 300px;">Item Spec</th>
+                <th style="width: 180px;">Lot No</th>
+                <th style="width: 140px;">Packing</th>
+                <th style="width: 120px;">Rosh</th>
+                <th style="width: 120px;">Result</th>
+                <th style="width: 190px;">Supplier</th>
+                <th style="width: 140px;">Amount</th>
+                <th style="width: 150px;">Not Control</th>
+              
+              </tr>
+            </thead>
+  
+            <tbody *ngIf="!isLoading">
+              <tr
+                *ngFor="
+                  let row of filteredRows;
+                  let i = index;
+                  trackBy: trackByRow
+                "
+              >
+                <td>
+                  <span class="index-badge">{{ i + 1 }}</span>
+                </td>
+  
+                <td class="cell-job">
+                  <div class="material-no">
+                    {{ row.jobNo || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                  <div class="time-text">
+                    {{ row.yearMonth || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-date">
+                  <div class="time-text">
+                    {{ formatDate(row.recivedDate) }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.inspector || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.unloadBy || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.invoiceOne || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.taxLnvNo || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-job">
+                  <div class="material-no">
+                    {{ row.materialNo || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                  <span
+                    class="line-badge"
+                    [class.line-gen]="row.lineNo === 'GEN'"
+                    [class.line-lam]="row.lineNo === 'LAM'"
+                  >
+                    {{ row.lineNo || '-' }}
+                  </span>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ row.unitPrice || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ row.qtyOfPalletPack || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ formatNumber(row.coil, 0) }}
+                  </div>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ formatNumber(row.qtyKgsPcs, 2) }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                  <div class="time-text">
+                    {{ row.unit || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ row.kgsCoil || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ row.odCoil || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="time-text">
+                    {{ row.remark || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.millSheet || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-name">
+                    {{ row.itemName || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.itemSpec || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.lotNo || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                  <div class="time-text">
+                    {{ row.packing || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                  <div class="time-text">
+                    {{ row.rosh || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                  <div class="time-text">
+                    {{ row.result || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-long">
+                  <div class="material-spec">
+                    {{ row.supplier || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short text-end">
+                  <div class="time-text">
+                    {{ row.amount || '-' }}
+                  </div>
+                </td>
+  
+                <td class="cell-short">
+                    <span
+                      class="control-badge status-not-control"
+                      *ngIf="getNotControlText(row)"
+                    >
+                      {{ getNotControlText(row) }}
+                    </span>
+                </td>
+  
+                
+              </tr>
+  
+              <tr *ngIf="!filteredRows.length">
+                <td colspan="29" class="empty-cell">
+                  <div class="empty-state">
+                    <i class="fa fa-inbox empty-icon"></i>
+  
+                    <div class="empty-title">
+                      No stock in data found
+                    </div>
+  
+                    <div class="empty-subtitle">
+                      ไม่พบข้อมูลที่ตรงกับเงื่อนไข หรือยังไม่มีข้อมูลในระบบ
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+  
+            <tbody *ngIf="isLoading">
+              <tr>
+                <td colspan="29" class="loading-cell">
+                  <div class="loading-state">
+                    <i class="fa fa-spinner fa-spin me-2"></i>
+                    Loading stock in data...
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  
+    </div>
+  </div>

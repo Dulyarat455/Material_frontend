@@ -386,15 +386,40 @@
 
           <div class="target-control">
             <label>Target</label>
-
-            <input
-              type="number"
-              min="0"
-              class="target-input"
-              [ngModel]="card.target"
-              (ngModelChange)="onTargetChange(card, $event)"
-              placeholder="-"
-            />
+          
+            <div class="target-edit-row">
+              <input
+                type="number"
+                min="0"
+                class="target-input"
+                [ngModel]="getTargetInputValue(card)"
+                (ngModelChange)="onTargetDraftChange(card, $event)"
+                placeholder="-"
+              />
+          
+              <div
+                class="target-action-buttons"
+                *ngIf="hasTargetDraft(card)"
+              >
+                <button
+                  type="button"
+                  class="target-action-btn target-action-confirm"
+                  title="Confirm"
+                  (click)="confirmTargetChange(card)"
+                >
+                  <i class="fas fa-check"></i>
+                </button>
+          
+                <button
+                  type="button"
+                  class="target-action-btn target-action-cancel"
+                  title="Cancel"
+                  (click)="cancelTargetChange(card)"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="footer-status">

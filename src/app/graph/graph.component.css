@@ -1290,3 +1290,73 @@ DENSE DATE RANGE BAR CONTROL
 .chart-area-long-range .chart-column {
   min-width: 0;
 }
+
+
+
+
+
+/* =========================
+TARGET CONFIRM / CANCEL
+========================= */
+
+.target-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.target-action-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.target-action-btn {
+  width: 28px;
+  height: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.target-action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.target-action-confirm {
+  color: #16a34a;
+  border-color: rgba(22, 163, 74, 0.28);
+  background: #f0fdf4;
+}
+
+.target-action-confirm:hover {
+  background: #dcfce7;
+  border-color: rgba(22, 163, 74, 0.45);
+}
+
+.target-action-cancel {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.25);
+  background: #fff7f7;
+}
+
+.target-action-cancel:hover {
+  background: #fee2e2;
+  border-color: rgba(220, 38, 38, 0.42);
+}
