@@ -344,7 +344,7 @@
                 <th style="width: 190px;">Supplier</th>
                 <th style="width: 140px;">Amount</th>
                 <th style="width: 150px;">Not Control</th>
-              
+                <th style="width: 180px;">AREA</th>
               </tr>
             </thead>
   
@@ -648,6 +648,12 @@
                       {{ getNotControlText(row) }}
                     </span>
                 </td>
+
+                <td class="cell-long">
+                    <div class="material-spec">
+                      {{ row.area || '-' }}
+                    </div>
+                  </td>
   
                 
               </tr>

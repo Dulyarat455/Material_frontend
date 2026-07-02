@@ -35,6 +35,7 @@ type StockInRow = {
   reInspectionDate?: string | null;
   status: string;
   lineNo: string;
+  area?: string;
 };
 
 type FilterKey =
@@ -48,6 +49,9 @@ type EditableField =
   | 'invoiceOne'
   | 'lotNo'
   | 'remark';
+
+
+type InventoryFilter = 'all' | 'Inventory';
 
 @Component({
   selector: 'app-stock-in',
@@ -78,6 +82,7 @@ export class StockInComponent {
   lineNoFilter = 'all';
   supplierFilter = 'all';
   notControlFilter = 'all';
+  inventoryFilter: InventoryFilter = 'all';
 
   rows: StockInRow[] = [];
   filteredRows: StockInRow[] = [];
@@ -608,7 +613,7 @@ export class StockInComponent {
       }
     });
   }
-  
+
 
   trackByRow(_index: number, row: StockInRow) {
     return row.id;
