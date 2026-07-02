@@ -149,6 +149,7 @@ export class StockInComponent {
     this.lineNoFilter = 'all';
     this.supplierFilter = 'all';
     this.notControlFilter = 'all';
+    this.inventoryFilter = 'all';
 
     this.dropdownSearch.jobNo = '';
     this.dropdownSearch.materialNo = '';
@@ -217,6 +218,13 @@ export class StockInComponent {
       : 'Blank';
   }
 
+
+
+  private hasArea(row: StockInRow): boolean {
+    return String(row.area || '').trim() !== '';
+  }
+
+
   private rowMatchesFilter(
     row: StockInRow,
     excludeKey?: FilterKey
@@ -250,13 +258,18 @@ export class StockInComponent {
       this.getNotControlFilterValue(row) === this.notControlFilter;
 
 
+    const matchInventory =
+      this.inventoryFilter === 'all' ||
+      this.hasArea(row);
+
 
     return (
       matchJobNo &&
       matchMaterialNo &&
       matchLineNo &&
       matchSupplier &&
-      matchNotControl
+      matchNotControl &&
+      matchInventory
     );
   }
 
@@ -612,6 +625,11 @@ export class StockInComponent {
         this.isSavingEdit = false;
       }
     });
+  }
+
+
+  onInventoryFilterChange() {
+    this.applyFilter();
   }
 
 

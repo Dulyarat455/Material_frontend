@@ -151,7 +151,7 @@
   .stockin-filter-grid {
     display: grid;
     grid-template-columns:
-      repeat(7, minmax(160px, 1fr))
+      repeat(4, minmax(160px, 1fr))
       minmax(150px, 0.7fr);
   
     gap: 10px;

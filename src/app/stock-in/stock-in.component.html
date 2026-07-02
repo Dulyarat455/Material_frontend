@@ -280,6 +280,22 @@
                 </div>
                 </div>
             </div>
+
+
+            <!-- Inventory Filter -->
+            <div class="filter-box">
+              <label class="filter-label">Inventory</label>
+
+              <select
+                class="form-control filter-input"
+                [(ngModel)]="inventoryFilter"
+                (change)="onInventoryFilterChange()"
+              >
+                <option value="all">All</option>
+                <option value="Inventory">Inventory</option>
+              </select>
+            </div>
+
   
           <!-- Clear Filter -->
           <div class="filter-box filter-action-box">
