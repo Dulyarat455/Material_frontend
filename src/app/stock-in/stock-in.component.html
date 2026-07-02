@@ -333,7 +333,7 @@
             <thead>
               <tr>
                 <th style="width: 80px;">Index</th>
-                <th style="width: 180px;">Job No</th>
+                <th class="freeze-job-col" style="width: 180px;">Job No</th>
                 <th style="width: 130px;">Year Month</th>
                 <th style="width: 150px;">Received Date</th>
                 <th style="width: 160px;">Inspector</th>
@@ -376,7 +376,7 @@
                   <span class="index-badge">{{ i + 1 }}</span>
                 </td>
   
-                <td class="cell-job">
+                <td class="cell-job freeze-job-col">
                   <div class="material-no">
                     {{ row.jobNo || '-' }}
                   </div>

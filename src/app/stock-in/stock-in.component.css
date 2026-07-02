@@ -728,3 +728,37 @@ INLINE EDIT CELL
     width: 100%;
     min-width: 0;
   }
+
+
+
+  /* =========================
+FREEZE JOB NO COLUMN
+========================= */
+
+.freeze-job-col {
+  position: sticky;
+  left: 0;
+  z-index: 8;
+
+  box-shadow:
+    6px 0 10px rgba(15, 23, 42, 0.08);
+}
+
+/* Header Job No */
+.material-table thead th.freeze-job-col {
+  z-index: 20;
+  background: #3e8556;
+}
+
+/* Body Job No background ต้อง fix เอง เพราะ sticky ไม่ควรโปร่งใส */
+.material-table tbody tr:nth-child(odd) td.freeze-job-col {
+  background: #e1f0e6;
+}
+
+.material-table tbody tr:nth-child(even) td.freeze-job-col {
+  background: #ffffff;
+}
+
+.material-table tbody tr:hover td.freeze-job-col {
+  background: #d1e8d8;
+}
