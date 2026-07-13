@@ -81,6 +81,7 @@ export class GraphComponent {
   constructor(private http: HttpClient) {}
 
   isLoading = false;
+  isUpdatingGraph = false;
   isError = false;
 
   startDate = '';
@@ -143,8 +144,34 @@ export class GraphComponent {
 
   ngOnInit() {
     this.setDefaultDateRange();
-    this.fetchGraphData();
+    this.updateGraphAndFetchData();
   }
+
+
+  updateGraphAndFetchData() {
+    if (this.isUpdatingGraph || this.isLoading) return;
+  
+    this.isUpdatingGraph = true;
+    this.isError = false;
+  
+    this.http.get<any>(
+      `${config.apiServer}/api/graph/updateGraph`
+    ).subscribe({
+      next: (res) => {
+        console.log('updateGraph success:', res);
+  
+        this.isUpdatingGraph = false;
+        this.fetchGraphData();
+      },
+      error: (err) => {
+        console.error('updateGraph error:', err);
+  
+        this.isUpdatingGraph = false;
+        this.isError = true;
+      }
+    });
+  }
+
 
   fetchGraphData() {
   if (this.isLoading) return;

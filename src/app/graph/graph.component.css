@@ -1360,3 +1360,38 @@ TARGET CONFIRM / CANCEL
   background: #fee2e2;
   border-color: rgba(220, 38, 38, 0.42);
 }
+
+
+
+
+/* =========================
+UPDATE GRAPH LOADING STATE
+========================= */
+
+.graph-state-updating {
+  min-height: 150px;
+
+  color: #1d4ed8;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  border-color: rgba(37, 99, 235, 0.18);
+}
+
+.graph-state-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.graph-state-title {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.graph-state-subtitle {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}

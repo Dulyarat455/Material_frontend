@@ -204,7 +204,7 @@
               </a>
             </li>
 
-
+            @if (this.role === 'admin') {
             <li class="nav-item">
               <a
                 routerLink="/stockIn"
@@ -212,11 +212,12 @@
                 ZY
                 routerLinkActive="active"
               >
-                <i class="fas fa-chart-bar"></i>
+                <i class="fas fa-box-open"></i>
                 <p class="ms-2">StockIn</p>
               </a>
             </li>
-           
+          }
+
           </ul>
         </li>
 

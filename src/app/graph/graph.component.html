@@ -31,7 +31,13 @@
             </div>
 
             <div class="status-value">
-              {{ isLoading ? 'Loading...' : 'API Data' }}
+              {{
+                isUpdatingGraph
+                  ? 'Updating...'
+                  : isLoading
+                    ? 'Loading...'
+                    : 'API Data'
+              }}
             </div>
           </div>
         </div>
@@ -92,12 +98,12 @@
         <button
           type="button"
           class="toolbar-btn"
-          [disabled]="isLoading"
+          [disabled]="isLoading || isUpdatingGraph"
           (click)="refresh()"
         >
           <i
             class="fas fa-sync-alt"
-            [class.fa-spin]="isLoading"
+            [class.fa-spin]="isLoading || isUpdatingGraph"
           ></i>
           Refresh
         </button>
@@ -108,16 +114,42 @@
          LOADING / ERROR
     ========================== -->
     <div
-      class="graph-state"
-      *ngIf="isLoading"
-    >
-      <i class="fas fa-spinner fa-spin"></i>
-      Loading graph data...
-    </div>
+        class="graph-state graph-state-updating"
+        *ngIf="isUpdatingGraph"
+      >
+        <i class="fas fa-spinner fa-spin"></i>
+
+        <div class="graph-state-text">
+          <div class="graph-state-title">
+            Updating graph data...
+          </div>
+
+          <div class="graph-state-subtitle">
+            กำลังตรวจสอบและปรับข้อมูล Inventory ให้เป็นปัจจุบัน กรุณารอสักครู่
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="graph-state"
+        *ngIf="!isUpdatingGraph && isLoading"
+      >
+        <i class="fas fa-spinner fa-spin"></i>
+
+        <div class="graph-state-text">
+          <div class="graph-state-title">
+            Loading graph data...
+          </div>
+
+          <div class="graph-state-subtitle">
+            กำลังโหลดข้อมูลสำหรับแสดงกราฟ
+          </div>
+        </div>
+      </div>
 
     <div
       class="graph-state graph-state-error"
-      *ngIf="!isLoading && isError"
+      *ngIf="!isUpdatingGraph && !isLoading && isError"
     >
       <i class="fas fa-triangle-exclamation"></i>
       Cannot load graph data
@@ -128,7 +160,7 @@
     ========================== -->
     <div
       class="graph-grid"
-      *ngIf="!isLoading && !isError"
+      *ngIf="!isUpdatingGraph && !isLoading && !isError"
     >
       <section
         class="graph-card"

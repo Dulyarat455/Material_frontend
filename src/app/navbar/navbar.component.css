@@ -341,3 +341,31 @@ text title material
   :host(.no-sidebar) .main-header {
     margin-left: 0 !important;
   }
+
+
+
+
+
+
+  /* =========================
+DOCUMENT NO TEXT
+========================= */
+
+.doc-no-text {
+  height: 36px;
+
+  display: flex !important;
+  align-items: center;
+
+  padding: 0 8px !important;
+
+  color: #000000 !important;
+  background: transparent !important;
+  border: none !important;
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  white-space: nowrap;
+}
