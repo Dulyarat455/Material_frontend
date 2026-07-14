@@ -517,3 +517,122 @@ type Material (accountCode )
   color: #1d4ed8;
   border: 1px solid rgba(29, 78, 216, 0.18);
 }
+
+
+
+
+
+
+
+
+
+
+/* =========================
+OVER 20 MIN CLOCK ICON
+========================= */
+
+.overdue-clock-badge {
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border-radius: 8px;
+
+  background: rgba(254, 226, 226, 0.75);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+
+  box-shadow: 0 2px 7px rgba(239, 68, 68, 0.18);
+}
+
+/* ตัวนาฬิกา */
+.clock-icon-css {
+  width: 24px;
+  height: 24px;
+
+  position: relative;
+
+  display: inline-block;
+
+  border: 4px solid #6b7280;
+  border-radius: 50%;
+
+  background: #eaf6fb;
+}
+
+/* ปุ่มด้านบนของนาฬิกา */
+.clock-icon-css::before {
+  content: "";
+
+  position: absolute;
+  top: -9px;
+  left: 50%;
+
+  width: 12px;
+  height: 5px;
+
+  border-radius: 2px;
+  background: #6b7280;
+
+  transform: translateX(-50%);
+}
+
+/* เข็มนาฬิกา */
+.clock-icon-css::after {
+  content: "";
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: 3px;
+  height: 8px;
+
+  background: #475569;
+  border-radius: 99px;
+
+  transform-origin: bottom center;
+  transform: translate(-50%, -100%) rotate(0deg);
+  box-shadow:
+    -5px 6px 0 -1px #475569;
+}
+
+/* สามเหลี่ยม warning */
+.clock-alert-css {
+  position: absolute;
+  right: -7px;
+  bottom: -4px;
+
+  width: 20px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #7f1d1d;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+
+  background: #fde68a;
+  border: 3px solid #ef4444;
+  border-radius: 5px;
+
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+/* จัดเครื่องหมาย ! ให้อยู่กลางสามเหลี่ยม */
+.clock-alert-css {
+  padding-top: 5px;
+}
+
+/* hover */
+.overdue-clock-badge:hover {
+  transform: translateY(-1px);
+  background: rgba(254, 202, 202, 0.85);
+}
