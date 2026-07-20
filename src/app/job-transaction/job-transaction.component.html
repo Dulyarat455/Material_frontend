@@ -198,7 +198,22 @@
             [class.row-urgent]="isOver10Min(row)"
           >
             <td class="text-center">
-              <span *ngIf="row.priority === 'Urgent'" class="urgent-badge" title="Urgent">
+              <!-- เกิน 20 นาที ให้โชว์นาฬิกาเท่านั้น -->
+              <span
+                *ngIf="isOver10Min(row)"
+                class="overdue-clock-badge"
+                title="Over 20 minutes"
+              >
+                <span class="clock-icon-css"></span>
+                <span class="clock-alert-css">!</span>
+              </span>
+            
+              <!-- ถ้าไม่เกิน 20 นาที และเป็น Urgent ให้โชว์ไฟ -->
+              <span
+                *ngIf="!isOver10Min(row) && row.priority === 'Urgent'"
+                class="urgent-badge"
+                title="Urgent"
+              >
                 <i class="fas fa-fire"></i>
               </span>
             </td>

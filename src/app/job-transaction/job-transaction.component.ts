@@ -254,7 +254,7 @@ export class JobTransactionComponent {
     const diffMs = now.getTime() - d.getTime();
     const diffMin = diffMs / (1000 * 60);
 
-    return diffMin >= 20;
+    return diffMin >= 30;
   }
 
   parseDateTime(value: string): Date | null {
