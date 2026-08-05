@@ -250,7 +250,8 @@
                 *ngIf="getTargetRatio(card) !== null"
               >
                 <span>
-                  Target {{ formatValue(card.target || 0, card.decimals) }}
+                  {{ getTargetLabel(card) }}
+                  {{ formatValue(card.target || 0, card.decimals) }}
                 </span>
               </div>
 
@@ -403,9 +404,7 @@
             <span class="footer-value">
               {{
                 formatValue(
-                  getTotal(
-                    card.days[card.days.length - 1]
-                  ),
+                  getLatestTotalForDisplay(card),
                   card.decimals
                 )
               }}
@@ -417,41 +416,55 @@
           </div>
 
           <div class="target-control">
-            <label>Target</label>
+            <label>
+              {{ getTargetLabel(card) }}
+            </label>
           
-            <div class="target-edit-row">
-              <input
-                type="number"
-                min="0"
-                class="target-input"
-                [ngModel]="getTargetInputValue(card)"
-                (ngModelChange)="onTargetDraftChange(card, $event)"
-                placeholder="-"
-              />
+            <ng-container *ngIf="!isMovementAutoTargetCard(card.id); else autoTargetText">
+              <div class="target-edit-row">
+                <input
+                  type="number"
+                  min="0"
+                  class="target-input"
+                  [ngModel]="getTargetInputValue(card)"
+                  (ngModelChange)="onTargetDraftChange(card, $event)"
+                  placeholder="-"
+                />
           
-              <div
-                class="target-action-buttons"
-                *ngIf="hasTargetDraft(card)"
-              >
-                <button
-                  type="button"
-                  class="target-action-btn target-action-confirm"
-                  title="Confirm"
-                  (click)="confirmTargetChange(card)"
+                <div
+                  class="target-action-buttons"
+                  *ngIf="hasTargetDraft(card)"
                 >
-                  <i class="fas fa-check"></i>
-                </button>
+                  <button
+                    type="button"
+                    class="target-action-btn target-action-confirm"
+                    title="Confirm"
+                    (click)="confirmTargetChange(card)"
+                  >
+                    <i class="fas fa-check"></i>
+                  </button>
           
-                <button
-                  type="button"
-                  class="target-action-btn target-action-cancel"
-                  title="Cancel"
-                  (click)="cancelTargetChange(card)"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
+                  <button
+                    type="button"
+                    class="target-action-btn target-action-cancel"
+                    title="Cancel"
+                    (click)="cancelTargetChange(card)"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
               </div>
-            </div>
+            </ng-container>
+          
+            <ng-template #autoTargetText>
+              <div class="auto-target-value">
+                {{
+                  card.target === null || card.target === undefined
+                    ? '-'
+                    : formatValue(card.target, card.decimals)
+                }}
+              </div>
+            </ng-template>
           </div>
 
           <div class="footer-status">

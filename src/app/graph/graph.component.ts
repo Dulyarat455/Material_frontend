@@ -232,6 +232,10 @@ export class GraphComponent {
   }
 
   onTargetChange(card: GraphCard, value: number | string | null) {
+
+    if (this.isMovementAutoTargetCard(card.id)) {
+      return;
+    }
     const targetValue = Number(value);
   
     const nextTarget =
@@ -720,7 +724,7 @@ export class GraphComponent {
       title: 'Pallet Movement',
       subtitle: 'Stock In',
       decimals: 0,
-      target: this.targetMap.palletMovementStockIn,
+      target: this.getAverageTargetFromVisibleDays(days),
       maxValue: 150,
       chartType: 'movement',
       days
@@ -771,7 +775,7 @@ export class GraphComponent {
       title: 'Pallet Movement',
       subtitle: 'Issue - Return',
       decimals: 0,
-      target: this.targetMap.palletMovementIssueReturn,
+      target: this.getAverageTargetFromVisibleDays(days),
       maxValue: 80,
       chartType: 'movement',
       days
@@ -811,7 +815,7 @@ export class GraphComponent {
       title: 'Pallet Movement',
       subtitle: 'Move Area',
       decimals: 0,
-      target: this.targetMap.palletMovementMoveArea,
+      target: this.getAverageTargetFromVisibleDays(days),
       maxValue: 110,
       chartType: 'movement',
       days
@@ -848,6 +852,82 @@ export class GraphComponent {
       return sum + Number(item.value || 0);
     }, 0);
   }
+
+
+
+
+
+ isMovementAutoTargetCard(cardId: GraphCardId): boolean {
+    return (
+      cardId === 'palletMovementStockIn' ||
+      cardId === 'palletMovementIssueReturn' ||
+      cardId === 'palletMovementMoveArea'
+    );
+  }
+  
+  private isTodayDisplayDate(displayDate: string): boolean {
+    const todayKey = this.toInputDate(new Date());
+    return displayDate === this.toDisplayDate(todayKey);
+  }
+  
+  private getAverageTargetFromVisibleDays(days: GraphDay[]): number | null {
+    const validTotals = days
+      .filter(day => !this.isTodayDisplayDate(day.date))
+      .map(day => this.getTotal(day))
+      .filter(total => total > 0);
+  
+    if (!validTotals.length) {
+      return null;
+    }
+  
+    const total = validTotals.reduce((sum, value) => {
+      return sum + Number(value || 0);
+    }, 0);
+  
+    return total / validTotals.length;
+  }
+
+
+
+  getTargetLabel(card: GraphCard): string {
+    return this.isMovementAutoTargetCard(card.id)
+      ? 'Average'
+      : 'Target';
+  }
+  
+  getLatestTotalForDisplay(card: GraphCard): number {
+    if (!card?.days?.length) {
+      return 0;
+    }
+  
+    // กราฟ 1-6 ใช้ logic เดิม คือเอาวันล่าสุดในช่วงวันที่
+    if (!this.isMovementAutoTargetCard(card.id)) {
+      return this.getTotal(card.days[card.days.length - 1]);
+    }
+  
+    // กราฟ 7-9 ไม่เอาวันปัจจุบัน
+    // และต้องหา day ล่าสุดที่ Total > 0
+    for (let i = card.days.length - 1; i >= 0; i--) {
+      const day = card.days[i];
+  
+      if (this.isTodayDisplayDate(day.date)) {
+        continue;
+      }
+  
+      const total = this.getTotal(day);
+  
+      if (total > 0) {
+        return total;
+      }
+    }
+  
+    return 0;
+  }
+
+
+
+
+
 
   getSegmentHeight(
     value: number,
@@ -1046,6 +1126,11 @@ export class GraphComponent {
     const graphIds = Object.keys(this.graphNoMap) as GraphCardId[];
   
     for (const graphId of graphIds) {
+      if (this.isMovementAutoTargetCard(graphId)) {
+        this.targetMap[graphId] = null;
+        continue;
+      }
+
       const graphNo = this.graphNoMap[graphId];
   
       this.targetMap[graphId] = targetByGraphNo.has(graphNo)

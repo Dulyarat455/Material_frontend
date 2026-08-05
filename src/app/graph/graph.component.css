@@ -1395,3 +1395,27 @@ UPDATE GRAPH LOADING STATE
   font-weight: 700;
   line-height: 1.35;
 }
+
+
+
+
+.auto-target-value {
+  width: 92px;
+  min-height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  padding: 4px 8px;
+
+  border: 1px dashed #bfdbfe;
+  border-radius: 8px;
+
+  color: #1d4ed8;
+  background: #eff6ff;
+
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
+}
