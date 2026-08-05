@@ -324,10 +324,7 @@ export class GraphComponent {
   }
 
   private toMillionBaht(value: number): number {
-    return this.roundExcel(
-      Number(value || 0) / 1_000_000,
-      1
-    );
+    return Number(value || 0) / 1_000_000;
   }
 
   private toTon(value: number): number {
@@ -480,7 +477,7 @@ export class GraphComponent {
       title: 'Stock Amount by Item',
       subtitle: 'Control - Not Control',
       unit: 'Mbaht',
-      decimals: 1,
+      decimals: 2,
       target: this.targetMap.stockAmountByItem,
       maxValue: 10,
       chartType: 'amount',
@@ -570,7 +567,7 @@ export class GraphComponent {
       title: 'Stock Amount by Group',
       subtitle: 'General - Lamination',
       unit: 'Mbaht',
-      decimals: 1,
+      decimals: 2,
       target: this.targetMap.stockAmountByGroup,
       maxValue: 10,
       chartType: 'amount',

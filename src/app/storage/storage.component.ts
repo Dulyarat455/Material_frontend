@@ -1688,6 +1688,112 @@ searchStockOutItem() {
   }
 
 
+  async onClickStockOutCheckbox(row: StockOutRow, ev: Event) {
+    ev.preventDefault();
+  
+    if (!row) return;
+  
+    if (this.isStockOutRowDisabled(row)) {
+      return;
+    }
+  
+    const willCheck = !row.checked;
+  
+    // ถ้ากดเอาติ๊กออก ไม่ต้องเตือน
+    if (!willCheck) {
+      this.stockOutRows = this.stockOutRows.map(r => ({
+        ...r,
+        checked: false
+      }));
+      return;
+    }
+  
+    // ถ้าเลือกแถวที่ไม่ใช่ FIFO ให้เตือนก่อน
+    if (!this.isOldestStockOutRow(row)) {
+      const result = await Swal.fire({
+        icon: 'warning',
+        title: '<span style="color:#dc2626; font-weight:900;">Not FIFO Item</span>',
+        html: `
+          <div style="text-align:left; line-height:1.7;">
+            <div style="
+              margin-bottom:12px;
+              padding:10px 12px;
+              border-radius:10px;
+              background:#fef2f2;
+              border:1px solid #fecaca;
+              color:#dc2626;
+              font-size:15px;
+              font-weight:900;
+            ">
+              You are selecting an item that is not FIFO.
+            </div>
+      
+            <div style="color:#0f172a;">
+              <div><b>Area:</b> ${row.area || '-'}</div>
+              <div><b>Received Date:</b> ${row.receivedDate || '-'}</div>
+              <div><b>Job No:</b> ${row.jobNo || '-'}</div>
+              <div><b>Invoice:</b> ${row.invoice || '-'}</div>
+            </div>
+      
+            <div style="
+              margin-top:14px;
+              padding:11px 12px;
+              border-radius:10px;
+              background:#fee2e2;
+              border:1px solid #fca5a5;
+              color:#b91c1c;
+              font-size:14px;
+              font-weight:900;
+              text-align:center;
+            ">
+              Are you sure you want to continue?
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Yes, continue',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+      
+        didOpen: () => {
+          const icon = document.querySelector('.swal2-icon.swal2-warning') as HTMLElement | null;
+          const iconContent = document.querySelector('.swal2-icon-content') as HTMLElement | null;
+          const confirmButton = document.querySelector('.swal2-confirm') as HTMLElement | null;
+      
+          if (icon) {
+            icon.style.borderColor = '#dc2626';
+            icon.style.color = '#dc2626';
+          }
+      
+          if (iconContent) {
+            iconContent.style.color = '#dc2626';
+          }
+      
+          if (confirmButton) {
+            confirmButton.style.background = '#dc2626';
+            confirmButton.style.border = 'none';
+            confirmButton.style.borderRadius = '10px';
+            confirmButton.style.fontWeight = '900';
+            confirmButton.style.padding = '10px 20px';
+            confirmButton.style.boxShadow = '0 8px 18px rgba(220, 38, 38, 0.28)';
+          }
+        }
+      });
+  
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
+  
+    // เลือกได้ทีละ 1 row เหมือน logic เดิม
+    this.stockOutRows = this.stockOutRows.map(r => ({
+      ...r,
+      checked: r.uid === row.uid
+    }));
+  }
+
+
 
   slotsBy(zone: SlotRow['zone'], row: SlotRow['row']) {
     return this.slots.filter(s => s.zone === zone && s.row === row);

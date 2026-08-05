@@ -1,8 +1,8 @@
 const config = {
  // apiServer: 'http://localhost:3001', //For Test
- // apiServer: 'http://10.121.50.45:3001', //Production PLB085
+  apiServer: 'http://10.121.50.233:3001', //Production PLB085
   //apiServer: 'http://10.121.1.85:3007', //Production PLB085
-  apiServer: 'http://10.121.1.85/materialPressAPI'//Production PLB085
+ // apiServer: 'http://10.121.1.85/materialPressAPI'//Production PLB085
 };
 
 export default config;

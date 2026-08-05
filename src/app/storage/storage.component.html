@@ -1272,7 +1272,7 @@
                             type="checkbox"
                             [checked]="row.checked"
                             [disabled]="isStockOutRowDisabled(row)"
-                            (change)="onSelectSingleStockOut(row, $event)"
+                            (click)="onClickStockOutCheckbox(row, $event)"
                           />
                           </td>
                           <td>{{ row.area }}</td>
