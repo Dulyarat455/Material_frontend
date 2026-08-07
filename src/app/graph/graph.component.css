@@ -1419,3 +1419,63 @@ UPDATE GRAPH LOADING STATE
   font-weight: 900;
   text-align: right;
 }
+
+
+
+
+
+
+
+.toolbar-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+  padding-bottom: 8px;
+}
+
+.toolbar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-title-row i {
+  color: #2563eb;
+}
+
+.export-excel-btn {
+  min-width: 134px;
+
+  justify-content: center;
+
+  color: #ffffff;
+  border-color: #16a34a;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.22);
+}
+
+.export-excel-btn i {
+  color: #ffffff;
+}
+
+.export-excel-btn:hover:not(:disabled) {
+  color: #ffffff;
+  border-color: #15803d;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.28);
+}
+
+.export-excel-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

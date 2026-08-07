@@ -82,6 +82,7 @@ export class GraphComponent {
 
   isLoading = false;
   isUpdatingGraph = false;
+  isExportingExcel = false;
   isError = false;
 
   startDate = '';
@@ -1160,6 +1161,48 @@ export class GraphComponent {
       next: () => {},
       error: (err) => {
         console.error('updateTargetGraph error:', err);
+      }
+    });
+  }
+
+
+
+
+  exportExcel() {
+    if (this.isExportingExcel || this.isLoading || this.isUpdatingGraph) {
+      return;
+    }
+  
+    this.isExportingExcel = true;
+  
+    const payload = {
+      startDate: this.startDate,
+      endDate: this.endDate,
+      notControlFilter: this.notControlFilter
+    };
+  
+    this.http.post(
+      `${config.apiServer}/api/graph/exportExcel`,
+      payload,
+      {
+        responseType: 'blob'
+      }
+    ).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+  
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `graph_export_${this.startDate}_to_${this.endDate}.xlsx`;
+        a.click();
+  
+        window.URL.revokeObjectURL(url);
+  
+        this.isExportingExcel = false;
+      },
+      error: (err) => {
+        console.error('exportExcel error:', err);
+        this.isExportingExcel = false;
       }
     });
   }
