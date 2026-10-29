@@ -559,7 +559,7 @@ CHART COLUMNS
 
 .chart-columns {
   position: relative;
-  z-index: 2;
+  z-index: auto;
 
   width: 100%;
   height: 100%;
@@ -1118,7 +1118,7 @@ BAR TOOLTIP
   box-shadow:
     0 12px 28px rgba(15, 23, 42, 0.16);
 
-  z-index: 50;
+  z-index: 9999;
 
   pointer-events: none;
 }
@@ -1478,4 +1478,21 @@ UPDATE GRAPH LOADING STATE
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+
+.chart-column-hover {
+  position: relative;
+  z-index: 999;
+}
+
+
+
+/* =========================
+   GRAPH 1 CONTROL VALUE WHITE
+========================= */
+
+.stock-amount-control-segment .bar-segment-value {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.35);
 }

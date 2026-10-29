@@ -88,7 +88,7 @@ export class ReturnComponent implements AfterViewInit {
 
   areas: AreaRow[] = [];
   machinesView: string[] = [];
-  lines = ['A', 'B', 'C', 'D', 'M'];
+  lines = ['A', 'B', 'C', 'D', 'M', 'Oil_Area'];
 
   requestsAll: ReturnRequestRow[] = [];
   requestsView: ReturnRequestRow[] = [];

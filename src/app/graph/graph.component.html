@@ -369,24 +369,28 @@
 
                     <div class="bar-track">
                       <div
-                        class="bar-segment"
-                        *ngFor="
-                          let item of day.values;
-                          trackBy: trackByValue
-                        "
-                        [class.dark-segment]="
-                          item.color === '#082f49' ||
-                          item.color === '#0f172a' ||
-                          item.color === '#000000'
-                        "
-                        [style.height.%]="
-                          getSegmentHeight(
-                            item.value,
-                            card.maxValue
-                          )
-                        "
-                        [style.background-color]="item.color"
-                      >
+                          class="bar-segment"
+                          *ngFor="
+                            let item of day.values;
+                            trackBy: trackByValue
+                          "
+                          [class.dark-segment]="
+                            item.color === '#082f49' ||
+                            item.color === '#0f172a' ||
+                            item.color === '#000000'
+                          "
+                          [class.stock-amount-control-segment]="
+                            card.id === 'stockAmountByItem' &&
+                            item.label === 'Control'
+                          "
+                          [style.height.%]="
+                            getSegmentHeight(
+                              item.value,
+                              card.maxValue
+                            )
+                          "
+                          [style.background-color]="item.color"
+                        >
                         <span
                         class="bar-segment-value"
                         *ngIf="item.value > 0 && !isLongDateRange(card)"

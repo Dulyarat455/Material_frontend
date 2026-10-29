@@ -85,7 +85,7 @@ export class IssueComponent implements AfterViewInit {
 
   areas: AreaRow[] = [];
   machinesView: string[] = [];
-  lines = ['A', 'B', 'C', 'D', 'M'];
+  lines = ['A', 'B', 'C', 'D', 'M', 'Oil_Area'];
 
   requestsAll: IssueRequestRow[] = [];
   requestsView: IssueRequestRow[] = [];

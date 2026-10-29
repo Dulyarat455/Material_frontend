@@ -1190,10 +1190,20 @@ export class GraphComponent {
     ).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
+        const now = new Date();
+        const fileTime = [
+          now.getFullYear(),
+          String(now.getMonth() + 1).padStart(2, '0'),
+          String(now.getDate()).padStart(2, '0')
+        ].join('') + '_' + [
+          String(now.getHours()).padStart(2, '0'),
+          String(now.getMinutes()).padStart(2, '0'),
+          String(now.getSeconds()).padStart(2, '0')
+        ].join('');
   
         const a = document.createElement('a');
         a.href = url;
-        a.download = `graph_export_${this.startDate}_to_${this.endDate}.xlsx`;
+        a.download = `graph_export_${this.startDate}_to_${this.endDate}_timeStmp_${fileTime}.xlsx`;
         a.click();
   
         window.URL.revokeObjectURL(url);
